@@ -35,6 +35,14 @@ import Ascot from "./pages/racing/Ascot";
 import Cheltenham from "./pages/racing/Cheltenham";
 import Kempton from "./pages/racing/Kempton";
 
+// Basketball Leagues
+import NBA from "./pages/basketball/NBA";
+import EuroLeague from "./pages/basketball/EuroLeague";
+
+// Tennis Tournaments
+import FrenchOpen from "./pages/tennis/FrenchOpen";
+import Wimbledon from "./pages/tennis/Wimbledon";
+
 // Casino
 import Slots from "./pages/casino/Slots";
 import Roulette from "./pages/casino/Roulette";
@@ -100,6 +108,14 @@ const App = () => (
           <Route path="/football/la-liga" element={<LaLiga />} />
           <Route path="/football/serie-a" element={<SerieA />} />
           <Route path="/football/bundesliga" element={<Bundesliga />} />
+          
+          {/* Basketball Leagues */}
+          <Route path="/basketball/nba" element={<NBA />} />
+          <Route path="/basketball/euroleague" element={<EuroLeague />} />
+          
+          {/* Tennis Tournaments */}
+          <Route path="/tennis/french-open" element={<FrenchOpen />} />
+          <Route path="/tennis/wimbledon" element={<Wimbledon />} />
           
           {/* Racing */}
           <Route path="/racing/ascot" element={<Ascot />} />
