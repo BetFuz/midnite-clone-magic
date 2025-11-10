@@ -73,7 +73,7 @@ const PremierLeague = () => {
       <Header />
       <div className="flex">
         <Sidebar />
-        <main className="flex-1 p-6 overflow-y-auto h-[calc(100vh-4rem)]">
+        <main className="flex-1 p-6 overflow-y-auto h-[calc(100vh-4rem)] pb-24">
           <h1 className="text-3xl font-bold text-foreground mb-2">Premier League</h1>
           <p className="text-muted-foreground mb-6">England's top football division</p>
           <Card className="p-4 bg-gradient-card border-border mb-6">

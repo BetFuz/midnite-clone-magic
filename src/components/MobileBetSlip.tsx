@@ -15,7 +15,7 @@ const MobileBetSlip = () => {
       <SheetTrigger asChild>
         <Button 
           size="icon" 
-          className="md:hidden fixed bottom-4 sm:bottom-6 right-4 h-14 w-14 rounded-full shadow-lg bg-primary z-50"
+          className="md:hidden fixed bottom-4 sm:bottom-6 left-4 h-14 w-14 rounded-full shadow-lg bg-primary z-50"
           aria-label="Open bet slip"
         >
           <ShoppingCart className="h-6 w-6" />
