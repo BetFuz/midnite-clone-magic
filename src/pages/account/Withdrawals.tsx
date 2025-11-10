@@ -7,10 +7,21 @@ import { Label } from "@/components/ui/label";
 import { formatCurrency } from "@/lib/currency";
 import { toast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const Withdrawals = () => {
   const [amount, setAmount] = useState("");
+  const [method, setMethod] = useState("bank_transfer");
   const balance = 127190; // Example balance in Naira
+  
+  // Mock withdrawal history
+  const recentWithdrawals = [
+    { id: "WTH001", method: "Bank Transfer", amount: 50000, status: "completed", date: "2025-01-08 10:20" },
+    { id: "WTH002", method: "Mobile Money", amount: 25000, status: "processing", date: "2025-01-09 16:15" },
+    { id: "WTH003", method: "PayPal", amount: 75000, status: "pending", date: "2025-01-09 18:30" },
+  ];
 
   const handleWithdraw = () => {
     if (!amount || parseFloat(amount) <= 0) {
@@ -54,11 +65,16 @@ const Withdrawals = () => {
               </div>
               <div>
                 <Label htmlFor="method">Withdrawal Method</Label>
-                <select id="method" className="w-full p-2 rounded-md bg-secondary border-border text-foreground">
-                  <option>Bank Transfer</option>
-                  <option>PayPal</option>
-                  <option>Debit Card</option>
-                </select>
+                <Select value={method} onValueChange={setMethod}>
+                  <SelectTrigger className="w-full bg-secondary">
+                    <SelectValue placeholder="Select method" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="bank_transfer">Bank Transfer (1-3 days)</SelectItem>
+                    <SelectItem value="mobile_money">Mobile Money (Instant)</SelectItem>
+                    <SelectItem value="paypal">PayPal (1-2 days)</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <Button 
                 className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
@@ -69,6 +85,41 @@ const Withdrawals = () => {
               <p className="text-xs text-muted-foreground">Withdrawals are typically processed within 1-3 business days</p>
             </div>
           </Card>
+
+          {/* Recent Withdrawals */}
+          <div className="mt-8 max-w-2xl">
+            <h2 className="text-2xl font-bold text-foreground mb-4">Recent Withdrawals</h2>
+            <Card className="p-6 bg-card border-border">
+              <div className="space-y-4">
+                {recentWithdrawals.map((txn) => (
+                  <div key={txn.id}>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-semibold text-foreground">{txn.method}</p>
+                        <p className="text-sm text-muted-foreground">{txn.date}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-foreground">-{formatCurrency(txn.amount)}</p>
+                        <Badge 
+                          variant={
+                            txn.status === "completed" ? "default" : 
+                            txn.status === "processing" ? "secondary" : 
+                            "outline"
+                          } 
+                          className="text-xs"
+                        >
+                          {txn.status}
+                        </Badge>
+                      </div>
+                    </div>
+                    {txn.id !== recentWithdrawals[recentWithdrawals.length - 1].id && (
+                      <Separator className="mt-4" />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
         </main>
       </div>
     </div>
