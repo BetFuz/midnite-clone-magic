@@ -1,7 +1,7 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { BetSlipProvider } from "@/contexts/BetSlipContext";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
@@ -139,6 +139,11 @@ const App = () => (
           <Route path="/football/african-cup-of-nations" element={<AFCON />} />
           <Route path="/football/egyptian-premier-league" element={<EgyptianPremierLeague />} />
           <Route path="/football/south-african-premier-league" element={<SouthAfricanPremierLeague />} />
+          {/* Uppercase path aliases -> redirect to canonical lowercase routes */}
+          <Route path="/Football/premier-league" element={<Navigate to="/football/premier-league" replace />} />
+          <Route path="/Football/champions-league" element={<Navigate to="/football/champions-league" replace />} />
+          <Route path="/Sports/American-football" element={<Navigate to="/sports/american-football" replace />} />
+          <Route path="/Sports/basketball" element={<Navigate to="/sports/basketball" replace />} />
           
           {/* Basketball Leagues */}
           <Route path="/basketball/nba" element={<NBA />} />
