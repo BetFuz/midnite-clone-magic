@@ -8,7 +8,7 @@ import { Clock, Trophy } from "lucide-react";
 import { formatCurrency } from "@/lib/currency";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 
 const BetTickets = () => {
@@ -192,6 +192,10 @@ const BetTickets = () => {
       {/* Win Celebration Modal */}
       <Dialog open={showWinModal} onOpenChange={setShowWinModal}>
         <DialogContent className="max-w-md p-0 overflow-hidden bg-gradient-to-b from-background via-primary/5 to-primary/10">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Congratulations on Your Win!</DialogTitle>
+            <DialogDescription>You've won more than most users</DialogDescription>
+          </DialogHeader>
           <div className="relative p-8 text-center">
             <div className="mb-4">
               <p className="text-sm text-muted-foreground mb-2">
