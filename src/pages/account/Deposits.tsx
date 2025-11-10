@@ -5,14 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { CreditCard, Smartphone, Building2, Wallet, Clock, CheckCircle2 } from "lucide-react";
+import { CreditCard, Smartphone, Building2, Wallet, Clock, CheckCircle2, ArrowRight, History } from "lucide-react";
 import { formatCurrency } from "@/lib/currency";
 import { toast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { useNavigate } from "react-router-dom";
 
 const Deposits = () => {
+  const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState<string>("");
   const [amount, setAmount] = useState("");
@@ -66,13 +68,36 @@ const Deposits = () => {
       <div className="flex">
         <Sidebar />
         <main className="flex-1 p-6 overflow-y-auto h-[calc(100vh-4rem)]">
-          <h1 className="text-3xl font-bold text-foreground mb-6">Deposit Funds</h1>
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-3xl font-bold text-foreground">Deposit Funds</h1>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                className="gap-2"
+                onClick={() => navigate("/account/transactions")}
+              >
+                <History className="h-4 w-4" />
+                History
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => navigate("/account/withdrawals")}
+                className="gap-2"
+              >
+                Withdraw
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
           
           {/* Regional Info Banner */}
-          <Card className="p-4 bg-primary/10 border-primary/20 mb-6 max-w-2xl">
-            <p className="text-sm text-foreground">
-              <strong>Payment methods for Nigeria</strong> - Showing region-specific options
-            </p>
+          <Card className="p-4 bg-gradient-to-r from-primary/10 to-accent/10 border-primary/20 mb-6 max-w-2xl">
+            <div className="flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-success animate-pulse" />
+              <p className="text-sm text-foreground">
+                <strong>Payment methods for Nigeria</strong> - Showing region-specific options
+              </p>
+            </div>
           </Card>
 
           {/* Payment Methods */}

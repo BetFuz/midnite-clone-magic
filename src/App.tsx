@@ -67,6 +67,7 @@ import Blackjack from "./pages/casino/Blackjack";
 import Profile from "./pages/account/Profile";
 import Deposits from "./pages/account/Deposits";
 import Withdrawals from "./pages/account/Withdrawals";
+import Transactions from "./pages/account/Transactions";
 import BettingHistory from "./pages/account/BettingHistory";
 import BetTickets from "./pages/account/BetTickets";
 import BetTicketDetail from "./pages/account/BetTicketDetail";
@@ -163,6 +164,7 @@ const App = () => (
           <Route path="/account/profile" element={<Profile />} />
           <Route path="/account/deposits" element={<Deposits />} />
           <Route path="/account/withdrawals" element={<Withdrawals />} />
+          <Route path="/account/transactions" element={<Transactions />} />
           <Route path="/account/history" element={<BettingHistory />} />
           <Route path="/account/bet-tickets" element={<BetTickets />} />
           <Route path="/bet-ticket/:ticketId" element={<BetTicketDetail />} />

@@ -10,11 +10,15 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ArrowLeft, History, AlertCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Withdrawals = () => {
+  const navigate = useNavigate();
   const [amount, setAmount] = useState("");
   const [method, setMethod] = useState("bank_transfer");
   const balance = 127190; // Example balance in Naira
+  const minWithdrawal = 1000;
   
   // Mock withdrawal history
   const recentWithdrawals = [
@@ -45,7 +49,43 @@ const Withdrawals = () => {
       <div className="flex">
         <Sidebar />
         <main className="flex-1 p-6 overflow-y-auto h-[calc(100vh-4rem)]">
-          <h1 className="text-3xl font-bold text-foreground mb-6">Withdraw Funds</h1>
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-3xl font-bold text-foreground">Withdraw Funds</h1>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline"
+                onClick={() => navigate("/account/deposits")}
+                className="gap-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Deposit
+              </Button>
+              <Button 
+                variant="outline" 
+                className="gap-2"
+                onClick={() => navigate("/account/transactions")}
+              >
+                <History className="h-4 w-4" />
+                History
+              </Button>
+            </div>
+          </div>
+
+          {/* Withdrawal Info */}
+          <Card className="p-4 bg-muted/50 border-border mb-6 max-w-2xl">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-muted-foreground mt-0.5" />
+              <div className="text-sm text-muted-foreground">
+                <p className="font-semibold text-foreground mb-1">Withdrawal Guidelines</p>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Minimum withdrawal: {formatCurrency(minWithdrawal)}</li>
+                  <li>Processing time: 1-3 business days</li>
+                  <li>Ensure your account details are up to date</li>
+                </ul>
+              </div>
+            </div>
+          </Card>
+
           <Card className="p-6 bg-card border-border max-w-2xl">
             <div className="space-y-4">
               <div className="p-4 bg-secondary rounded-lg">
