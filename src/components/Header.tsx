@@ -1,8 +1,20 @@
 import { Search, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Link, useLocation } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
 const Header = () => {
+  const location = useLocation();
+
+  const navItems = [
+    { label: "⚽ Sports", path: "/" },
+    { label: "🏇 Racing", path: "/racing" },
+    { label: "🎮 Games", path: "/games" },
+    { label: "🎰 Live Casino", path: "/live-casino" },
+    { label: "🎲 Virtuals", path: "/virtuals" },
+  ];
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-16 items-center px-6">
@@ -12,21 +24,19 @@ const Header = () => {
           </div>
           
           <nav className="hidden md:flex items-center gap-1">
-            <Button variant="ghost" className="text-foreground hover:text-primary">
-              ⚽ Sports
-            </Button>
-            <Button variant="ghost" className="text-foreground hover:text-primary">
-              🏇 Racing
-            </Button>
-            <Button variant="ghost" className="text-foreground hover:text-primary">
-              🎮 Games
-            </Button>
-            <Button variant="ghost" className="text-foreground hover:text-primary">
-              🎰 Live Casino
-            </Button>
-            <Button variant="ghost" className="text-foreground hover:text-primary">
-              🎲 Virtuals
-            </Button>
+            {navItems.map((item) => (
+              <Button
+                key={item.path}
+                variant="ghost"
+                className={cn(
+                  "text-foreground hover:text-primary",
+                  location.pathname === item.path && "text-primary bg-primary/10"
+                )}
+                asChild
+              >
+                <Link to={item.path}>{item.label}</Link>
+              </Button>
+            ))}
           </nav>
         </div>
 

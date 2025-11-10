@@ -1,0 +1,137 @@
+import Header from "@/components/Header";
+import Sidebar from "@/components/Sidebar";
+import BetSlip from "@/components/BetSlip";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Users, Play } from "lucide-react";
+
+const LiveCasino = () => {
+  const categories = ["All Tables", "Roulette", "Blackjack", "Baccarat", "Game Shows", "Poker"];
+  
+  const liveTables = [
+    { name: "Lightning Roulette", dealer: "Sarah", players: 847, provider: "Evolution", stakes: "£0.20 - £5,000", category: "Roulette" },
+    { name: "Blackjack VIP", dealer: "Michael", players: 234, provider: "Evolution", stakes: "£25 - £10,000", category: "Blackjack" },
+    { name: "Crazy Time", dealer: "Anna", players: 1432, provider: "Evolution", stakes: "£0.10 - £1,000", category: "Game Shows" },
+    { name: "Baccarat Squeeze", dealer: "Chen", players: 567, provider: "Evolution", stakes: "£1 - £5,000", category: "Baccarat" },
+    { name: "Mega Ball", dealer: "Emma", players: 923, provider: "Evolution", stakes: "£0.10 - £100", category: "Game Shows" },
+    { name: "Speed Roulette", dealer: "David", players: 689, provider: "Evolution", stakes: "£0.50 - £2,500", category: "Roulette" },
+    { name: "Infinite Blackjack", dealer: "Lisa", players: 1156, provider: "Evolution", stakes: "£1 - £5,000", category: "Blackjack" },
+    { name: "Dragon Tiger", dealer: "Wei", players: 445, provider: "Evolution", stakes: "£1 - £2,500", category: "Baccarat" },
+  ];
+
+  const featuredTables = liveTables.slice(0, 4);
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Header />
+      <div className="flex">
+        <Sidebar />
+        
+        <main className="flex-1 p-6 overflow-y-auto h-[calc(100vh-4rem)]">
+          <div className="mb-6">
+            <div className="flex items-center gap-3 mb-2">
+              <h1 className="text-3xl font-bold text-foreground">Live Casino</h1>
+              <Badge className="bg-destructive/20 text-destructive border-destructive/30">
+                <span className="w-2 h-2 bg-destructive rounded-full mr-2 animate-pulse"></span>
+                LIVE
+              </Badge>
+            </div>
+            <p className="text-muted-foreground">Real dealers, real-time gaming</p>
+          </div>
+
+          <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+            {categories.map((category) => (
+              <Button
+                key={category}
+                variant="secondary"
+                size="sm"
+                className="whitespace-nowrap"
+              >
+                {category}
+              </Button>
+            ))}
+          </div>
+
+          <section className="mb-8">
+            <h2 className="text-xl font-bold text-foreground mb-4">Featured Tables</h2>
+            <div className="grid grid-cols-2 gap-4">
+              {featuredTables.map((table, index) => (
+                <Card key={index} className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all">
+                  <div className="aspect-video bg-gradient-card relative">
+                    <div className="absolute top-3 left-3 flex gap-2">
+                      <Badge className="bg-destructive/90 text-white">
+                        <span className="w-1.5 h-1.5 bg-white rounded-full mr-1.5 animate-pulse"></span>
+                        LIVE
+                      </Badge>
+                      <Badge variant="secondary" className="bg-black/50 text-white border-white/20">
+                        <Users className="h-3 w-3 mr-1" />
+                        {table.players}
+                      </Badge>
+                    </div>
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button size="lg" className="rounded-full w-16 h-16 p-0 bg-primary text-primary-foreground hover:bg-primary/90">
+                        <Play className="h-6 w-6" fill="currentColor" />
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-bold text-foreground mb-1">{table.name}</h3>
+                    <div className="flex items-center justify-between text-sm mb-2">
+                      <span className="text-muted-foreground">Dealer: {table.dealer}</span>
+                      <span className="text-muted-foreground">{table.provider}</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Stakes: {table.stakes}
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </section>
+
+          <section>
+            <h2 className="text-xl font-bold text-foreground mb-4">All Live Tables</h2>
+            <div className="grid grid-cols-2 gap-4">
+              {liveTables.map((table, index) => (
+                <Card key={index} className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all cursor-pointer">
+                  <div className="aspect-video bg-gradient-card relative">
+                    <div className="absolute top-3 left-3 flex gap-2">
+                      <Badge className="bg-destructive/90 text-white">
+                        <span className="w-1.5 h-1.5 bg-white rounded-full mr-1.5 animate-pulse"></span>
+                        LIVE
+                      </Badge>
+                      <Badge variant="secondary" className="bg-black/50 text-white border-white/20">
+                        <Users className="h-3 w-3 mr-1" />
+                        {table.players}
+                      </Badge>
+                    </div>
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button size="lg" className="rounded-full w-16 h-16 p-0 bg-primary text-primary-foreground hover:bg-primary/90">
+                        <Play className="h-6 w-6" fill="currentColor" />
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-bold text-foreground mb-1">{table.name}</h3>
+                    <div className="flex items-center justify-between text-sm mb-2">
+                      <span className="text-muted-foreground">Dealer: {table.dealer}</span>
+                      <span className="text-muted-foreground">{table.provider}</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Stakes: {table.stakes}
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </section>
+        </main>
+
+        <BetSlip />
+      </div>
+    </div>
+  );
+};
+
+export default LiveCasino;
