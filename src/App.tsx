@@ -67,6 +67,8 @@ import Profile from "./pages/account/Profile";
 import Deposits from "./pages/account/Deposits";
 import Withdrawals from "./pages/account/Withdrawals";
 import BettingHistory from "./pages/account/BettingHistory";
+import BetTickets from "./pages/account/BetTickets";
+import BetTicketDetail from "./pages/account/BetTicketDetail";
 import AccountSettings from "./pages/account/AccountSettings";
 
 // Promotions
@@ -160,6 +162,8 @@ const App = () => (
           <Route path="/account/deposits" element={<Deposits />} />
           <Route path="/account/withdrawals" element={<Withdrawals />} />
           <Route path="/account/history" element={<BettingHistory />} />
+          <Route path="/account/bet-tickets" element={<BetTickets />} />
+          <Route path="/bet-ticket/:ticketId" element={<BetTicketDetail />} />
           <Route path="/account/settings" element={<AccountSettings />} />
           
           {/* Promotions */}
