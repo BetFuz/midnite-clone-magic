@@ -1,11 +1,10 @@
 import { Search, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import MobileNav from "./MobileNav";
 import ThemeToggle from "./ThemeToggle";
-import { toast } from "@/hooks/use-toast";
 
 const Header = () => {
   const location = useLocation();
@@ -18,18 +17,14 @@ const Header = () => {
     { label: "🎲 Virtuals", path: "/virtuals" },
   ];
 
+  const navigate = useNavigate();
+
   const handleLogin = () => {
-    toast({
-      title: "Login",
-      description: "Login feature coming soon!",
-    });
+    navigate("/auth");
   };
 
   const handleJoin = () => {
-    toast({
-      title: "Join Betfuz",
-      description: "Registration feature coming soon!",
-    });
+    navigate("/auth");
   };
 
   return (

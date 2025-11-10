@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
+import Auth from "./pages/Auth";
 import Racing from "./pages/Racing";
 import Games from "./pages/Games";
 import LiveCasino from "./pages/LiveCasino";
@@ -74,6 +75,7 @@ const App = () => (
     <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
           <Route path="/racing" element={<Racing />} />
           <Route path="/games" element={<Games />} />
           <Route path="/live-casino" element={<LiveCasino />} />
