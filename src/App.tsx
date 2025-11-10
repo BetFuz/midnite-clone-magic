@@ -74,6 +74,7 @@ import BetTicketDetail from "./pages/account/BetTicketDetail";
 import AccountSettings from "./pages/account/AccountSettings";
 
 // Promotions
+import Promotions from "./pages/promotions/Promotions";
 import Welcome from "./pages/promotions/Welcome";
 import AccaBoost from "./pages/promotions/AccaBoost";
 
@@ -171,6 +172,7 @@ const App = () => (
           <Route path="/account/settings" element={<AccountSettings />} />
           
           {/* Promotions */}
+          <Route path="/promotions" element={<Promotions />} />
           <Route path="/promotions/welcome" element={<Welcome />} />
           <Route path="/promotions/acca-boost" element={<AccaBoost />} />
           
