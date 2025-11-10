@@ -50,7 +50,7 @@ const Football = () => {
             ))}
           </div>
         </main>
-        <BetSlip />
+        <BetSlip className="hidden md:flex" />
       </div>
     </div>
   );

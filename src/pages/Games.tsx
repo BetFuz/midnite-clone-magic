@@ -149,7 +149,7 @@ const Games = () => {
           </section>
         </main>
 
-        <BetSlip />
+        <BetSlip className="hidden md:flex" />
       </div>
     </div>
   );

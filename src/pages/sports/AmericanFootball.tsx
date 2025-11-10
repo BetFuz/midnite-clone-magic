@@ -21,7 +21,7 @@ const AmericanFootball = () => {
             {games.map((game, i) => <MatchCard key={i} {...game} />)}
           </div>
         </main>
-        <BetSlip />
+        <BetSlip className="hidden md:flex" />
       </div>
     </div>
   );

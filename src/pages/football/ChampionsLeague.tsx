@@ -23,7 +23,7 @@ const ChampionsLeague = () => {
             {matches.map((match, i) => <MatchCard key={i} {...match} />)}
           </div>
         </main>
-        <BetSlip />
+        <BetSlip className="hidden md:flex" />
       </div>
     </div>
   );
