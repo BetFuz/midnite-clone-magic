@@ -113,7 +113,7 @@ const Index = () => {
         <main className="flex-1 p-4 md:p-6 overflow-y-auto h-[calc(100vh-4rem)] pb-24 md:pb-6">
           <HeroBanner />
 
-          <div className="flex gap-2 mb-6 overflow-x-auto pb-2 pr-20">
+          <div className="flex gap-2 mb-6 overflow-x-auto pb-2 pr-24">
             {categories.map((category) => (
               <Button
                 key={category.label}
