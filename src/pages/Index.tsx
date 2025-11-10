@@ -4,7 +4,7 @@ import BetSlip from "@/components/BetSlip";
 import HeroBanner from "@/components/HeroBanner";
 import MatchCard from "@/components/MatchCard";
 import BoostCard from "@/components/BoostCard";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
 const Index = () => {
@@ -115,15 +115,17 @@ const Index = () => {
 
           <div className="flex gap-2 mb-6 overflow-x-auto pb-2 pr-24">
             {categories.map((category) => (
-              <Button
+              <Link
                 key={category.label}
-                variant="secondary"
-                size="sm"
-                className="whitespace-nowrap"
-                asChild
+                to={category.url}
+                className={buttonVariants({ variant: "secondary", size: "sm", className: "whitespace-nowrap" })}
+                role="link"
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
               >
-                <Link to={category.url}>{category.label}</Link>
-              </Button>
+                {category.label}
+              </Link>
             ))}
           </div>
 
