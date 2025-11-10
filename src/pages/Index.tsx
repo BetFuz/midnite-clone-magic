@@ -6,14 +6,36 @@ import MatchCard from "@/components/MatchCard";
 import BoostCard from "@/components/BoostCard";
 import { buttonVariants } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { ChevronRight } from "lucide-react";
+
+// Import league logos
+import premierLeagueLogo from "@/assets/leagues/premier-league.png";
+import championsLeagueLogo from "@/assets/leagues/champions-league.png";
+import laLigaLogo from "@/assets/leagues/la-liga.png";
+import serieALogo from "@/assets/leagues/serie-a.png";
+import bundesligaLogo from "@/assets/leagues/bundesliga.png";
+import nbaLogo from "@/assets/leagues/nba.png";
+import nflLogo from "@/assets/leagues/nfl.png";
+import atpLogo from "@/assets/leagues/atp.png";
 
 const Index = () => {
   const categories = [
-    { label: "Today's Football", url: "/sports/football" },
-    { label: "Premier League", url: "/football/premier-league" },
-    { label: "Champions League", url: "/football/champions-league" },
-    { label: "NFL", url: "/sports/american-football" },
-    { label: "NBA", url: "/sports/basketball" },
+    { label: "⚽ Today's Football", url: "/sports/football", gradient: "from-emerald-500 to-teal-600" },
+    { label: "🏆 Premier League", url: "/football/premier-league", gradient: "from-purple-500 to-pink-600" },
+    { label: "⭐ Champions League", url: "/football/champions-league", gradient: "from-blue-500 to-indigo-600" },
+    { label: "🏈 NFL", url: "/sports/american-football", gradient: "from-orange-500 to-red-600" },
+    { label: "🏀 NBA", url: "/sports/basketball", gradient: "from-amber-500 to-orange-600" },
+  ];
+
+  const leagues = [
+    { name: "Premier League", url: "/football/premier-league", logo: premierLeagueLogo, matches: 10 },
+    { name: "Champions League", url: "/football/champions-league", logo: championsLeagueLogo, matches: 8 },
+    { name: "La Liga", url: "/football/la-liga", logo: laLigaLogo, matches: 10 },
+    { name: "Serie A", url: "/football/serie-a", logo: serieALogo, matches: 10 },
+    { name: "Bundesliga", url: "/football/bundesliga", logo: bundesligaLogo, matches: 9 },
+    { name: "NBA", url: "/basketball/nba", logo: nbaLogo, matches: 12 },
+    { name: "NFL", url: "/sports/american-football", logo: nflLogo, matches: 16 },
+    { name: "ATP Tennis", url: "/tennis/atp-masters-1000", logo: atpLogo, matches: 8 },
   ];
 
   const featuredMatches = [
@@ -113,21 +135,56 @@ const Index = () => {
         <main className="flex-1 p-4 md:p-6 overflow-y-auto h-[calc(100vh-4rem)] pb-24 md:pb-6">
           <HeroBanner />
 
-          <div className="flex gap-2 mb-6 overflow-x-auto pb-2 pr-24">
+          {/* Sophisticated Category Pills */}
+          <div className="flex gap-3 mb-8 overflow-x-auto pb-2 pr-24 scrollbar-hide">
             {categories.map((category) => (
               <Link
                 key={category.label}
                 to={category.url}
-                className={buttonVariants({ variant: "secondary", size: "sm", className: "whitespace-nowrap" })}
+                className="group relative overflow-hidden rounded-xl px-6 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105 whitespace-nowrap"
                 role="link"
                 onClick={(e) => {
                   e.stopPropagation();
                 }}
               >
-                {category.label}
+                <div className={`absolute inset-0 bg-gradient-to-r ${category.gradient} opacity-90 group-hover:opacity-100 transition-opacity`}></div>
+                <span className="relative z-10 flex items-center gap-2">
+                  {category.label}
+                  <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </span>
               </Link>
             ))}
           </div>
+
+          {/* All Leagues Section with Crests */}
+          <section className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold text-foreground">All Leagues</h2>
+              <Link to="/sports/football" className="text-sm text-primary hover:underline flex items-center gap-1">
+                View All <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
+              {leagues.map((league) => (
+                <Link
+                  key={league.name}
+                  to={league.url}
+                  className="group relative overflow-hidden rounded-lg border border-border bg-card p-4 hover:border-primary/50 hover:shadow-lg transition-all duration-300"
+                >
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="w-16 h-16 flex items-center justify-center rounded-lg bg-background/50 p-2 group-hover:scale-110 transition-transform">
+                      <img src={league.logo} alt={league.name} className="w-full h-full object-contain" />
+                    </div>
+                    <div className="text-center w-full">
+                      <h3 className="text-xs font-semibold text-foreground truncate">{league.name}</h3>
+                      <p className="text-xs text-muted-foreground mt-1">{league.matches} matches</p>
+                    </div>
+                  </div>
+                  <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+                </Link>
+              ))}
+            </div>
+          </section>
 
           <section className="mb-8">
             <h2 className="text-xl font-bold text-foreground mb-4">Featured Matches</h2>
