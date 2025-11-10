@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import BetSlip from "@/components/BetSlip";
+import MobileBetSlip from "@/components/MobileBetSlip";
 import HeroBanner from "@/components/HeroBanner";
 import MatchCard from "@/components/MatchCard";
 import BoostCard from "@/components/BoostCard";
@@ -67,9 +68,9 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <div className="flex">
-        <Sidebar />
+        <Sidebar className="hidden md:flex" />
         
-        <main className="flex-1 p-6 overflow-y-auto h-[calc(100vh-4rem)]">
+        <main className="flex-1 p-4 md:p-6 overflow-y-auto h-[calc(100vh-4rem)] pb-24 md:pb-6">
           <HeroBanner />
 
           <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
@@ -109,7 +110,8 @@ const Index = () => {
           </section>
         </main>
 
-        <BetSlip />
+        <BetSlip className="hidden md:flex" />
+        <MobileBetSlip />
       </div>
     </div>
   );
