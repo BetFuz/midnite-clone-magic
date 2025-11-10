@@ -17,6 +17,12 @@ import bundesligaLogo from "@/assets/leagues/bundesliga.png";
 import nbaLogo from "@/assets/leagues/nba.png";
 import nflLogo from "@/assets/leagues/nfl.png";
 import atpLogo from "@/assets/leagues/atp.png";
+import ligue1Logo from "@/assets/leagues/ligue-1.png";
+import eredivisieLogo from "@/assets/leagues/eredivisie.png";
+import mlsLogo from "@/assets/leagues/mls.png";
+import wnbaLogo from "@/assets/leagues/wnba.png";
+import euroleagueLogo from "@/assets/leagues/euroleague.png";
+import iplLogo from "@/assets/leagues/ipl.png";
 
 // Import team logos
 import manUnitedLogo from "@/assets/teams/man-united.png";
@@ -27,6 +33,14 @@ import chelseaLogo from "@/assets/teams/chelsea.png";
 import arsenalLogo from "@/assets/teams/arsenal.png";
 import bayernLogo from "@/assets/teams/bayern.png";
 import psgLogo from "@/assets/teams/psg.png";
+import manCityLogo from "@/assets/teams/man-city.png";
+import tottenhamLogo from "@/assets/teams/tottenham.png";
+import acMilanLogo from "@/assets/teams/ac-milan.png";
+import interMilanLogo from "@/assets/teams/inter-milan.png";
+import juventusLogo from "@/assets/teams/juventus.png";
+import atleticoMadridLogo from "@/assets/teams/atletico-madrid.png";
+import dortmundLogo from "@/assets/teams/dortmund.png";
+import ajaxLogo from "@/assets/teams/ajax.png";
 
 // Import promotional banners
 import championsPromo from "@/assets/promos/champions-league-promo.jpg";
@@ -109,20 +123,34 @@ const Index = () => {
     { name: "La Liga", url: "/football/la-liga", logo: laLigaLogo, matches: 10, country: "Spain" },
     { name: "Serie A", url: "/football/serie-a", logo: serieALogo, matches: 10, country: "Italy" },
     { name: "Bundesliga", url: "/football/bundesliga", logo: bundesligaLogo, matches: 9, country: "Germany" },
+    { name: "Ligue 1", url: "/football/la-liga", logo: ligue1Logo, matches: 10, country: "France" },
+    { name: "Eredivisie", url: "/football/bundesliga", logo: eredivisieLogo, matches: 9, country: "Netherlands" },
+    { name: "MLS", url: "/sports/football", logo: mlsLogo, matches: 12, country: "USA" },
     { name: "NBA", url: "/basketball/nba", logo: nbaLogo, matches: 12, country: "USA" },
+    { name: "WNBA", url: "/basketball/wnba", logo: wnbaLogo, matches: 10, country: "USA" },
+    { name: "EuroLeague", url: "/basketball/euroleague", logo: euroleagueLogo, matches: 8, country: "Europe" },
     { name: "NFL", url: "/sports/american-football", logo: nflLogo, matches: 16, country: "USA" },
     { name: "ATP Masters", url: "/tennis/atp-masters-1000", logo: atpLogo, matches: 8, country: "International" },
+    { name: "IPL", url: "/sports/cricket", logo: iplLogo, matches: 14, country: "India" },
   ];
 
   const teams = [
     { name: "Man United", url: "/football/premier-league", logo: manUnitedLogo },
+    { name: "Man City", url: "/football/premier-league", logo: manCityLogo },
     { name: "Liverpool", url: "/football/premier-league", logo: liverpoolLogo },
-    { name: "Barcelona", url: "/football/la-liga", logo: barcelonaLogo },
-    { name: "Real Madrid", url: "/football/la-liga", logo: realMadridLogo },
     { name: "Chelsea", url: "/football/premier-league", logo: chelseaLogo },
     { name: "Arsenal", url: "/football/premier-league", logo: arsenalLogo },
+    { name: "Tottenham", url: "/football/premier-league", logo: tottenhamLogo },
+    { name: "Real Madrid", url: "/football/la-liga", logo: realMadridLogo },
+    { name: "Barcelona", url: "/football/la-liga", logo: barcelonaLogo },
+    { name: "Atletico Madrid", url: "/football/la-liga", logo: atleticoMadridLogo },
     { name: "Bayern Munich", url: "/football/bundesliga", logo: bayernLogo },
+    { name: "Dortmund", url: "/football/bundesliga", logo: dortmundLogo },
+    { name: "AC Milan", url: "/football/serie-a", logo: acMilanLogo },
+    { name: "Inter Milan", url: "/football/serie-a", logo: interMilanLogo },
+    { name: "Juventus", url: "/football/serie-a", logo: juventusLogo },
     { name: "PSG", url: "/football/la-liga", logo: psgLogo },
+    { name: "Ajax", url: "/football/bundesliga", logo: ajaxLogo },
   ];
 
   const featuredMatches = [
