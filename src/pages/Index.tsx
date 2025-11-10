@@ -39,6 +39,23 @@ import footballBall from "@/assets/sports/football-ball.png";
 import basketballBall from "@/assets/sports/basketball-ball.png";
 import tennisBall from "@/assets/sports/tennis-ball.png";
 import americanFootballBall from "@/assets/sports/american-football-ball.png";
+import cricketBall from "@/assets/sports/cricket-ball.png";
+import rugbyBall from "@/assets/sports/rugby-ball.png";
+import volleyballBall from "@/assets/sports/volleyball-ball.png";
+import hockeyPuck from "@/assets/sports/hockey-puck.png";
+import baseballBall from "@/assets/sports/baseball-ball.png";
+import tabletennisPaddle from "@/assets/sports/tabletennis-paddle.png";
+import handballBall from "@/assets/sports/handball-ball.png";
+import dartsBoard from "@/assets/sports/darts-board.png";
+import snookerBalls from "@/assets/sports/snooker-balls.png";
+import badmintonShuttlecock from "@/assets/sports/badminton-shuttlecock.png";
+import golfBall from "@/assets/sports/golf-ball.png";
+import futsalBall from "@/assets/sports/futsal-ball.png";
+import cyclingWheel from "@/assets/sports/cycling-wheel.png";
+import motorsportsHelmet from "@/assets/sports/motorsports-helmet.png";
+import beachvolleyballBall from "@/assets/sports/beachvolleyball-ball.png";
+import esportsController from "@/assets/sports/esports-controller.png";
+import virtualSports from "@/assets/sports/virtual-sports.png";
 
 const Index = () => {
   const promoCards = [
@@ -48,11 +65,34 @@ const Index = () => {
     { title: "Welcome Bonus", image: welcomePromo, url: "/promotions/welcome" },
   ];
 
-  const sportIcons = [
+  const mainSports = [
     { name: "Football", image: footballBall, url: "/sports/football" },
     { name: "Basketball", image: basketballBall, url: "/sports/basketball" },
     { name: "Tennis", image: tennisBall, url: "/sports/tennis" },
+    { name: "Cricket", image: cricketBall, url: "/sports/cricket" },
+    { name: "Rugby", image: rugbyBall, url: "/sports/rugby" },
+    { name: "Volleyball", image: volleyballBall, url: "/sports/volleyball" },
+    { name: "Ice Hockey", image: hockeyPuck, url: "/sports/ice-hockey" },
+    { name: "Baseball", image: baseballBall, url: "/sports/baseball" },
     { name: "NFL", image: americanFootballBall, url: "/sports/american-football" },
+  ];
+
+  const minorSports = [
+    { name: "Table Tennis", image: tabletennisPaddle, url: "/sports/table-tennis" },
+    { name: "Handball", image: handballBall, url: "/sports/handball" },
+    { name: "Darts", image: dartsBoard, url: "/sports/darts" },
+    { name: "Snooker", image: snookerBalls, url: "/sports/snooker" },
+    { name: "Badminton", image: badmintonShuttlecock, url: "/sports/badminton" },
+    { name: "Golf", image: golfBall, url: "/sports/golf" },
+    { name: "Futsal", image: futsalBall, url: "/sports/futsal" },
+    { name: "Cycling", image: cyclingWheel, url: "/sports/cycling" },
+    { name: "Motor Sports", image: motorsportsHelmet, url: "/sports/motor-sports" },
+    { name: "Beach Volleyball", image: beachvolleyballBall, url: "/sports/beach-volleyball" },
+  ];
+
+  const esportsVirtual = [
+    { name: "eSports", image: esportsController, url: "/sports/esports" },
+    { name: "Virtual Sports", image: virtualSports, url: "/virtuals" },
   ];
 
   const categories = [
@@ -201,27 +241,6 @@ const Index = () => {
             </div>
           </section>
 
-          {/* Sport Icons - SportyBet Style */}
-          <section className="mb-6">
-            <div className="flex justify-around items-center gap-2">
-              {sportIcons.map((sport) => (
-                <Link
-                  key={sport.name}
-                  to={sport.url}
-                  className="flex flex-col items-center gap-1.5 group"
-                >
-                  <div className="w-14 h-14 rounded-full bg-card border border-border flex items-center justify-center group-hover:border-primary group-hover:bg-primary/10 transition-all overflow-hidden p-1.5">
-                    <img 
-                      src={sport.image} 
-                      alt={sport.name}
-                      className="w-full h-full object-contain group-hover:scale-110 transition-transform" 
-                    />
-                  </div>
-                  <span className="text-[10px] font-medium text-foreground">{sport.name}</span>
-                </Link>
-              ))}
-            </div>
-          </section>
 
           {/* Popular Leagues - SportyBet Style: Mobile-first horizontal scroll */}
           <section className="mb-6">
