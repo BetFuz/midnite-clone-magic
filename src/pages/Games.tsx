@@ -41,6 +41,25 @@ const Games = () => {
     { name: "Baccarat Pro", provider: "NetEnt", category: "Table", featured: false },
   ];
 
+  // Filter by selected category
+  const categoryKey = (label: string) => {
+    if (label === "Table Games") return "Table";
+    if (label === "Jackpots") return "Jackpot";
+    if (label === "New Games") return "New";
+    if (label === "Popular") return "Popular";
+    return label;
+  };
+
+  const filteredGames = (() => {
+    if (selectedCategory === "All Games") return games;
+    if (selectedCategory === "Popular") return games.filter((g) => g.featured);
+    if (selectedCategory === "New Games") return games.slice(0, 6);
+    const key = categoryKey(selectedCategory);
+    return games.filter((g) => g.category === key);
+  })();
+
+  const visibleFeatured = filteredGames.filter((g) => g.featured);
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -70,54 +89,62 @@ const Games = () => {
           <section className="mb-8">
             <h2 className="text-xl font-bold text-foreground mb-4">Featured Games</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {games.filter(game => game.featured).map((game, index) => (
-                <Card key={index} className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all cursor-pointer" onClick={() => handlePlayGame(game.name)}>
-                  <div className="aspect-square bg-gradient-card relative">
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button size="lg" className="rounded-full w-16 h-16 p-0" onClick={(e) => { e.stopPropagation(); handlePlayGame(game.name); }}>
-                        <Play className="h-6 w-6" fill="currentColor" />
-                      </Button>
-                    </div>
-                    <div className="absolute top-3 right-3">
-                      <div className="bg-primary/20 backdrop-blur-sm rounded-full p-1.5">
-                        <Star className="h-4 w-4 text-primary" fill="currentColor" />
+              {visibleFeatured.length === 0 ? (
+                <p className="text-muted-foreground text-sm col-span-2 md:col-span-4">No featured games in this category.</p>
+              ) : (
+                visibleFeatured.map((game, index) => (
+                  <Card key={index} className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all cursor-pointer" onClick={() => handlePlayGame(game.name)}>
+                    <div className="aspect-square bg-gradient-card relative">
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button size="lg" className="rounded-full w-16 h-16 p-0" onClick={(e) => { e.stopPropagation(); handlePlayGame(game.name); }}>
+                          <Play className="h-6 w-6" fill="currentColor" />
+                        </Button>
+                      </div>
+                      <div className="absolute top-3 right-3">
+                        <div className="bg-primary/20 backdrop-blur-sm rounded-full p-1.5">
+                          <Star className="h-4 w-4 text-primary" fill="currentColor" />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="p-3">
-                    <h3 className="font-semibold text-sm text-foreground mb-1 truncate">{game.name}</h3>
-                    <p className="text-xs text-muted-foreground">{game.provider}</p>
-                  </div>
-                </Card>
-              ))}
+                    <div className="p-3">
+                      <h3 className="font-semibold text-sm text-foreground mb-1 truncate">{game.name}</h3>
+                      <p className="text-xs text-muted-foreground">{game.provider}</p>
+                    </div>
+                  </Card>
+                ))
+              )}
             </div>
           </section>
 
           <section>
             <h2 className="text-xl font-bold text-foreground mb-4">All Games</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {games.map((game, index) => (
-                <Card key={index} className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all cursor-pointer" onClick={() => handlePlayGame(game.name)}>
-                  <div className="aspect-square bg-gradient-card relative">
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button size="lg" className="rounded-full w-16 h-16 p-0" onClick={(e) => { e.stopPropagation(); handlePlayGame(game.name); }}>
-                        <Play className="h-6 w-6" fill="currentColor" />
-                      </Button>
-                    </div>
-                    {game.featured && (
-                      <div className="absolute top-3 right-3">
-                        <div className="bg-primary/20 backdrop-blur-sm rounded-full p-1.5">
-                          <Star className="h-4 w-4 text-primary" fill="currentColor" />
-                        </div>
+              {filteredGames.length === 0 ? (
+                <p className="text-muted-foreground text-sm col-span-2 md:col-span-4">No games found for this category.</p>
+              ) : (
+                filteredGames.map((game, index) => (
+                  <Card key={index} className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all cursor-pointer" onClick={() => handlePlayGame(game.name)}>
+                    <div className="aspect-square bg-gradient-card relative">
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button size="lg" className="rounded-full w-16 h-16 p-0" onClick={(e) => { e.stopPropagation(); handlePlayGame(game.name); }}>
+                          <Play className="h-6 w-6" fill="currentColor" />
+                        </Button>
                       </div>
-                    )}
-                  </div>
-                  <div className="p-3">
-                    <h3 className="font-semibold text-sm text-foreground mb-1 truncate">{game.name}</h3>
-                    <p className="text-xs text-muted-foreground">{game.provider}</p>
-                  </div>
-                </Card>
-              ))}
+                      {game.featured && (
+                        <div className="absolute top-3 right-3">
+                          <div className="bg-primary/20 backdrop-blur-sm rounded-full p-1.5">
+                            <Star className="h-4 w-4 text-primary" fill="currentColor" />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-3">
+                      <h3 className="font-semibold text-sm text-foreground mb-1 truncate">{game.name}</h3>
+                      <p className="text-xs text-muted-foreground">{game.provider}</p>
+                    </div>
+                  </Card>
+                ))
+              )}
             </div>
           </section>
         </main>

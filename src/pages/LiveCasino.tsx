@@ -39,7 +39,11 @@ const LiveCasino = () => {
     { name: "Dragon Tiger", dealer: "Wei", players: 445, provider: "Evolution", minStake: 1000, maxStake: 2500000, category: "Baccarat" },
   ];
 
-  const featuredTables = liveTables.slice(0, 4);
+  const filteredTables = selectedCategory === "All Tables" 
+    ? liveTables 
+    : liveTables.filter((t) => t.category === selectedCategory);
+
+  const featuredTables = filteredTables.slice(0, 4);
 
   return (
     <div className="min-h-screen bg-background">
