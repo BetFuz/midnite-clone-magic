@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { BetSlipProvider } from "@/contexts/BetSlipContext";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import Live from "./pages/Live";
 import Racing from "./pages/Racing";
 import Games from "./pages/Games";
 import LiveCasino from "./pages/LiveCasino";
@@ -119,6 +120,7 @@ const App = () => (
           <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/live" element={<Live />} />
           <Route path="/racing" element={<Racing />} />
           <Route path="/games" element={<Games />} />
           <Route path="/live-casino" element={<LiveCasino />} />

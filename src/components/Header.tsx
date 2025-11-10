@@ -25,6 +25,7 @@ const Header = () => {
 
   const navItems = [
     { label: "🏠 Home", path: "/", key: "home" },
+    { label: "🔴 Live", path: "/live", key: "live" },
     { label: "⚽ Sports", path: "/", key: "sports" },
     { label: "🏇 Racing", path: "/racing", key: "racing" },
     { label: "🎮 Games", path: "/games", key: "games" },
