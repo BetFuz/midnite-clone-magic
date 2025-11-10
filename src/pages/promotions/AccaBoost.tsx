@@ -6,6 +6,10 @@ import { Badge } from "@/components/ui/badge";
 import { TrendingUp, Zap, Target, Award, CheckCircle2, Calculator } from "lucide-react";
 import { formatCurrency } from "@/lib/currency";
 import { useNavigate } from "react-router-dom";
+import { BetCalculator } from "@/components/promotions/BetCalculator";
+import { RecentWinners } from "@/components/promotions/RecentWinners";
+import { PromotionFAQ } from "@/components/promotions/PromotionFAQ";
+import { SocialProofStats } from "@/components/promotions/SocialProofStats";
 
 const AccaBoost = () => {
   const navigate = useNavigate();
@@ -62,103 +66,124 @@ const AccaBoost = () => {
               </div>
             </div>
 
-            {/* Boost Tiers */}
-            <h2 className="text-3xl font-bold text-foreground mb-6 flex items-center gap-3">
-              <Award className="h-8 w-8 text-primary" />
-              Boost Tiers
-            </h2>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-              {boostTiers.map((tier, i) => (
-                <Card 
-                  key={i} 
-                  className={`p-6 bg-gradient-to-br ${tier.color} ${tier.borderColor} border-2 hover:scale-105 transition-transform cursor-pointer`}
-                >
-                  <div className="text-center">
-                    <div className="text-5xl font-bold text-foreground mb-2">{tier.selections}</div>
-                    <div className="text-sm text-muted-foreground mb-3">Selections</div>
-                    <Badge variant="default" className="text-lg px-4 py-1 bg-success hover:bg-success">
-                      {tier.boost}
-                    </Badge>
-                    <div className="text-xs text-muted-foreground mt-2">Bonus</div>
+            {/* Social Proof Stats */}
+            <SocialProofStats />
+
+            {/* Two Column Layout */}
+            <div className="grid lg:grid-cols-3 gap-6 mt-8">
+              <div className="lg:col-span-2 space-y-6">
+                {/* Boost Tiers */}
+                <div>
+                  <h2 className="text-3xl font-bold text-foreground mb-6 flex items-center gap-3">
+                    <Award className="h-8 w-8 text-primary" />
+                    Boost Tiers
+                  </h2>
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    {boostTiers.map((tier, i) => (
+                      <Card 
+                        key={i} 
+                        className={`p-6 bg-gradient-to-br ${tier.color} ${tier.borderColor} border-2 hover:scale-105 transition-transform cursor-pointer`}
+                      >
+                        <div className="text-center">
+                          <div className="text-5xl font-bold text-foreground mb-2">{tier.selections}</div>
+                          <div className="text-sm text-muted-foreground mb-3">Selections</div>
+                          <Badge variant="default" className="text-lg px-4 py-1 bg-success hover:bg-success">
+                            {tier.boost}
+                          </Badge>
+                          <div className="text-xs text-muted-foreground mt-2">Bonus</div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Bet Calculator */}
+                <BetCalculator boostPercentage={20} minOdds={1.2} />
+
+                {/* Example Calculations */}
+                <Card className="p-8 bg-gradient-card border-border">
+                  <h2 className="text-3xl font-bold text-foreground mb-6 flex items-center gap-3">
+                    <Calculator className="h-8 w-8 text-primary" />
+                    Example Wins
+                  </h2>
+                  <div className="space-y-4">
+                    {exampleBets.map((bet, i) => (
+                      <Card key={i} className="p-6 bg-card border-border hover:border-primary/50 transition-colors">
+                        <div className="grid md:grid-cols-5 gap-4">
+                          <div>
+                            <div className="text-sm text-muted-foreground mb-1">Selections</div>
+                            <div className="text-2xl font-bold text-foreground">{bet.selections}</div>
+                          </div>
+                          <div>
+                            <div className="text-sm text-muted-foreground mb-1">Stake</div>
+                            <div className="text-lg font-semibold text-foreground">{formatCurrency(bet.stake)}</div>
+                          </div>
+                          <div>
+                            <div className="text-sm text-muted-foreground mb-1">Total Odds</div>
+                            <div className="text-lg font-semibold text-foreground">{bet.odds.toFixed(2)}</div>
+                          </div>
+                          <div>
+                            <div className="text-sm text-muted-foreground mb-1">Normal Win</div>
+                            <div className="text-lg font-semibold text-foreground">{formatCurrency(bet.normalWin)}</div>
+                          </div>
+                          <div className="bg-success/10 rounded-lg p-3">
+                            <div className="text-sm text-success mb-1 font-semibold flex items-center gap-1">
+                              <Zap className="h-3 w-3" />
+                              Boosted Win (+{bet.boost}%)
+                            </div>
+                            <div className="text-xl font-bold text-success">{formatCurrency(bet.boostedWin)}</div>
+                            <div className="text-xs text-success/80 mt-1">
+                              Extra: {formatCurrency(bet.boostedWin - bet.normalWin)}
+                            </div>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
                   </div>
                 </Card>
-              ))}
-            </div>
 
-            {/* Example Calculations */}
-            <Card className="p-8 bg-gradient-card border-border mb-8">
-              <h2 className="text-3xl font-bold text-foreground mb-6 flex items-center gap-3">
-                <Calculator className="h-8 w-8 text-primary" />
-                Example Wins
-              </h2>
-              <div className="space-y-4">
-                {exampleBets.map((bet, i) => (
-                  <Card key={i} className="p-6 bg-card border-border hover:border-primary/50 transition-colors">
-                    <div className="grid md:grid-cols-5 gap-4">
-                      <div>
-                        <div className="text-sm text-muted-foreground mb-1">Selections</div>
-                        <div className="text-2xl font-bold text-foreground">{bet.selections}</div>
+                {/* How It Works */}
+                <Card className="p-8 bg-card border-border">
+                  <h2 className="text-3xl font-bold text-foreground mb-6">How It Works</h2>
+                  <div className="grid gap-4">
+                    {[
+                      "Add 5 or more selections to your bet slip with minimum odds of 1.20 per selection",
+                      "Your boost is automatically applied based on the number of selections",
+                      "If your accumulator wins, the boost is added to your winnings",
+                      "Available on all sports and leagues - pre-match and in-play",
+                      "Maximum boost of ₦500,000 per bet slip",
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-start gap-3">
+                        <CheckCircle2 className="h-5 w-5 text-success flex-shrink-0 mt-1" />
+                        <p className="text-muted-foreground">{item}</p>
                       </div>
-                      <div>
-                        <div className="text-sm text-muted-foreground mb-1">Stake</div>
-                        <div className="text-lg font-semibold text-foreground">{formatCurrency(bet.stake)}</div>
-                      </div>
-                      <div>
-                        <div className="text-sm text-muted-foreground mb-1">Total Odds</div>
-                        <div className="text-lg font-semibold text-foreground">{bet.odds.toFixed(2)}</div>
-                      </div>
-                      <div>
-                        <div className="text-sm text-muted-foreground mb-1">Normal Win</div>
-                        <div className="text-lg font-semibold text-foreground">{formatCurrency(bet.normalWin)}</div>
-                      </div>
-                      <div className="bg-success/10 rounded-lg p-3">
-                        <div className="text-sm text-success mb-1 font-semibold flex items-center gap-1">
-                          <Zap className="h-3 w-3" />
-                          Boosted Win (+{bet.boost}%)
-                        </div>
-                        <div className="text-xl font-bold text-success">{formatCurrency(bet.boostedWin)}</div>
-                        <div className="text-xs text-success/80 mt-1">
-                          Extra: {formatCurrency(bet.boostedWin - bet.normalWin)}
-                        </div>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </Card>
-
-            {/* How It Works */}
-            <Card className="p-8 bg-card border-border mb-8">
-              <h2 className="text-3xl font-bold text-foreground mb-6">How It Works</h2>
-              <div className="grid gap-4">
-                {[
-                  "Add 5 or more selections to your bet slip with minimum odds of 1.20 per selection",
-                  "Your boost is automatically applied based on the number of selections",
-                  "If your accumulator wins, the boost is added to your winnings",
-                  "Available on all sports and leagues - pre-match and in-play",
-                  "Maximum boost of ₦500,000 per bet slip",
-                ].map((item, i) => (
-                  <div key={i} className="flex items-start gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-success flex-shrink-0 mt-1" />
-                    <p className="text-muted-foreground">{item}</p>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </Card>
+                </Card>
 
-            {/* Terms */}
-            <Card className="p-8 bg-muted/50 border-border">
-              <h3 className="text-xl font-bold text-foreground mb-4">Terms & Conditions</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li>• Minimum 5 selections required, each at odds of 1.20 or greater</li>
-                <li>• Maximum boost amount of {formatCurrency(500000)} per bet slip</li>
-                <li>• Available on pre-match and in-play bets across all sports</li>
-                <li>• Boost calculated on net winnings (stake not included)</li>
-                <li>• Acca Insurance and Acca Boost cannot be combined on the same bet</li>
-                <li>• Betfuz reserves the right to void boosts if terms are breached</li>
-                <li>• 18+ BeGambleAware.org. Terms apply.</li>
-              </ul>
-            </Card>
+                {/* FAQ */}
+                <PromotionFAQ />
+
+                {/* Terms */}
+                <Card className="p-8 bg-muted/50 border-border">
+                  <h3 className="text-xl font-bold text-foreground mb-4">Terms & Conditions</h3>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li>• Minimum 5 selections required, each at odds of 1.20 or greater</li>
+                    <li>• Maximum boost amount of {formatCurrency(500000)} per bet slip</li>
+                    <li>• Available on pre-match and in-play bets across all sports</li>
+                    <li>• Boost calculated on net winnings (stake not included)</li>
+                    <li>• Acca Insurance and Acca Boost cannot be combined on the same bet</li>
+                    <li>• Betfuz reserves the right to void boosts if terms are breached</li>
+                    <li>• 18+ BeGambleAware.org. Terms apply.</li>
+                  </ul>
+                </Card>
+              </div>
+
+              {/* Sidebar */}
+              <div className="space-y-6">
+                <RecentWinners />
+              </div>
+            </div>
           </div>
         </main>
       </div>

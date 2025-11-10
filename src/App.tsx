@@ -87,6 +87,9 @@ import Privacy from "./pages/info/Privacy";
 import Contact from "./pages/info/Contact";
 import FAQ from "./pages/info/FAQ";
 
+// Admin
+import WebhookSettings from "./pages/admin/WebhookSettings";
+
 import MobileBetSlip from "./components/MobileBetSlip";
 
 // Match & Live Casino
@@ -184,6 +187,9 @@ const App = () => (
           <Route path="/info/privacy" element={<Privacy />} />
           <Route path="/info/contact" element={<Contact />} />
           <Route path="/info/faq" element={<FAQ />} />
+
+          {/* Admin */}
+          <Route path="/admin/webhooks" element={<WebhookSettings />} />
           
           {/* Match & Live Tables */}
           <Route path="/match/:id" element={<MatchDetail />} />
