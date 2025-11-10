@@ -4,8 +4,22 @@ import BetSlip from "@/components/BetSlip";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useParams } from "react-router-dom";
 
 const MatchDetail = () => {
+  const { id } = useParams();
+
+  const toTitle = (str: string) =>
+    str
+      .split("-")
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ");
+
+  const slug = id || "manchester-united-vs-liverpool";
+  const [leftSlug = "manchester-united", rightSlug = "liverpool"] = slug.split("-vs-");
+  const leftTeam = toTitle(leftSlug);
+  const rightTeam = toTitle(rightSlug);
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -13,17 +27,21 @@ const MatchDetail = () => {
         <Sidebar />
         <main className="flex-1 p-6 overflow-y-auto h-[calc(100vh-4rem)]">
           <Card className="p-6 bg-gradient-hero border-border/50 mb-6">
-            <Badge className="mb-2">Premier League</Badge>
-            <div className="flex items-center justify-between text-white mb-4">
-              <div className="text-center flex-1">
-                <h2 className="text-3xl font-bold mb-2">Manchester United</h2>
+            <Badge className="mb-2">Match</Badge>
+            <div className="flex items-center justify-between text-white mb-2 gap-2">
+              <div className="text-center flex-1 min-w-0">
+                <h2 className="font-extrabold leading-tight break-words text-2xl md:text-4xl">
+                  {leftTeam}
+                </h2>
               </div>
-              <div className="text-center px-8">
-                <div className="text-sm mb-1">Saturday 15:00</div>
-                <div className="text-4xl font-bold">VS</div>
+              <div className="text-center px-4 md:px-8 shrink-0">
+                <div className="text-xs md:text-sm mb-1">Saturday 15:00</div>
+                <div className="text-3xl md:text-4xl font-black">VS</div>
               </div>
-              <div className="text-center flex-1">
-                <h2 className="text-3xl font-bold mb-2">Liverpool</h2>
+              <div className="text-center flex-1 min-w-0">
+                <h2 className="font-extrabold leading-tight break-words text-2xl md:text-4xl">
+                  {rightTeam}
+                </h2>
               </div>
             </div>
           </Card>
