@@ -6,7 +6,7 @@ import MatchCard from "@/components/MatchCard";
 import BoostCard from "@/components/BoostCard";
 import { buttonVariants } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Award, TrendingUp as TrendingUpIcon } from "lucide-react";
 
 // Import league logos
 import premierLeagueLogo from "@/assets/leagues/premier-league.png";
@@ -28,7 +28,27 @@ import arsenalLogo from "@/assets/teams/arsenal.png";
 import bayernLogo from "@/assets/teams/bayern.png";
 import psgLogo from "@/assets/teams/psg.png";
 
+// Import promotional banners
+import championsPromo from "@/assets/promos/champions-league-promo.jpg";
+import nbaPromo from "@/assets/promos/nba-promo.jpg";
+import betBuilderPromo from "@/assets/promos/bet-builder-promo.jpg";
+import welcomePromo from "@/assets/promos/welcome-bonus-promo.jpg";
+
 const Index = () => {
+  const promoCards = [
+    { title: "UEFA Champions League", image: championsPromo, url: "/football/champions-league" },
+    { title: "NBA Basketball", image: nbaPromo, url: "/basketball/nba" },
+    { title: "Bet Builder", image: betBuilderPromo, url: "/promotions" },
+    { title: "Welcome Bonus", image: welcomePromo, url: "/promotions/welcome" },
+  ];
+
+  const sportIcons = [
+    { name: "Football", icon: Award, url: "/sports/football" },
+    { name: "Basketball", icon: Award, url: "/sports/basketball" },
+    { name: "Tennis", icon: Award, url: "/sports/tennis" },
+    { name: "NFL", icon: Award, url: "/sports/american-football" },
+  ];
+
   const categories = [
     { label: "Football", url: "/sports/football" },
     { label: "Premier League", url: "/football/premier-league" },
@@ -154,38 +174,44 @@ const Index = () => {
         <Sidebar className="hidden md:flex" />
         
         <main className="flex-1 p-4 md:p-6 overflow-y-auto h-[calc(100vh-4rem)] pb-24 md:pb-6">
-          <HeroBanner />
-
-          {/* Quick Sports Navigation - Fanatics Style: Clean & Streamlined */}
-          <div className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
-            {categories.map((category) => (
-              <Link
-                key={category.label}
-                to={category.url}
-                className={buttonVariants({ 
-                  variant: "outline", 
-                  size: "sm",
-                  className: "whitespace-nowrap font-medium hover:bg-primary hover:text-primary-foreground transition-all" 
-                })}
-                role="link"
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-              >
-                {category.label}
-              </Link>
-            ))}
-          </div>
-
-          {/* Live Matches Banner - Midnite Style: Real-time Emphasis */}
-          <div className="mb-6 p-4 rounded-lg bg-gradient-to-r from-red-500/10 to-orange-500/10 border border-red-500/20">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-              <h3 className="text-sm font-semibold text-foreground">LIVE NOW</h3>
-              <span className="text-xs text-muted-foreground ml-auto">3 matches in play</span>
+          {/* Promotional Carousel - SportyBet Style */}
+          <section className="mb-6 -mx-4 md:mx-0">
+            <div className="flex gap-3 overflow-x-auto px-4 md:px-0 pb-2 scrollbar-hide snap-x snap-mandatory">
+              {promoCards.map((promo, index) => (
+                <Link
+                  key={index}
+                  to={promo.url}
+                  className="relative flex-shrink-0 w-[280px] md:w-[320px] h-[140px] md:h-[160px] rounded-xl overflow-hidden group snap-start"
+                >
+                  <img 
+                    src={promo.image} 
+                    alt={promo.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                  <div className="absolute bottom-3 left-3 text-white font-bold text-sm">{promo.title}</div>
+                </Link>
+              ))}
             </div>
-            <p className="text-xs text-muted-foreground">Bet in-play with live odds updates</p>
-          </div>
+          </section>
+
+          {/* Sport Icons - SportyBet Style */}
+          <section className="mb-6">
+            <div className="flex justify-around items-center gap-2">
+              {sportIcons.map((sport) => (
+                <Link
+                  key={sport.name}
+                  to={sport.url}
+                  className="flex flex-col items-center gap-1.5 group"
+                >
+                  <div className="w-12 h-12 rounded-full bg-card border border-border flex items-center justify-center group-hover:border-primary group-hover:bg-primary/10 transition-all">
+                    <sport.icon className="w-5 h-5 text-foreground group-hover:text-primary transition-colors" />
+                  </div>
+                  <span className="text-[10px] font-medium text-foreground">{sport.name}</span>
+                </Link>
+              ))}
+            </div>
+          </section>
 
           {/* Popular Leagues - SportyBet Style: Mobile-first horizontal scroll */}
           <section className="mb-6">
