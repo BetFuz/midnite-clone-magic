@@ -156,15 +156,16 @@ const Index = () => {
         <main className="flex-1 p-4 md:p-6 overflow-y-auto h-[calc(100vh-4rem)] pb-24 md:pb-6">
           <HeroBanner />
 
-          {/* Quick Navigation */}
-          <div className="flex gap-2 mb-8 overflow-x-auto pb-2 scrollbar-hide">
+          {/* Quick Sports Navigation - Fanatics Style: Clean & Streamlined */}
+          <div className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
             {categories.map((category) => (
               <Link
                 key={category.label}
                 to={category.url}
                 className={buttonVariants({ 
                   variant: "outline", 
-                  className: "whitespace-nowrap font-medium hover:bg-primary hover:text-primary-foreground transition-colors" 
+                  size: "sm",
+                  className: "whitespace-nowrap font-medium hover:bg-primary hover:text-primary-foreground transition-all" 
                 })}
                 role="link"
                 onClick={(e) => {
@@ -176,61 +177,76 @@ const Index = () => {
             ))}
           </div>
 
-          {/* Popular Leagues */}
-          <section className="mb-8">
-            <h2 className="text-xl font-semibold text-foreground mb-4">Popular Leagues</h2>
-            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+          {/* Live Matches Banner - Midnite Style: Real-time Emphasis */}
+          <div className="mb-6 p-4 rounded-lg bg-gradient-to-r from-red-500/10 to-orange-500/10 border border-red-500/20">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+              <h3 className="text-sm font-semibold text-foreground">LIVE NOW</h3>
+              <span className="text-xs text-muted-foreground ml-auto">3 matches in play</span>
+            </div>
+            <p className="text-xs text-muted-foreground">Bet in-play with live odds updates</p>
+          </div>
+
+          {/* Popular Leagues - SportyBet Style: Mobile-first horizontal scroll */}
+          <section className="mb-6">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg font-semibold text-foreground">Popular Leagues</h2>
+              <Link to="/sports/football" className="text-xs text-primary hover:underline">View All</Link>
+            </div>
+            <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-hide">
               {leagues.map((league) => (
                 <Link
                   key={league.name}
                   to={league.url}
-                  className="flex flex-col items-center gap-1.5 p-2.5 rounded-lg border border-border bg-card hover:border-primary hover:bg-accent transition-all group min-w-[90px]"
+                  className="flex flex-col items-center gap-1.5 p-2 rounded-lg border border-border bg-card hover:border-primary hover:shadow-md transition-all group min-w-[85px] flex-shrink-0"
                 >
-                  <div className="w-14 h-14 flex items-center justify-center">
+                  <div className="w-12 h-12 flex items-center justify-center">
                     <img 
                       src={league.logo} 
                       alt={league.name} 
-                      className="w-full h-full object-contain opacity-90 group-hover:opacity-100 transition-opacity" 
+                      className="w-full h-full object-contain opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all" 
                     />
                   </div>
-                  <p className="text-[10px] font-medium text-foreground text-center leading-tight w-full">{league.name}</p>
+                  <p className="text-[10px] font-medium text-foreground text-center leading-tight w-full truncate px-1">{league.name}</p>
                 </Link>
               ))}
             </div>
           </section>
 
-          {/* Popular Teams */}
-          <section className="mb-8">
-            <h2 className="text-xl font-semibold text-foreground mb-4">Popular Teams</h2>
-            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+          {/* Popular Teams - SportyBet Style: Mobile-first horizontal scroll */}
+          <section className="mb-6">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg font-semibold text-foreground">Popular Teams</h2>
+              <Link to="/sports/football" className="text-xs text-primary hover:underline">View All</Link>
+            </div>
+            <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-hide">
               {teams.map((team) => (
                 <Link
                   key={team.name}
                   to={team.url}
-                  className="flex flex-col items-center gap-1.5 p-2.5 rounded-lg border border-border bg-card hover:border-primary hover:bg-accent transition-all group min-w-[90px]"
+                  className="flex flex-col items-center gap-1.5 p-2 rounded-lg border border-border bg-card hover:border-primary hover:shadow-md transition-all group min-w-[85px] flex-shrink-0"
                 >
-                  <div className="w-14 h-14 flex items-center justify-center">
+                  <div className="w-12 h-12 flex items-center justify-center">
                     <img 
                       src={team.logo} 
                       alt={team.name} 
-                      className="w-full h-full object-contain opacity-90 group-hover:opacity-100 transition-opacity" 
+                      className="w-full h-full object-contain opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all" 
                     />
                   </div>
-                  <p className="text-[10px] font-medium text-foreground text-center leading-tight w-full">{team.name}</p>
+                  <p className="text-[10px] font-medium text-foreground text-center leading-tight w-full truncate px-1">{team.name}</p>
                 </Link>
               ))}
             </div>
           </section>
 
-          <section className="mb-8">
-            <h2 className="text-xl font-bold text-foreground mb-4">Featured Matches</h2>
+          {/* Featured Matches - Fanatics Style: Clean section headers */}
+          <section className="mb-6">
+            <h2 className="text-lg font-semibold text-foreground mb-3">Featured Matches</h2>
             
             {/* Football Matches */}
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
-                <span>⚽</span> Football
-              </h3>
-              <div className="grid gap-4">
+            <div className="mb-5">
+              <h3 className="text-base font-semibold text-foreground mb-2.5">⚽ Football</h3>
+              <div className="grid gap-3">
                 {featuredMatches.filter(m => m.sport === "Football").map((match, index) => (
                   <MatchCard key={index} {...match} />
                 ))}
@@ -238,11 +254,9 @@ const Index = () => {
             </div>
 
             {/* Basketball Matches */}
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
-                <span>🏀</span> Basketball
-              </h3>
-              <div className="grid gap-4">
+            <div className="mb-5">
+              <h3 className="text-base font-semibold text-foreground mb-2.5">🏀 Basketball</h3>
+              <div className="grid gap-3">
                 {featuredMatches.filter(m => m.sport === "Basketball").map((match, index) => (
                   <MatchCard key={index} {...match} />
                 ))}
@@ -250,11 +264,9 @@ const Index = () => {
             </div>
 
             {/* NFL Matches */}
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
-                <span>🏈</span> American Football
-              </h3>
-              <div className="grid gap-4">
+            <div className="mb-5">
+              <h3 className="text-base font-semibold text-foreground mb-2.5">🏈 American Football</h3>
+              <div className="grid gap-3">
                 {featuredMatches.filter(m => m.sport === "American Football").map((match, index) => (
                   <MatchCard key={index} {...match} />
                 ))}
@@ -262,11 +274,9 @@ const Index = () => {
             </div>
 
             {/* Tennis Matches */}
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
-                <span>🎾</span> Tennis
-              </h3>
-              <div className="grid gap-4">
+            <div className="mb-5">
+              <h3 className="text-base font-semibold text-foreground mb-2.5">🎾 Tennis</h3>
+              <div className="grid gap-3">
                 {featuredMatches.filter(m => m.sport === "Tennis").map((match, index) => (
                   <MatchCard key={index} {...match} />
                 ))}
@@ -274,14 +284,16 @@ const Index = () => {
             </div>
           </section>
 
+          {/* Boosts Section - Betano Style: Electrifying promotions */}
           <section>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="rounded-full bg-primary/20 p-1.5">
-                <TrendingUp className="h-4 w-4 text-primary" />
+            <div className="flex items-center gap-2 mb-3">
+              <div className="rounded-full bg-gradient-to-r from-yellow-500 to-orange-500 p-1.5">
+                <TrendingUp className="h-4 w-4 text-white" />
               </div>
-              <h2 className="text-xl font-bold text-foreground">Boosts</h2>
+              <h2 className="text-lg font-semibold text-foreground">Odds Boosts</h2>
+              <span className="ml-auto text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-medium">Hot 🔥</span>
             </div>
-            <div className="grid gap-4">
+            <div className="grid gap-3">
               {boosts.map((boost, index) => (
                 <BoostCard key={index} {...boost} />
               ))}
