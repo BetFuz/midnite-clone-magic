@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import MobileNav from "./MobileNav";
+import ThemeToggle from "./ThemeToggle";
 
 const Header = () => {
   const location = useLocation();
@@ -43,6 +44,7 @@ const Header = () => {
         </div>
 
         <div className="ml-auto flex items-center gap-2 md:gap-4">
+          <ThemeToggle />
           <div className="relative hidden md:block">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
