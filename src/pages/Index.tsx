@@ -18,6 +18,16 @@ import nbaLogo from "@/assets/leagues/nba.png";
 import nflLogo from "@/assets/leagues/nfl.png";
 import atpLogo from "@/assets/leagues/atp.png";
 
+// Import team logos
+import manUnitedLogo from "@/assets/teams/man-united.png";
+import liverpoolLogo from "@/assets/teams/liverpool.png";
+import barcelonaLogo from "@/assets/teams/barcelona.png";
+import realMadridLogo from "@/assets/teams/real-madrid.png";
+import chelseaLogo from "@/assets/teams/chelsea.png";
+import arsenalLogo from "@/assets/teams/arsenal.png";
+import bayernLogo from "@/assets/teams/bayern.png";
+import psgLogo from "@/assets/teams/psg.png";
+
 const Index = () => {
   const categories = [
     { label: "Football", url: "/sports/football" },
@@ -36,6 +46,17 @@ const Index = () => {
     { name: "NBA", url: "/basketball/nba", logo: nbaLogo, matches: 12, country: "USA" },
     { name: "NFL", url: "/sports/american-football", logo: nflLogo, matches: 16, country: "USA" },
     { name: "ATP Masters", url: "/tennis/atp-masters-1000", logo: atpLogo, matches: 8, country: "International" },
+  ];
+
+  const teams = [
+    { name: "Man United", url: "/football/premier-league", logo: manUnitedLogo },
+    { name: "Liverpool", url: "/football/premier-league", logo: liverpoolLogo },
+    { name: "Barcelona", url: "/football/la-liga", logo: barcelonaLogo },
+    { name: "Real Madrid", url: "/football/la-liga", logo: realMadridLogo },
+    { name: "Chelsea", url: "/football/premier-league", logo: chelseaLogo },
+    { name: "Arsenal", url: "/football/premier-league", logo: arsenalLogo },
+    { name: "Bayern Munich", url: "/football/bundesliga", logo: bayernLogo },
+    { name: "PSG", url: "/football/la-liga", logo: psgLogo },
   ];
 
   const featuredMatches = [
@@ -173,6 +194,29 @@ const Index = () => {
                     />
                   </div>
                   <p className="text-[10px] font-medium text-foreground text-center leading-tight w-full">{league.name}</p>
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          {/* Popular Teams */}
+          <section className="mb-8">
+            <h2 className="text-xl font-semibold text-foreground mb-4">Popular Teams</h2>
+            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+              {teams.map((team) => (
+                <Link
+                  key={team.name}
+                  to={team.url}
+                  className="flex flex-col items-center gap-1.5 p-2.5 rounded-lg border border-border bg-card hover:border-primary hover:bg-accent transition-all group min-w-[90px]"
+                >
+                  <div className="w-14 h-14 flex items-center justify-center">
+                    <img 
+                      src={team.logo} 
+                      alt={team.name} 
+                      className="w-full h-full object-contain opacity-90 group-hover:opacity-100 transition-opacity" 
+                    />
+                  </div>
+                  <p className="text-[10px] font-medium text-foreground text-center leading-tight w-full">{team.name}</p>
                 </Link>
               ))}
             </div>
