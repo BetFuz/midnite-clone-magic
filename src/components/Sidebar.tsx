@@ -23,12 +23,28 @@ const Sidebar = ({ className, showOnMobile = false }: SidebarProps) => {
 
   const sportsCategories = [
     { icon: CircleDot, label: "Football", url: "/sports/football" },
-    { icon: TrendingUp, label: "Horse Racing", url: "/racing" },
-    { icon: CircleDot, label: "American Football", url: "/sports/american-football" },
-    { icon: Target, label: "Darts", url: "/sports/darts" },
-    { icon: Volleyball, label: "Tennis", url: "/sports/tennis" },
     { icon: Dumbbell, label: "Basketball", url: "/sports/basketball" },
+    { icon: Volleyball, label: "Tennis", url: "/sports/tennis" },
     { icon: Table2, label: "Cricket", url: "/sports/cricket" },
+    { icon: CircleDot, label: "Rugby", url: "/sports/rugby" },
+    { icon: CircleDot, label: "Volleyball", url: "/sports/volleyball" },
+    { icon: CircleDot, label: "Ice Hockey", url: "/sports/ice-hockey" },
+    { icon: CircleDot, label: "Baseball", url: "/sports/baseball" },
+    { icon: CircleDot, label: "American Football", url: "/sports/american-football" },
+    { icon: Target, label: "Table Tennis", url: "/sports/table-tennis" },
+    { icon: Target, label: "Handball", url: "/sports/handball" },
+    { icon: Target, label: "Darts", url: "/sports/darts" },
+    { icon: Target, label: "Snooker", url: "/sports/snooker" },
+    { icon: Target, label: "Badminton", url: "/sports/badminton" },
+    { icon: Target, label: "Golf", url: "/sports/golf" },
+    { icon: CircleDot, label: "Futsal", url: "/sports/futsal" },
+    { icon: CircleDot, label: "Cycling", url: "/sports/cycling" },
+    { icon: CircleDot, label: "Motor Sports", url: "/sports/motor-sports" },
+    { icon: CircleDot, label: "Beach Volleyball", url: "/sports/beach-volleyball" },
+    { icon: Target, label: "Boxing", url: "/sports/boxing" },
+    { icon: Target, label: "MMA", url: "/sports/mma" },
+    { icon: CircleDot, label: "eSports", url: "/sports/esports" },
+    { icon: TrendingUp, label: "Horse Racing", url: "/racing" },
   ];
 
   return (

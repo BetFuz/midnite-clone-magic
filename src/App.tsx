@@ -23,6 +23,17 @@ import Boxing from "./pages/sports/Boxing";
 import MMA from "./pages/sports/MMA";
 import Darts from "./pages/sports/Darts";
 import Snooker from "./pages/sports/Snooker";
+import Volleyball from "./pages/sports/Volleyball";
+import IceHockey from "./pages/sports/IceHockey";
+import Baseball from "./pages/sports/Baseball";
+import TableTennis from "./pages/sports/TableTennis";
+import Handball from "./pages/sports/Handball";
+import Badminton from "./pages/sports/Badminton";
+import Futsal from "./pages/sports/Futsal";
+import Cycling from "./pages/sports/Cycling";
+import MotorSports from "./pages/sports/MotorSports";
+import BeachVolleyball from "./pages/sports/BeachVolleyball";
+import Esports from "./pages/sports/Esports";
 
 // Football Leagues
 import PremierLeague from "./pages/football/PremierLeague";
@@ -125,6 +136,17 @@ const App = () => (
           <Route path="/sports/mma" element={<MMA />} />
           <Route path="/sports/darts" element={<Darts />} />
           <Route path="/sports/snooker" element={<Snooker />} />
+          <Route path="/sports/volleyball" element={<Volleyball />} />
+          <Route path="/sports/ice-hockey" element={<IceHockey />} />
+          <Route path="/sports/baseball" element={<Baseball />} />
+          <Route path="/sports/table-tennis" element={<TableTennis />} />
+          <Route path="/sports/handball" element={<Handball />} />
+          <Route path="/sports/badminton" element={<Badminton />} />
+          <Route path="/sports/futsal" element={<Futsal />} />
+          <Route path="/sports/cycling" element={<Cycling />} />
+          <Route path="/sports/motor-sports" element={<MotorSports />} />
+          <Route path="/sports/beach-volleyball" element={<BeachVolleyball />} />
+          <Route path="/sports/esports" element={<Esports />} />
           
           {/* Football Leagues */}
           <Route path="/football/premier-league" element={<PremierLeague />} />
