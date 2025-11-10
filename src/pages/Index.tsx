@@ -34,6 +34,12 @@ import nbaPromo from "@/assets/promos/nba-promo.jpg";
 import betBuilderPromo from "@/assets/promos/bet-builder-promo.jpg";
 import welcomePromo from "@/assets/promos/welcome-bonus-promo.jpg";
 
+// Import sport balls
+import footballBall from "@/assets/sports/football-ball.png";
+import basketballBall from "@/assets/sports/basketball-ball.png";
+import tennisBall from "@/assets/sports/tennis-ball.png";
+import americanFootballBall from "@/assets/sports/american-football-ball.png";
+
 const Index = () => {
   const promoCards = [
     { title: "UEFA Champions League", image: championsPromo, url: "/football/champions-league" },
@@ -43,10 +49,10 @@ const Index = () => {
   ];
 
   const sportIcons = [
-    { name: "Football", icon: Award, url: "/sports/football" },
-    { name: "Basketball", icon: Award, url: "/sports/basketball" },
-    { name: "Tennis", icon: Award, url: "/sports/tennis" },
-    { name: "NFL", icon: Award, url: "/sports/american-football" },
+    { name: "Football", image: footballBall, url: "/sports/football" },
+    { name: "Basketball", image: basketballBall, url: "/sports/basketball" },
+    { name: "Tennis", image: tennisBall, url: "/sports/tennis" },
+    { name: "NFL", image: americanFootballBall, url: "/sports/american-football" },
   ];
 
   const categories = [
@@ -204,8 +210,12 @@ const Index = () => {
                   to={sport.url}
                   className="flex flex-col items-center gap-1.5 group"
                 >
-                  <div className="w-12 h-12 rounded-full bg-card border border-border flex items-center justify-center group-hover:border-primary group-hover:bg-primary/10 transition-all">
-                    <sport.icon className="w-5 h-5 text-foreground group-hover:text-primary transition-colors" />
+                  <div className="w-14 h-14 rounded-full bg-card border border-border flex items-center justify-center group-hover:border-primary group-hover:bg-primary/10 transition-all overflow-hidden p-1.5">
+                    <img 
+                      src={sport.image} 
+                      alt={sport.name}
+                      className="w-full h-full object-contain group-hover:scale-110 transition-transform" 
+                    />
                   </div>
                   <span className="text-[10px] font-medium text-foreground">{sport.name}</span>
                 </Link>
