@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-sports.jpg";
+import { Link } from "react-router-dom";
 
 const HeroBanner = () => {
   return (
@@ -19,8 +20,8 @@ const HeroBanner = () => {
           <p className="text-white/90 text-sm mb-4">
             Enhanced odds on today's featured matches. Max stake applies. T&C's apply.
           </p>
-          <Button className="bg-white text-primary-foreground font-bold hover:bg-white/90">
-            Bet Here
+          <Button className="bg-white text-primary-foreground font-bold hover:bg-white/90" asChild>
+            <Link to="/promotions/welcome">Bet Here</Link>
           </Button>
         </div>
       </div>

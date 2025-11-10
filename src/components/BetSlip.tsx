@@ -2,6 +2,7 @@ import { X } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { formatCurrency } from "@/lib/currency";
 
 interface BetSlipProps {
   className?: string;
@@ -21,6 +22,7 @@ const BetSlip = ({ className }: BetSlipProps) => {
         <div className="text-center text-muted-foreground">
           <p className="text-sm font-medium">Bet Slip is empty</p>
           <p className="text-xs mt-1">Add selections to place bet</p>
+          <p className="text-xs mt-2 text-muted-foreground/70">Min stake: {formatCurrency(100)}</p>
         </div>
       </div>
     </aside>

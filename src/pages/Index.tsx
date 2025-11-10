@@ -5,14 +5,15 @@ import HeroBanner from "@/components/HeroBanner";
 import MatchCard from "@/components/MatchCard";
 import BoostCard from "@/components/BoostCard";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   const categories = [
-    "Today's Football",
-    "Premier League",
-    "Champions League",
-    "NFL",
-    "NBA",
+    { label: "Today's Football", url: "/sports/football" },
+    { label: "Premier League", url: "/football/premier-league" },
+    { label: "Champions League", url: "/football/champions-league" },
+    { label: "NFL", url: "/sports/american-football" },
+    { label: "NBA", url: "/sports/basketball" },
   ];
 
   const featuredMatches = [
@@ -75,12 +76,13 @@ const Index = () => {
           <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
             {categories.map((category) => (
               <Button
-                key={category}
+                key={category.label}
                 variant="secondary"
                 size="sm"
                 className="whitespace-nowrap"
+                asChild
               >
-                {category}
+                <Link to={category.url}>{category.label}</Link>
               </Button>
             ))}
           </div>

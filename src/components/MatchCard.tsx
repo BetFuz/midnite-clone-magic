@@ -1,5 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { toast } from "@/hooks/use-toast";
 
 interface MatchCardProps {
   time: string;
@@ -11,8 +13,21 @@ interface MatchCardProps {
 }
 
 const MatchCard = ({ time, homeTeam, awayTeam, homeOdds, drawOdds, awayOdds }: MatchCardProps) => {
+  const navigate = useNavigate();
+  
+  const handleOddsClick = (selection: string, odds: string) => {
+    toast({
+      title: "Added to Bet Slip",
+      description: `${selection} @ ${odds}`,
+    });
+  };
+
+  const handleMatchClick = () => {
+    navigate(`/match/${homeTeam.toLowerCase().replace(/\s+/g, '-')}-vs-${awayTeam.toLowerCase().replace(/\s+/g, '-')}`);
+  };
+
   return (
-    <Card className="p-4 bg-card border-border hover:border-primary/50 transition-colors">
+    <Card className="p-4 bg-card border-border hover:border-primary/50 transition-colors cursor-pointer" onClick={handleMatchClick}>
       <div className="flex items-center justify-between">
         <div className="flex-1">
           <div className="text-xs text-muted-foreground mb-3">{time}</div>
@@ -28,12 +43,16 @@ const MatchCard = ({ time, homeTeam, awayTeam, homeOdds, drawOdds, awayOdds }: M
           </div>
         </div>
         
-        <div className="flex gap-2">
+        <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
           <div className="flex flex-col gap-2">
             <Button 
               variant="secondary" 
               size="sm" 
               className="w-20 flex flex-col h-auto py-2 hover:bg-primary/20 hover:text-primary"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleOddsClick(`${homeTeam} to win`, homeOdds);
+              }}
             >
               <span className="text-xs text-muted-foreground">Home</span>
               <span className="text-base font-bold text-odds">{homeOdds}</span>
@@ -42,6 +61,10 @@ const MatchCard = ({ time, homeTeam, awayTeam, homeOdds, drawOdds, awayOdds }: M
               variant="secondary" 
               size="sm" 
               className="w-20 flex flex-col h-auto py-2 hover:bg-primary/20 hover:text-primary"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleOddsClick(`${awayTeam} to win`, awayOdds);
+              }}
             >
               <span className="text-xs text-muted-foreground">Away</span>
               <span className="text-base font-bold text-odds">{awayOdds}</span>
@@ -51,6 +74,10 @@ const MatchCard = ({ time, homeTeam, awayTeam, homeOdds, drawOdds, awayOdds }: M
             variant="secondary" 
             size="sm" 
             className="w-20 flex flex-col h-auto py-2 hover:bg-primary/20 hover:text-primary"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleOddsClick("Draw", drawOdds);
+            }}
           >
             <span className="text-xs text-muted-foreground">Draw</span>
             <span className="text-base font-bold text-odds">{drawOdds}</span>

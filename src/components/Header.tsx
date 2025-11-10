@@ -5,6 +5,7 @@ import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import MobileNav from "./MobileNav";
 import ThemeToggle from "./ThemeToggle";
+import { toast } from "@/hooks/use-toast";
 
 const Header = () => {
   const location = useLocation();
@@ -17,13 +18,27 @@ const Header = () => {
     { label: "🎲 Virtuals", path: "/virtuals" },
   ];
 
+  const handleLogin = () => {
+    toast({
+      title: "Login",
+      description: "Login feature coming soon!",
+    });
+  };
+
+  const handleJoin = () => {
+    toast({
+      title: "Join Betfuz",
+      description: "Registration feature coming soon!",
+    });
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-16 items-center px-4 md:px-6">
         <div className="flex items-center gap-2 md:gap-8">
           <MobileNav />
           <Link to="/" className="flex items-center gap-2">
-            <div className="text-2xl font-bold text-primary">M</div>
+            <div className="text-xl md:text-2xl font-bold text-primary">Betfuz</div>
           </Link>
           
           <nav className="hidden md:flex items-center gap-1">
@@ -52,11 +67,11 @@ const Header = () => {
               className="w-64 pl-10 bg-secondary border-border"
             />
           </div>
-          <Button variant="outline" size="sm" className="hidden sm:flex">
+          <Button variant="outline" size="sm" className="hidden sm:flex" onClick={handleLogin}>
             <LogIn className="mr-2 h-4 w-4" />
             Log In
           </Button>
-          <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+          <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={handleJoin}>
             <span className="hidden sm:inline">Join Now</span>
             <span className="sm:hidden">Join</span>
           </Button>
