@@ -114,6 +114,111 @@ export type Database = {
           },
         ]
       }
+      betting_trends: {
+        Row: {
+          bet_count: number | null
+          created_at: string | null
+          id: string
+          match_id: string
+          percentage: number | null
+          selection_type: string
+          selection_value: string
+          updated_at: string | null
+        }
+        Insert: {
+          bet_count?: number | null
+          created_at?: string | null
+          id?: string
+          match_id: string
+          percentage?: number | null
+          selection_type: string
+          selection_value: string
+          updated_at?: string | null
+        }
+        Update: {
+          bet_count?: number | null
+          created_at?: string | null
+          id?: string
+          match_id?: string
+          percentage?: number | null
+          selection_type?: string
+          selection_value?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      match_statistics: {
+        Row: {
+          away_form: string | null
+          away_goals_conceded: number | null
+          away_goals_scored: number | null
+          away_position: number | null
+          away_team: string
+          created_at: string | null
+          h2h_away_wins: number | null
+          h2h_draws: number | null
+          h2h_home_wins: number | null
+          home_form: string | null
+          home_goals_conceded: number | null
+          home_goals_scored: number | null
+          home_position: number | null
+          home_team: string
+          id: string
+          last_meeting_date: string | null
+          last_meeting_result: string | null
+          league: string | null
+          match_id: string
+          sport: string
+          updated_at: string | null
+        }
+        Insert: {
+          away_form?: string | null
+          away_goals_conceded?: number | null
+          away_goals_scored?: number | null
+          away_position?: number | null
+          away_team: string
+          created_at?: string | null
+          h2h_away_wins?: number | null
+          h2h_draws?: number | null
+          h2h_home_wins?: number | null
+          home_form?: string | null
+          home_goals_conceded?: number | null
+          home_goals_scored?: number | null
+          home_position?: number | null
+          home_team: string
+          id?: string
+          last_meeting_date?: string | null
+          last_meeting_result?: string | null
+          league?: string | null
+          match_id: string
+          sport: string
+          updated_at?: string | null
+        }
+        Update: {
+          away_form?: string | null
+          away_goals_conceded?: number | null
+          away_goals_scored?: number | null
+          away_position?: number | null
+          away_team?: string
+          created_at?: string | null
+          h2h_away_wins?: number | null
+          h2h_draws?: number | null
+          h2h_home_wins?: number | null
+          home_form?: string | null
+          home_goals_conceded?: number | null
+          home_goals_scored?: number | null
+          home_position?: number | null
+          home_team?: string
+          id?: string
+          last_meeting_date?: string | null
+          last_meeting_result?: string | null
+          league?: string | null
+          match_id?: string
+          sport?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           balance: number | null
@@ -144,6 +249,111 @@ export type Database = {
           id?: string
           phone?: string | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      sport_statistics: {
+        Row: {
+          bets_placed: number | null
+          bets_won: number | null
+          created_at: string | null
+          id: string
+          profit_loss: number | null
+          sport: string
+          total_returns: number | null
+          total_staked: number | null
+          updated_at: string | null
+          user_id: string
+          win_rate: number | null
+        }
+        Insert: {
+          bets_placed?: number | null
+          bets_won?: number | null
+          created_at?: string | null
+          id?: string
+          profit_loss?: number | null
+          sport: string
+          total_returns?: number | null
+          total_staked?: number | null
+          updated_at?: string | null
+          user_id: string
+          win_rate?: number | null
+        }
+        Update: {
+          bets_placed?: number | null
+          bets_won?: number | null
+          created_at?: string | null
+          id?: string
+          profit_loss?: number | null
+          sport?: string
+          total_returns?: number | null
+          total_staked?: number | null
+          updated_at?: string | null
+          user_id?: string
+          win_rate?: number | null
+        }
+        Relationships: []
+      }
+      user_statistics: {
+        Row: {
+          best_streak: number | null
+          biggest_loss: number | null
+          biggest_win: number | null
+          created_at: string | null
+          current_streak: number | null
+          favorite_sport: string | null
+          id: string
+          profit_loss: number | null
+          roi: number | null
+          total_bets: number | null
+          total_losses: number | null
+          total_pending: number | null
+          total_returns: number | null
+          total_staked: number | null
+          total_wins: number | null
+          updated_at: string | null
+          user_id: string
+          win_rate: number | null
+        }
+        Insert: {
+          best_streak?: number | null
+          biggest_loss?: number | null
+          biggest_win?: number | null
+          created_at?: string | null
+          current_streak?: number | null
+          favorite_sport?: string | null
+          id?: string
+          profit_loss?: number | null
+          roi?: number | null
+          total_bets?: number | null
+          total_losses?: number | null
+          total_pending?: number | null
+          total_returns?: number | null
+          total_staked?: number | null
+          total_wins?: number | null
+          updated_at?: string | null
+          user_id: string
+          win_rate?: number | null
+        }
+        Update: {
+          best_streak?: number | null
+          biggest_loss?: number | null
+          biggest_win?: number | null
+          created_at?: string | null
+          current_streak?: number | null
+          favorite_sport?: string | null
+          id?: string
+          profit_loss?: number | null
+          roi?: number | null
+          total_bets?: number | null
+          total_losses?: number | null
+          total_pending?: number | null
+          total_returns?: number | null
+          total_staked?: number | null
+          total_wins?: number | null
+          updated_at?: string | null
+          user_id?: string
+          win_rate?: number | null
         }
         Relationships: []
       }
