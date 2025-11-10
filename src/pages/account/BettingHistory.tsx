@@ -2,13 +2,14 @@ import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { formatCurrency } from "@/lib/currency";
 
 const BettingHistory = () => {
   const bets = [
-    { id: "#BET001", date: "Today 14:30", event: "Man United vs Liverpool", stake: "£50.00", odds: "3.60", status: "won", returns: "£180.00" },
-    { id: "#BET002", date: "Today 12:00", event: "Arsenal vs Chelsea", stake: "£25.00", odds: "1.97", status: "lost", returns: "£0.00" },
-    { id: "#BET003", date: "Yesterday", event: "Real Madrid vs Barcelona", stake: "£100.00", odds: "2.15", status: "won", returns: "£215.00" },
-    { id: "#BET004", date: "Yesterday", event: "Bayern vs Dortmund", stake: "£75.00", odds: "1.85", status: "pending", returns: "-" },
+    { id: "#BET001", date: "Today 14:30", event: "Man United vs Liverpool", stake: 2500, odds: "3.60", status: "won", returns: 9000 },
+    { id: "#BET002", date: "Today 12:00", event: "Arsenal vs Chelsea", stake: 1250, odds: "1.97", status: "lost", returns: 0 },
+    { id: "#BET003", date: "Yesterday", event: "Real Madrid vs Barcelona", stake: 5000, odds: "2.15", status: "won", returns: 10750 },
+    { id: "#BET004", date: "Yesterday", event: "Bayern vs Dortmund", stake: 3750, odds: "1.85", status: "pending", returns: null },
   ];
 
   return (
@@ -34,11 +35,13 @@ const BettingHistory = () => {
                   </div>
                   <div className="text-right">
                     <div className="text-xs text-muted-foreground">Returns</div>
-                    <div className="text-lg font-bold text-foreground">{bet.returns}</div>
+                    <div className="text-lg font-bold text-foreground">
+                      {bet.returns !== null ? formatCurrency(bet.returns) : "-"}
+                    </div>
                   </div>
                 </div>
                 <div className="flex gap-4 text-sm">
-                  <div><span className="text-muted-foreground">Stake:</span> {bet.stake}</div>
+                  <div><span className="text-muted-foreground">Stake:</span> {formatCurrency(bet.stake)}</div>
                   <div><span className="text-muted-foreground">Odds:</span> {bet.odds}</div>
                 </div>
               </Card>

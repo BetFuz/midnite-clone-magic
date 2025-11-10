@@ -3,13 +3,22 @@ import Sidebar from "@/components/Sidebar";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CreditCard, Smartphone, Building2 } from "lucide-react";
+import { formatCurrency } from "@/lib/currency";
+import { toast } from "@/hooks/use-toast";
 
 const Deposits = () => {
   const methods = [
-    { name: "Debit Card", icon: CreditCard, limits: "£10 - £10,000", instant: true },
-    { name: "PayPal", icon: Smartphone, limits: "£10 - £5,000", instant: true },
-    { name: "Bank Transfer", icon: Building2, limits: "£50 - £50,000", instant: false },
+    { name: "Debit Card", icon: CreditCard, limits: `${formatCurrency(500)} - ${formatCurrency(500000)}`, instant: true },
+    { name: "PayPal", icon: Smartphone, limits: `${formatCurrency(500)} - ${formatCurrency(250000)}`, instant: true },
+    { name: "Bank Transfer", icon: Building2, limits: `${formatCurrency(2500)} - ${formatCurrency(2500000)}`, instant: false },
   ];
+
+  const handleDeposit = (methodName: string) => {
+    toast({
+      title: "Deposit",
+      description: `${methodName} deposit coming soon!`,
+    });
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -30,7 +39,12 @@ const Deposits = () => {
                     <p className="text-sm text-muted-foreground">{method.limits}</p>
                     {method.instant && <p className="text-xs text-success">Instant</p>}
                   </div>
-                  <Button className="bg-primary text-primary-foreground hover:bg-primary/90">Deposit</Button>
+                  <Button 
+                    className="bg-primary text-primary-foreground hover:bg-primary/90"
+                    onClick={() => handleDeposit(method.name)}
+                  >
+                    Deposit
+                  </Button>
                 </div>
               </Card>
             ))}

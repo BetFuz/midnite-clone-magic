@@ -4,8 +4,22 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 const Profile = () => {
+  const [email, setEmail] = useState("user@example.com");
+  const [name, setName] = useState("John Doe");
+  const [phone, setPhone] = useState("+234 700 900 0000");
+  const [dob, setDob] = useState("1990-01-01");
+
+  const handleSave = () => {
+    toast({
+      title: "Profile Updated",
+      description: "Your profile has been saved successfully.",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -17,21 +31,48 @@ const Profile = () => {
             <div className="space-y-4">
               <div>
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" defaultValue="user@example.com" className="bg-secondary" />
+                <Input 
+                  id="email" 
+                  type="email" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="bg-secondary" 
+                />
               </div>
               <div>
                 <Label htmlFor="name">Full Name</Label>
-                <Input id="name" defaultValue="John Doe" className="bg-secondary" />
+                <Input 
+                  id="name" 
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="bg-secondary" 
+                />
               </div>
               <div>
                 <Label htmlFor="phone">Phone Number</Label>
-                <Input id="phone" defaultValue="+44 7700 900000" className="bg-secondary" />
+                <Input 
+                  id="phone" 
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="bg-secondary" 
+                />
               </div>
               <div>
                 <Label htmlFor="dob">Date of Birth</Label>
-                <Input id="dob" type="date" defaultValue="1990-01-01" className="bg-secondary" />
+                <Input 
+                  id="dob" 
+                  type="date" 
+                  value={dob}
+                  onChange={(e) => setDob(e.target.value)}
+                  className="bg-secondary" 
+                />
               </div>
-              <Button className="bg-primary text-primary-foreground hover:bg-primary/90">Save Changes</Button>
+              <Button 
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
+                onClick={handleSave}
+              >
+                Save Changes
+              </Button>
             </div>
           </Card>
         </main>

@@ -4,8 +4,31 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { toast } from "@/hooks/use-toast";
 
 const AccountSettings = () => {
+  const handleChangePassword = () => {
+    toast({
+      title: "Change Password",
+      description: "Password change feature coming soon!",
+    });
+  };
+
+  const handleEnable2FA = () => {
+    toast({
+      title: "Two-Factor Authentication",
+      description: "2FA setup coming soon!",
+    });
+  };
+
+  const handleCloseAccount = () => {
+    toast({
+      title: "Close Account",
+      description: "Please contact support to close your account.",
+      variant: "destructive",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -49,9 +72,27 @@ const AccountSettings = () => {
           <Card className="p-6 bg-card border-border">
             <h2 className="text-xl font-bold text-foreground mb-4">Security</h2>
             <div className="space-y-3">
-              <Button variant="outline" className="w-full justify-start">Change Password</Button>
-              <Button variant="outline" className="w-full justify-start">Enable Two-Factor Auth</Button>
-              <Button variant="outline" className="w-full justify-start text-destructive hover:text-destructive">Close Account</Button>
+              <Button 
+                variant="outline" 
+                className="w-full justify-start"
+                onClick={handleChangePassword}
+              >
+                Change Password
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full justify-start"
+                onClick={handleEnable2FA}
+              >
+                Enable Two-Factor Auth
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full justify-start text-destructive hover:text-destructive"
+                onClick={handleCloseAccount}
+              >
+                Close Account
+              </Button>
             </div>
           </Card>
         </main>
