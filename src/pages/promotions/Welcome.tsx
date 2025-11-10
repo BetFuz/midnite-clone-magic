@@ -77,59 +77,75 @@ const Welcome = () => {
         <main className="flex-1 p-6 overflow-y-auto h-[calc(100vh-4rem)]">
           <div className="max-w-5xl mx-auto">
             {/* Hero Section */}
-            <div className="relative mb-8 overflow-hidden rounded-2xl">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary via-accent to-primary opacity-90" />
-              <div className="relative p-8 md:p-12">
-                <Badge className="mb-4 bg-white/20 text-white border-white/30 hover:bg-white/30">
-                  <Sparkles className="h-3 w-3 mr-1" />
-                  New Customer Offer
+            <div className="relative mb-8 overflow-hidden rounded-3xl shadow-2xl">
+              {/* Gradient Background */}
+              <div className="absolute inset-0 bg-[image:var(--gradient-elite)]" />
+              
+              {/* Subtle Pattern Overlay */}
+              <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_50%)]" />
+              
+              <div className="relative p-8 md:p-16">
+                {/* Badge */}
+                <Badge className="mb-6 bg-white/10 text-white border-white/20 hover:bg-white/20 backdrop-blur-sm px-4 py-1.5">
+                  <Sparkles className="h-3.5 w-3.5 mr-1.5" />
+                  Exclusive New Customer Offer
                 </Badge>
-                <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 animate-fade-in">
+                
+                {/* Main Heading */}
+                <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-3 tracking-tight">
                   Welcome to Betfuz
                 </h1>
-                <div className="flex items-baseline gap-3 mb-6">
-                  <span className="text-5xl md:text-7xl font-bold text-white">
-                    {formatCurrency(15000)}
-                  </span>
-                  <span className="text-2xl text-white/90">in Free Bets</span>
+                
+                {/* Bonus Amount */}
+                <div className="mb-6">
+                  <div className="flex items-baseline gap-3 mb-2">
+                    <span className="text-5xl md:text-7xl lg:text-8xl font-black text-white tracking-tight">
+                      {formatCurrency(15000)}
+                    </span>
+                  </div>
+                  <span className="text-xl md:text-2xl text-white/80 font-medium">in Free Bets</span>
                 </div>
-                <p className="text-xl text-white/90 mb-8 max-w-2xl">
+                
+                {/* Description */}
+                <p className="text-base md:text-lg text-white/80 mb-10 max-w-2xl leading-relaxed">
                   Place your first bet of {formatCurrency(5000)} and receive {formatCurrency(15000)} in free bets. 
-                  Start your winning journey with us today!
+                  Start your winning journey with us today.
                 </p>
                 
                 {/* Countdown Timer */}
-                <div className="flex items-center gap-4 mb-8">
-                  <Clock className="h-5 w-5 text-white" />
-                  <span className="text-white/90 text-sm">Offer ends in:</span>
-                  <div className="flex gap-2">
+                <div className="inline-flex items-center gap-6 mb-10 bg-black/20 backdrop-blur-md rounded-2xl px-6 py-4 border border-white/10">
+                  <div className="flex items-center gap-3">
+                    <Clock className="h-5 w-5 text-white/70" />
+                    <span className="text-white/70 text-sm font-medium">Offer expires in</span>
+                  </div>
+                  <div className="flex gap-3">
                     {[
-                      { value: timeLeft.hours, label: 'hrs' },
-                      { value: timeLeft.minutes, label: 'min' },
-                      { value: timeLeft.seconds, label: 'sec' }
+                      { value: timeLeft.hours, label: 'hours' },
+                      { value: timeLeft.minutes, label: 'minutes' },
+                      { value: timeLeft.seconds, label: 'seconds' }
                     ].map((item, i) => (
-                      <div key={i} className="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-2 min-w-[60px] text-center">
-                        <div className="text-2xl font-bold text-white">{String(item.value).padStart(2, '0')}</div>
-                        <div className="text-xs text-white/70">{item.label}</div>
+                      <div key={i} className="flex flex-col items-center">
+                        <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3 min-w-[70px] text-center border border-white/10">
+                          <div className="text-3xl font-bold text-white tabular-nums">{String(item.value).padStart(2, '0')}</div>
+                        </div>
+                        <div className="text-xs text-white/50 mt-1.5 font-medium">{item.label}</div>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 mb-8">
-                  <Badge variant="destructive" className="animate-pulse">
-                    🔥 Only {spotsLeft} spots left today
-                  </Badge>
+                {/* CTA Button */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                  <Button 
+                    size="lg" 
+                    className="bg-white text-foreground font-bold hover:bg-white/95 shadow-xl hover:shadow-2xl transition-all gap-2 text-base md:text-lg px-10 py-6 rounded-xl"
+                    onClick={handleClaimOffer}
+                  >
+                    Claim Your Bonus
+                    <ArrowRight className="h-5 w-5" />
+                  </Button>
+                  <span className="text-white/60 text-sm">Limited availability • {spotsLeft} spots remaining</span>
                 </div>
-
-                <Button 
-                  size="lg" 
-                  className="bg-white text-primary font-bold hover:bg-white/90 hover:scale-105 transition-transform gap-2 text-lg px-8"
-                  onClick={handleClaimOffer}
-                >
-                  Claim Your Bonus
-                  <ArrowRight className="h-5 w-5" />
-                </Button>
               </div>
             </div>
 
