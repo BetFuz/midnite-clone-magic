@@ -113,20 +113,20 @@ const Welcome = () => {
                 </p>
                 
                 {/* Countdown Timer */}
-                <div className="inline-flex items-center gap-6 mb-10 bg-black/20 backdrop-blur-md rounded-2xl px-6 py-4 border border-white/10">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8 bg-black/20 backdrop-blur-md rounded-2xl px-6 py-5 border border-white/10">
                   <div className="flex items-center gap-3">
                     <Clock className="h-5 w-5 text-white/70" />
                     <span className="text-white/70 text-sm font-medium">Offer expires in</span>
                   </div>
-                  <div className="flex gap-3">
+                  <div className="flex gap-2 sm:gap-3">
                     {[
                       { value: timeLeft.hours, label: 'hours' },
-                      { value: timeLeft.minutes, label: 'minutes' },
-                      { value: timeLeft.seconds, label: 'seconds' }
+                      { value: timeLeft.minutes, label: 'min' },
+                      { value: timeLeft.seconds, label: 'sec' }
                     ].map((item, i) => (
                       <div key={i} className="flex flex-col items-center">
-                        <div className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3 min-w-[70px] text-center border border-white/10">
-                          <div className="text-3xl font-bold text-white tabular-nums">{String(item.value).padStart(2, '0')}</div>
+                        <div className="bg-white/10 backdrop-blur-sm rounded-xl px-3 sm:px-4 py-2 sm:py-3 min-w-[60px] sm:min-w-[70px] text-center border border-white/10">
+                          <div className="text-2xl sm:text-3xl font-bold text-white tabular-nums">{String(item.value).padStart(2, '0')}</div>
                         </div>
                         <div className="text-xs text-white/50 mt-1.5 font-medium">{item.label}</div>
                       </div>
@@ -135,16 +135,18 @@ const Welcome = () => {
                 </div>
 
                 {/* CTA Button */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                <div className="space-y-4">
                   <Button 
                     size="lg" 
-                    className="bg-white text-foreground font-bold hover:bg-white/95 shadow-xl hover:shadow-2xl transition-all gap-2 text-base md:text-lg px-10 py-6 rounded-xl"
+                    className="w-full sm:w-auto bg-primary text-primary-foreground font-bold hover:bg-primary/90 shadow-xl hover:shadow-2xl transition-all gap-2 text-base md:text-lg px-10 py-6 rounded-xl"
                     onClick={handleClaimOffer}
                   >
-                    Claim Your Bonus
+                    Claim Your Bonus Now
                     <ArrowRight className="h-5 w-5" />
                   </Button>
-                  <span className="text-white/60 text-sm">Limited availability • {spotsLeft} spots remaining</span>
+                  <p className="text-white/70 text-sm font-medium">
+                    Limited availability • Only {spotsLeft} spots remaining today
+                  </p>
                 </div>
               </div>
             </div>
