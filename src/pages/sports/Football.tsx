@@ -15,6 +15,13 @@ const Football = () => {
     { name: "Ligue 1", matches: 10, country: "France" },
     { name: "Championship", matches: 12, country: "England" },
     { name: "Europa League", matches: 16, country: "Europe" },
+    { name: "World Cup", matches: 64, country: "International" },
+    { name: "U20 World Cup", matches: 52, country: "International" },
+    { name: "U17 World Cup", matches: 52, country: "International" },
+    { name: "CAF Champions League", matches: 14, country: "Africa" },
+    { name: "African Cup of Nations", matches: 52, country: "Africa" },
+    { name: "Egyptian Premier League", matches: 18, country: "Egypt" },
+    { name: "South African Premier League", matches: 16, country: "South Africa" },
   ];
 
   return (

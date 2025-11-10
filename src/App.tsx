@@ -29,6 +29,13 @@ import ChampionsLeague from "./pages/football/ChampionsLeague";
 import LaLiga from "./pages/football/LaLiga";
 import SerieA from "./pages/football/SerieA";
 import Bundesliga from "./pages/football/Bundesliga";
+import WorldCup from "./pages/football/WorldCup";
+import U20WorldCup from "./pages/football/U20WorldCup";
+import U17WorldCup from "./pages/football/U17WorldCup";
+import CAFChampionsLeague from "./pages/football/CAFChampionsLeague";
+import AFCON from "./pages/football/AFCON";
+import EgyptianPremierLeague from "./pages/football/EgyptianPremierLeague";
+import SouthAfricanPremierLeague from "./pages/football/SouthAfricanPremierLeague";
 
 // Racing Venues
 import Ascot from "./pages/racing/Ascot";
@@ -115,6 +122,13 @@ const App = () => (
           <Route path="/football/la-liga" element={<LaLiga />} />
           <Route path="/football/serie-a" element={<SerieA />} />
           <Route path="/football/bundesliga" element={<Bundesliga />} />
+          <Route path="/football/world-cup" element={<WorldCup />} />
+          <Route path="/football/u20-world-cup" element={<U20WorldCup />} />
+          <Route path="/football/u17-world-cup" element={<U17WorldCup />} />
+          <Route path="/football/caf-champions-league" element={<CAFChampionsLeague />} />
+          <Route path="/football/african-cup-of-nations" element={<AFCON />} />
+          <Route path="/football/egyptian-premier-league" element={<EgyptianPremierLeague />} />
+          <Route path="/football/south-african-premier-league" element={<SouthAfricanPremierLeague />} />
           
           {/* Basketball Leagues */}
           <Route path="/basketball/nba" element={<NBA />} />
