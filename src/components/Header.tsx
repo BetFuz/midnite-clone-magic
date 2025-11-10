@@ -1,4 +1,4 @@
-import { Search, LogIn } from "lucide-react";
+import { Search, LogIn, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -10,6 +10,7 @@ const Header = () => {
   const location = useLocation();
 
   const navItems = [
+    { label: "🏠 Home", path: "/" },
     { label: "⚽ Sports", path: "/" },
     { label: "🏇 Racing", path: "/racing" },
     { label: "🎮 Games", path: "/games" },
