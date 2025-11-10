@@ -14,7 +14,139 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      bet_selections: {
+        Row: {
+          away_team: string
+          bet_slip_id: string | null
+          created_at: string | null
+          home_team: string
+          id: string
+          league: string | null
+          match_id: string
+          match_time: string | null
+          odds: number
+          selection_type: string
+          selection_value: string
+          sport: string
+          status: string | null
+        }
+        Insert: {
+          away_team: string
+          bet_slip_id?: string | null
+          created_at?: string | null
+          home_team: string
+          id?: string
+          league?: string | null
+          match_id: string
+          match_time?: string | null
+          odds: number
+          selection_type: string
+          selection_value: string
+          sport: string
+          status?: string | null
+        }
+        Update: {
+          away_team?: string
+          bet_slip_id?: string | null
+          created_at?: string | null
+          home_team?: string
+          id?: string
+          league?: string | null
+          match_id?: string
+          match_time?: string | null
+          odds?: number
+          selection_type?: string
+          selection_value?: string
+          sport?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bet_selections_bet_slip_id_fkey"
+            columns: ["bet_slip_id"]
+            isOneToOne: false
+            referencedRelation: "bet_slips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bet_slips: {
+        Row: {
+          bet_type: string
+          created_at: string | null
+          id: string
+          potential_win: number
+          settled_at: string | null
+          status: string
+          total_odds: number
+          total_stake: number
+          user_id: string
+        }
+        Insert: {
+          bet_type?: string
+          created_at?: string | null
+          id?: string
+          potential_win?: number
+          settled_at?: string | null
+          status?: string
+          total_odds?: number
+          total_stake?: number
+          user_id: string
+        }
+        Update: {
+          bet_type?: string
+          created_at?: string | null
+          id?: string
+          potential_win?: number
+          settled_at?: string | null
+          status?: string
+          total_odds?: number
+          total_stake?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bet_slips_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          balance: number | null
+          created_at: string | null
+          currency_code: string | null
+          email: string
+          full_name: string | null
+          id: string
+          phone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          balance?: number | null
+          created_at?: string | null
+          currency_code?: string | null
+          email: string
+          full_name?: string | null
+          id: string
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          balance?: number | null
+          created_at?: string | null
+          currency_code?: string | null
+          email?: string
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
