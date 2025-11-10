@@ -1,8 +1,11 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { useNavigate } from "react-router-dom";
 import { useBetSlip } from "@/contexts/BetSlipContext";
+import { TrendingUp, Users, Info } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface MatchCardProps {
   sport?: string;
@@ -13,9 +16,26 @@ interface MatchCardProps {
   homeOdds: string;
   drawOdds: string | null;
   awayOdds: string;
+  homeForm?: string;
+  awayForm?: string;
+  popularBet?: string;
+  popularBetPercentage?: number;
 }
 
-const MatchCard = ({ sport, league, time, homeTeam, awayTeam, homeOdds, drawOdds, awayOdds }: MatchCardProps) => {
+const MatchCard = ({ 
+  sport, 
+  league, 
+  time, 
+  homeTeam, 
+  awayTeam, 
+  homeOdds, 
+  drawOdds, 
+  awayOdds,
+  homeForm,
+  awayForm,
+  popularBet,
+  popularBetPercentage 
+}: MatchCardProps) => {
   const navigate = useNavigate();
   const { addSelection } = useBetSlip();
   
@@ -53,22 +73,62 @@ const MatchCard = ({ sport, league, time, homeTeam, awayTeam, homeOdds, drawOdds
     }
   };
 
+  const FormIndicator = ({ form }: { form: string }) => (
+    <div className="flex gap-0.5">
+      {form.split('').slice(0, 3).map((result, i) => (
+        <div
+          key={i}
+          className={`w-1.5 h-1.5 rounded-full ${
+            result === 'W' ? 'bg-success' :
+            result === 'D' ? 'bg-muted-foreground' :
+            'bg-destructive'
+          }`}
+        />
+      ))}
+    </div>
+  );
+
   return (
-    <Card className="p-4 bg-card border-border hover:border-primary/50 transition-colors cursor-pointer" onClick={handleMatchClick}>
-      {league && (
-        <Badge variant="secondary" className="mb-2 text-xs">{league}</Badge>
-      )}
+    <Card className="p-4 bg-card border-border hover:border-primary/50 transition-colors cursor-pointer group" onClick={handleMatchClick}>
+      <div className="flex items-center justify-between mb-3">
+        {league && (
+          <Badge variant="secondary" className="text-xs">{league}</Badge>
+        )}
+        {popularBet && popularBetPercentage && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-center gap-1 text-xs text-primary">
+                  <TrendingUp className="h-3 w-3" />
+                  <Users className="h-3 w-3" />
+                  <span className="font-semibold">{popularBetPercentage}%</span>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-xs">{popularBetPercentage}% betting on {popularBet}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
+      </div>
+
       <div className="flex items-center justify-between">
         <div className="flex-1">
           <div className="text-xs text-muted-foreground mb-3">{time}</div>
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-2">
-              <div className="w-5 h-5 rounded-full bg-secondary flex items-center justify-center text-xs">{getSportIcon()}</div>
-              <span className="text-sm font-medium text-foreground">{homeTeam}</span>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 flex-1">
+                <div className="w-5 h-5 rounded-full bg-secondary flex items-center justify-center text-xs">{getSportIcon()}</div>
+                <span className="text-sm font-medium text-foreground">{homeTeam}</span>
+              </div>
+              {homeForm && <FormIndicator form={homeForm} />}
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-5 h-5 rounded-full bg-secondary flex items-center justify-center text-xs">{getSportIcon()}</div>
-              <span className="text-sm font-medium text-foreground">{awayTeam}</span>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 flex-1">
+                <div className="w-5 h-5 rounded-full bg-secondary flex items-center justify-center text-xs">{getSportIcon()}</div>
+                <span className="text-sm font-medium text-foreground">{awayTeam}</span>
+              </div>
+              {awayForm && <FormIndicator form={awayForm} />}
             </div>
           </div>
         </div>
@@ -116,6 +176,15 @@ const MatchCard = ({ sport, league, time, homeTeam, awayTeam, homeOdds, drawOdds
           )}
         </div>
       </div>
+
+      {(homeForm || awayForm || popularBet) && (
+        <div className="mt-3 pt-3 border-t border-border">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Info className="h-3 w-3" />
+            <span>Click for detailed stats & trends</span>
+          </div>
+        </div>
+      )}
     </Card>
   );
 };

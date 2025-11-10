@@ -1,4 +1,4 @@
-import { Home, Trophy, CircleDot, Flame, Hammer, Target, TrendingUp, Dumbbell, Volleyball, Table2, TicketCheck } from "lucide-react";
+import { Home, Trophy, CircleDot, Flame, Hammer, Target, TrendingUp, Dumbbell, Volleyball, Table2, TicketCheck, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NavLink } from "@/components/NavLink";
 
@@ -11,6 +11,7 @@ const Sidebar = ({ className, showOnMobile = false }: SidebarProps) => {
   const menuItems = [
     { icon: Home, label: "Home", url: "/" },
     { icon: TicketCheck, label: "My Bets", url: "/account/bet-tickets" },
+    { icon: BarChart3, label: "Statistics", url: "/account/statistics" },
     { icon: Trophy, label: "Rewards", url: "/promotions/welcome" },
     { icon: Flame, label: "In-Play", url: "/sports/football", badge: "54" },
     { icon: Hammer, label: "Acca Builder", url: "/promotions/acca-boost" },

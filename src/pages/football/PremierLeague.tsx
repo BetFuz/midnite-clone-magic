@@ -6,11 +6,66 @@ import { Card } from "@/components/ui/card";
 
 const PremierLeague = () => {
   const matches = [
-    { time: "Sat 12:30", homeTeam: "Manchester United", awayTeam: "Liverpool", homeOdds: "3.60", drawOdds: "3.30", awayOdds: "2.00" },
-    { time: "Sat 15:00", homeTeam: "Arsenal", awayTeam: "Chelsea", homeOdds: "1.97", drawOdds: "3.80", awayOdds: "5.00" },
-    { time: "Sat 15:00", homeTeam: "Manchester City", awayTeam: "Tottenham", homeOdds: "1.45", drawOdds: "4.50", awayOdds: "7.00" },
-    { time: "Sat 17:30", homeTeam: "Newcastle", awayTeam: "Brighton", homeOdds: "2.10", drawOdds: "3.40", awayOdds: "3.60" },
-    { time: "Sun 14:00", homeTeam: "Aston Villa", awayTeam: "West Ham", homeOdds: "2.30", drawOdds: "3.30", awayOdds: "3.20" },
+    { 
+      time: "Sat 12:30", 
+      homeTeam: "Manchester United", 
+      awayTeam: "Liverpool", 
+      homeOdds: "3.60", 
+      drawOdds: "3.30", 
+      awayOdds: "2.00",
+      homeForm: "WDLWL",
+      awayForm: "WWWDW",
+      popularBet: "Liverpool",
+      popularBetPercentage: 58
+    },
+    { 
+      time: "Sat 15:00", 
+      homeTeam: "Arsenal", 
+      awayTeam: "Chelsea", 
+      homeOdds: "1.97", 
+      drawOdds: "3.80", 
+      awayOdds: "5.00",
+      homeForm: "WWLWD",
+      awayForm: "WLDWL",
+      popularBet: "Arsenal",
+      popularBetPercentage: 67
+    },
+    { 
+      time: "Sat 15:00", 
+      homeTeam: "Manchester City", 
+      awayTeam: "Tottenham", 
+      homeOdds: "1.45", 
+      drawOdds: "4.50", 
+      awayOdds: "7.00",
+      homeForm: "WWDWW",
+      awayForm: "WDLDD",
+      popularBet: "Man City",
+      popularBetPercentage: 82
+    },
+    { 
+      time: "Sat 17:30", 
+      homeTeam: "Newcastle", 
+      awayTeam: "Brighton", 
+      homeOdds: "2.10", 
+      drawOdds: "3.40", 
+      awayOdds: "3.60",
+      homeForm: "DWWLD",
+      awayForm: "WDWLL",
+      popularBet: "Newcastle",
+      popularBetPercentage: 52
+    },
+    { 
+      time: "Sun 14:00", 
+      homeTeam: "Aston Villa", 
+      awayTeam: "West Ham", 
+      homeOdds: "2.30", 
+      drawOdds: "3.30", 
+      awayOdds: "3.20",
+      homeForm: "WWLDW",
+      awayForm: "LDWDL",
+      popularBet: "Aston Villa",
+      popularBetPercentage: 48
+    },
   ];
 
   return (
