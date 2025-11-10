@@ -4,14 +4,19 @@ import { NavLink } from "@/components/NavLink";
 
 interface SidebarProps {
   className?: string;
+  showOnMobile?: boolean;
 }
 
-const Sidebar = ({ className }: SidebarProps) => {
+const Sidebar = ({ className, showOnMobile = false }: SidebarProps) => {
   const menuItems = [
     { icon: Home, label: "Home", url: "/" },
     { icon: Trophy, label: "Rewards", url: "/promotions/welcome" },
     { icon: Flame, label: "In-Play", url: "/sports/football", badge: "54" },
     { icon: Hammer, label: "Acca Builder", url: "/promotions/acca-boost" },
+    { icon: TrendingUp, label: "Racing", url: "/racing" },
+    { icon: CircleDot, label: "Games", url: "/games" },
+    { icon: Target, label: "Live Casino", url: "/live-casino" },
+    { icon: Dumbbell, label: "Virtuals", url: "/virtuals" },
   ];
 
   const sportsCategories = [
@@ -25,7 +30,7 @@ const Sidebar = ({ className }: SidebarProps) => {
   ];
 
   return (
-    <aside className={cn("hidden md:flex w-64 border-r border-border bg-sidebar h-[calc(100vh-4rem)] overflow-y-auto", className)}>
+    <aside className={cn(showOnMobile ? "flex" : "hidden md:flex", "w-64 border-r border-border bg-sidebar h-[calc(100vh-4rem)] overflow-y-auto flex-col", className)}>
       <div className="p-4 space-y-6">
         <div className="space-y-1">
           {menuItems.map((item) => (
