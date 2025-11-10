@@ -4,8 +4,16 @@ import BetSlip from "@/components/BetSlip";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Play } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 const Roulette = () => {
+  const handlePlayGame = (gameName: string) => {
+    toast({
+      title: "Launching Game",
+      description: `${gameName} is loading...`,
+    });
+  };
+
   const games = [
     { name: "European Roulette", provider: "NetEnt", type: "Single Zero" },
     { name: "American Roulette", provider: "NetEnt", type: "Double Zero" },
@@ -24,10 +32,10 @@ const Roulette = () => {
           <h1 className="text-3xl font-bold text-foreground mb-6">Roulette Games</h1>
           <div className="grid grid-cols-2 gap-4">
             {games.map((game) => (
-              <Card key={game.name} className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all cursor-pointer">
+              <Card key={game.name} className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all cursor-pointer" onClick={() => handlePlayGame(game.name)}>
                 <div className="aspect-video bg-gradient-card relative">
                   <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button size="lg" className="rounded-full w-16 h-16 p-0">
+                    <Button size="lg" className="rounded-full w-16 h-16 p-0" onClick={(e) => { e.stopPropagation(); handlePlayGame(game.name); }}>
                       <Play className="h-6 w-6" fill="currentColor" />
                     </Button>
                   </div>

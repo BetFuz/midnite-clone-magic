@@ -6,8 +6,34 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Mail, Phone, MessageCircle } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 const Contact = () => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
+
+  const handleSendMessage = () => {
+    if (!name || !email || !subject || !message) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all fields",
+        variant: "destructive",
+      });
+      return;
+    }
+    toast({
+      title: "Message Sent",
+      description: "We'll get back to you within 24 hours",
+    });
+    setName("");
+    setEmail("");
+    setSubject("");
+    setMessage("");
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -40,21 +66,21 @@ const Contact = () => {
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="name">Name</Label>
-                  <Input id="name" placeholder="Your name" className="bg-secondary" />
+                  <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" className="bg-secondary" />
                 </div>
                 <div>
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="your@email.com" className="bg-secondary" />
+                  <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="your@email.com" className="bg-secondary" />
                 </div>
                 <div>
                   <Label htmlFor="subject">Subject</Label>
-                  <Input id="subject" placeholder="How can we help?" className="bg-secondary" />
+                  <Input id="subject" value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="How can we help?" className="bg-secondary" />
                 </div>
                 <div>
                   <Label htmlFor="message">Message</Label>
-                  <Textarea id="message" rows={6} placeholder="Your message..." className="bg-secondary" />
+                  <Textarea id="message" value={message} onChange={(e) => setMessage(e.target.value)} rows={6} placeholder="Your message..." className="bg-secondary" />
                 </div>
-                <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">Send Message</Button>
+                <Button onClick={handleSendMessage} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">Send Message</Button>
               </div>
             </Card>
           </div>

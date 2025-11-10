@@ -4,9 +4,27 @@ import BetSlip from "@/components/BetSlip";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Play, Star } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 const Games = () => {
+  const [selectedCategory, setSelectedCategory] = useState("All Games");
   const gameCategories = ["All Games", "Slots", "Table Games", "Jackpots", "New Games", "Popular"];
+  
+  const handlePlayGame = (gameName: string) => {
+    toast({
+      title: "Launching Game",
+      description: `${gameName} is loading...`,
+    });
+  };
+  
+  const handleCategoryClick = (category: string) => {
+    setSelectedCategory(category);
+    toast({
+      title: "Category Selected",
+      description: `Showing ${category}`,
+    });
+  };
   
   const games = [
     { name: "Starburst", provider: "NetEnt", category: "Slots", featured: true },
@@ -39,9 +57,10 @@ const Games = () => {
             {gameCategories.map((category) => (
               <Button
                 key={category}
-                variant="secondary"
+                variant={selectedCategory === category ? "default" : "secondary"}
                 size="sm"
                 className="whitespace-nowrap"
+                onClick={() => handleCategoryClick(category)}
               >
                 {category}
               </Button>
@@ -51,11 +70,11 @@ const Games = () => {
           <section className="mb-8">
             <h2 className="text-xl font-bold text-foreground mb-4">Featured Games</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {games.filter(game => game.featured).map((game, index) => (
-                <Card key={index} className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all cursor-pointer">
+            {games.filter(game => game.featured).map((game, index) => (
+                <Card key={index} className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all cursor-pointer" onClick={() => handlePlayGame(game.name)}>
                   <div className="aspect-square bg-gradient-card relative">
                     <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button size="lg" className="rounded-full w-16 h-16 p-0">
+                      <Button size="lg" className="rounded-full w-16 h-16 p-0" onClick={(e) => { e.stopPropagation(); handlePlayGame(game.name); }}>
                         <Play className="h-6 w-6" fill="currentColor" />
                       </Button>
                     </div>
@@ -77,11 +96,11 @@ const Games = () => {
           <section>
             <h2 className="text-xl font-bold text-foreground mb-4">All Games</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {games.map((game, index) => (
-                <Card key={index} className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all cursor-pointer">
+            {games.map((game, index) => (
+                <Card key={index} className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all cursor-pointer" onClick={() => handlePlayGame(game.name)}>
                   <div className="aspect-square bg-gradient-card relative">
                     <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button size="lg" className="rounded-full w-16 h-16 p-0">
+                      <Button size="lg" className="rounded-full w-16 h-16 p-0" onClick={(e) => { e.stopPropagation(); handlePlayGame(game.name); }}>
                         <Play className="h-6 w-6" fill="currentColor" />
                       </Button>
                     </div>

@@ -5,8 +5,30 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Play, Clock } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 const Virtuals = () => {
+  const handlePlayVirtual = (gameName: string) => {
+    toast({
+      title: "Loading Virtual Game",
+      description: `${gameName} is starting...`,
+    });
+  };
+  
+  const handlePlaceBet = (match: string) => {
+    toast({
+      title: "Bet Placed",
+      description: `Your bet on ${match} has been added to your bet slip`,
+    });
+  };
+  
+  const handleViewSchedule = (gameName: string) => {
+    toast({
+      title: "Schedule",
+      description: `Viewing ${gameName} schedule`,
+    });
+  };
+
   const virtualGames = [
     {
       name: "Virtual Football League",
@@ -75,7 +97,7 @@ const Virtuals = () => {
                       <Clock className="h-5 w-5 mr-2" />
                       2:34
                     </Badge>
-                    <Button size="lg" className="bg-white text-primary font-bold hover:bg-white/90">
+                    <Button size="lg" className="bg-white text-primary font-bold hover:bg-white/90" onClick={() => handlePlaceBet("City vs United")}>
                       Place Bet Now
                     </Button>
                   </div>
@@ -86,7 +108,7 @@ const Virtuals = () => {
             <h2 className="text-xl font-bold text-foreground mb-4">Available Virtual Sports</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {virtualGames.map((game, index) => (
-                <Card key={index} className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all">
+                <Card key={index} className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all cursor-pointer" onClick={() => handlePlayVirtual(game.name)}>
                   <div className="aspect-video bg-gradient-card relative">
                     <div className="absolute top-3 left-3">
                       <Badge className="bg-success/90 text-white">
@@ -95,7 +117,7 @@ const Virtuals = () => {
                       </Badge>
                     </div>
                     <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button size="lg" className="rounded-full w-16 h-16 p-0 bg-primary text-primary-foreground hover:bg-primary/90">
+                      <Button size="lg" className="rounded-full w-16 h-16 p-0 bg-primary text-primary-foreground hover:bg-primary/90" onClick={(e) => { e.stopPropagation(); handlePlayVirtual(game.name); }}>
                         <Play className="h-6 w-6" fill="currentColor" />
                       </Button>
                     </div>
@@ -105,7 +127,7 @@ const Virtuals = () => {
                     <p className="text-sm text-muted-foreground mb-2">{game.description}</p>
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-muted-foreground">{game.frequency}</span>
-                      <Button size="sm" variant="outline">
+                      <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); handleViewSchedule(game.name); }}>
                         View Schedule
                       </Button>
                     </div>
@@ -129,7 +151,7 @@ const Virtuals = () => {
                       <Badge variant="secondary" className="text-base font-bold">
                         {event.time}
                       </Badge>
-                      <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                      <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => handlePlaceBet(event.match)}>
                         Bet Now
                       </Button>
                     </div>

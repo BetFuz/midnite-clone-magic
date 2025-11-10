@@ -6,8 +6,16 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Users } from "lucide-react";
 import { formatCurrency } from "@/lib/currency";
+import { toast } from "@/hooks/use-toast";
 
 const LightningRoulette = () => {
+  const handleJoinTable = () => {
+    toast({
+      title: "Joining Table",
+      description: "Lightning Roulette is loading...",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -56,7 +64,7 @@ const LightningRoulette = () => {
             </div>
           </Card>
 
-          <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-14 text-lg font-bold">
+          <Button onClick={handleJoinTable} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-14 text-lg font-bold">
             Join Table
           </Button>
         </main>

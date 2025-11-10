@@ -4,8 +4,41 @@ import BetSlip from "@/components/BetSlip";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Clock, MapPin } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 const Racing = () => {
+  const [selectedTab, setSelectedTab] = useState("All Races");
+  
+  const handleTabClick = (tab: string) => {
+    setSelectedTab(tab);
+    toast({
+      title: "Filter Applied",
+      description: `Showing ${tab}`,
+    });
+  };
+  
+  const handleViewRaceCard = (venue: string) => {
+    toast({
+      title: "Race Card",
+      description: `Viewing ${venue} race card`,
+    });
+  };
+  
+  const handleFormGuide = (venue: string) => {
+    toast({
+      title: "Form Guide",
+      description: `Opening ${venue} form guide`,
+    });
+  };
+  
+  const handleHorseClick = (horseName: string) => {
+    toast({
+      title: "Horse Selected",
+      description: `Viewing details for ${horseName}`,
+    });
+  };
+
   const races = [
     {
       venue: "Ascot",
@@ -68,9 +101,10 @@ const Racing = () => {
             {["All Races", "UK", "Ireland", "Antepost", "Results"].map((tab) => (
               <Button
                 key={tab}
-                variant="secondary"
+                variant={selectedTab === tab ? "default" : "secondary"}
                 size="sm"
                 className="justify-start"
+                onClick={() => handleTabClick(tab)}
               >
                 {tab}
               </Button>
@@ -106,10 +140,10 @@ const Racing = () => {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                    <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => handleViewRaceCard(race.venue)}>
                       View Race Card
                     </Button>
-                    <Button size="sm" variant="outline">
+                    <Button size="sm" variant="outline" onClick={() => handleFormGuide(race.venue)}>
                       Form Guide
                     </Button>
                   </div>
@@ -122,7 +156,7 @@ const Racing = () => {
             <h2 className="text-xl font-bold text-foreground mb-4">Featured Runners</h2>
             <div className="grid grid-cols-2 gap-4">
               {featuredHorses.map((horse, index) => (
-                <Card key={index} className="p-4 bg-gradient-card border-border hover:border-primary/50 transition-colors cursor-pointer">
+                <Card key={index} className="p-4 bg-gradient-card border-border hover:border-primary/50 transition-colors cursor-pointer" onClick={() => handleHorseClick(horse.name)}>
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="font-semibold text-foreground mb-1">{horse.name}</h3>

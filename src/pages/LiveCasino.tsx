@@ -6,9 +6,27 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Users, Play } from "lucide-react";
 import { formatCurrency } from "@/lib/currency";
+import { toast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 const LiveCasino = () => {
+  const [selectedCategory, setSelectedCategory] = useState("All Tables");
   const categories = ["All Tables", "Roulette", "Blackjack", "Baccarat", "Game Shows", "Poker"];
+  
+  const handleJoinTable = (tableName: string) => {
+    toast({
+      title: "Joining Table",
+      description: `${tableName} is loading...`,
+    });
+  };
+  
+  const handleCategoryClick = (category: string) => {
+    setSelectedCategory(category);
+    toast({
+      title: "Category Selected",
+      description: `Showing ${category}`,
+    });
+  };
   
   const liveTables = [
     { name: "Lightning Roulette", dealer: "Sarah", players: 847, provider: "Evolution", minStake: 100, maxStake: 5000000, category: "Roulette" },
@@ -45,9 +63,10 @@ const LiveCasino = () => {
             {categories.map((category) => (
               <Button
                 key={category}
-                variant="secondary"
+                variant={selectedCategory === category ? "default" : "secondary"}
                 size="sm"
                 className="whitespace-nowrap"
+                onClick={() => handleCategoryClick(category)}
               >
                 {category}
               </Button>
@@ -57,8 +76,8 @@ const LiveCasino = () => {
           <section className="mb-8">
             <h2 className="text-xl font-bold text-foreground mb-4">Featured Tables</h2>
             <div className="grid grid-cols-2 gap-4">
-              {featuredTables.map((table, index) => (
-                <Card key={index} className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all">
+            {featuredTables.map((table, index) => (
+                <Card key={index} className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all cursor-pointer" onClick={() => handleJoinTable(table.name)}>
                   <div className="aspect-video bg-gradient-card relative">
                     <div className="absolute top-3 left-3 flex gap-2">
                       <Badge className="bg-destructive/90 text-white">
@@ -71,7 +90,7 @@ const LiveCasino = () => {
                       </Badge>
                     </div>
                     <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button size="lg" className="rounded-full w-16 h-16 p-0 bg-primary text-primary-foreground hover:bg-primary/90">
+                      <Button size="lg" className="rounded-full w-16 h-16 p-0 bg-primary text-primary-foreground hover:bg-primary/90" onClick={(e) => { e.stopPropagation(); handleJoinTable(table.name); }}>
                         <Play className="h-6 w-6" fill="currentColor" />
                       </Button>
                     </div>
@@ -94,8 +113,8 @@ const LiveCasino = () => {
           <section>
             <h2 className="text-xl font-bold text-foreground mb-4">All Live Tables</h2>
             <div className="grid grid-cols-2 gap-4">
-              {liveTables.map((table, index) => (
-                <Card key={index} className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all cursor-pointer">
+            {liveTables.map((table, index) => (
+                <Card key={index} className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all cursor-pointer" onClick={() => handleJoinTable(table.name)}>
                   <div className="aspect-video bg-gradient-card relative">
                     <div className="absolute top-3 left-3 flex gap-2">
                       <Badge className="bg-destructive/90 text-white">
@@ -108,7 +127,7 @@ const LiveCasino = () => {
                       </Badge>
                     </div>
                     <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button size="lg" className="rounded-full w-16 h-16 p-0 bg-primary text-primary-foreground hover:bg-primary/90">
+                      <Button size="lg" className="rounded-full w-16 h-16 p-0 bg-primary text-primary-foreground hover:bg-primary/90" onClick={(e) => { e.stopPropagation(); handleJoinTable(table.name); }}>
                         <Play className="h-6 w-6" fill="currentColor" />
                       </Button>
                     </div>

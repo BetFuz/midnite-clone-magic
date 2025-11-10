@@ -3,8 +3,16 @@ import Sidebar from "@/components/Sidebar";
 import BetSlip from "@/components/BetSlip";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { toast } from "@/hooks/use-toast";
 
 const Ascot = () => {
+  const handleViewCard = (raceName: string, time: string) => {
+    toast({
+      title: "Race Card",
+      description: `Viewing ${raceName} at ${time}`,
+    });
+  };
+
   const races = [
     { time: "14:10", name: "Maiden Stakes", distance: "1m", runners: 12, going: "Good to Firm" },
     { time: "14:45", name: "Handicap Chase", distance: "2m 4f", runners: 8, going: "Good to Firm" },
@@ -29,7 +37,7 @@ const Ascot = () => {
                     <div className="text-2xl font-bold text-primary mb-1">{race.time}</div>
                     <h3 className="text-lg font-semibold text-foreground">{race.name}</h3>
                   </div>
-                  <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">View Card</Button>
+                  <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => handleViewCard(race.name, race.time)}>View Card</Button>
                 </div>
                 <div className="flex gap-4 text-sm text-muted-foreground">
                   <span>{race.distance}</span>

@@ -4,8 +4,16 @@ import BetSlip from "@/components/BetSlip";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Play } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 const Slots = () => {
+  const handlePlayGame = (gameName: string) => {
+    toast({
+      title: "Launching Game",
+      description: `${gameName} is loading...`,
+    });
+  };
+
   const slots = [
     { name: "Starburst", provider: "NetEnt", rtp: "96.09%" },
     { name: "Book of Dead", provider: "Play'n GO", rtp: "96.21%" },
@@ -26,10 +34,10 @@ const Slots = () => {
           <h1 className="text-3xl font-bold text-foreground mb-6">Slot Games</h1>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {slots.map((slot) => (
-              <Card key={slot.name} className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all cursor-pointer">
+              <Card key={slot.name} className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all cursor-pointer" onClick={() => handlePlayGame(slot.name)}>
                 <div className="aspect-square bg-gradient-card relative">
                   <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Button size="lg" className="rounded-full w-16 h-16 p-0">
+                    <Button size="lg" className="rounded-full w-16 h-16 p-0" onClick={(e) => { e.stopPropagation(); handlePlayGame(slot.name); }}>
                       <Play className="h-6 w-6" fill="currentColor" />
                     </Button>
                   </div>

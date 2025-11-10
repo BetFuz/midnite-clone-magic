@@ -4,8 +4,16 @@ import BetSlip from "@/components/BetSlip";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "@/hooks/use-toast";
 
 const Cheltenham = () => {
+  const handleViewCard = (raceName: string, time: string) => {
+    toast({
+      title: "Race Card",
+      description: `Viewing ${raceName} at ${time}`,
+    });
+  };
+
   const races = [
     { time: "13:30", name: "Champion Hurdle", distance: "2m 87y", runners: 14, going: "Good", grade: "Grade 1", feature: true },
     { time: "14:10", name: "Champion Chase", distance: "2m", runners: 9, going: "Good", grade: "Grade 1", feature: true },
@@ -33,7 +41,7 @@ const Cheltenham = () => {
                     </div>
                     <h3 className="text-lg font-semibold text-foreground">{race.name}</h3>
                   </div>
-                  <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">View Card</Button>
+                  <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={() => handleViewCard(race.name, race.time)}>View Card</Button>
                 </div>
                 <div className="flex gap-4 text-sm text-muted-foreground">
                   <span>{race.distance}</span>
