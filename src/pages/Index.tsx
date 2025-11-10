@@ -281,8 +281,11 @@ const Index = () => {
                 <Link
                   key={league.name}
                   to={league.url}
-                  className="flex flex-col items-center gap-1.5 p-2 rounded-lg border border-border bg-card hover:border-primary hover:shadow-md transition-all group min-w-[85px] flex-shrink-0 cursor-pointer relative z-10"
-                  style={{ pointerEvents: 'auto' }}
+                  className="flex flex-col items-center gap-1.5 p-2 rounded-lg border border-border bg-card hover:border-primary hover:shadow-md transition-all group min-w-[85px] flex-shrink-0"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.location.href = league.url;
+                  }}
                 >
                   <div className="w-12 h-12 flex items-center justify-center pointer-events-none">
                     <img 
@@ -308,8 +311,11 @@ const Index = () => {
                 <Link
                   key={team.name}
                   to={team.url}
-                  className="flex flex-col items-center gap-1.5 p-2 rounded-lg border border-border bg-card hover:border-primary hover:shadow-md transition-all group min-w-[85px] flex-shrink-0 cursor-pointer relative z-10"
-                  style={{ pointerEvents: 'auto' }}
+                  className="flex flex-col items-center gap-1.5 p-2 rounded-lg border border-border bg-card hover:border-primary hover:shadow-md transition-all group min-w-[85px] flex-shrink-0"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.location.href = team.url;
+                  }}
                 >
                   <div className="w-12 h-12 flex items-center justify-center pointer-events-none">
                     <img 
