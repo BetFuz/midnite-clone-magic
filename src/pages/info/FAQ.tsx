@@ -2,6 +2,7 @@ import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import { Card } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { formatCurrency } from "@/lib/currency";
 
 const FAQ = () => {
   return (
@@ -17,7 +18,7 @@ const FAQ = () => {
                 <AccordionItem value="item-1">
                   <AccordionTrigger className="text-foreground">What is the minimum deposit?</AccordionTrigger>
                   <AccordionContent className="text-muted-foreground">
-                    The minimum deposit is £10 for most payment methods. Some methods may have higher minimums.
+                    The minimum deposit is {formatCurrency(5000)} for most payment methods. Some methods may have higher minimums.
                   </AccordionContent>
                 </AccordionItem>
 

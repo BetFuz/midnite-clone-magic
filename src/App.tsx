@@ -38,10 +38,17 @@ import Kempton from "./pages/racing/Kempton";
 // Basketball Leagues
 import NBA from "./pages/basketball/NBA";
 import EuroLeague from "./pages/basketball/EuroLeague";
+import NCAABasketball from "./pages/basketball/NCAABasketball";
+import WNBA from "./pages/basketball/WNBA";
+import SpanishACB from "./pages/basketball/SpanishACB";
 
 // Tennis Tournaments
 import FrenchOpen from "./pages/tennis/FrenchOpen";
 import Wimbledon from "./pages/tennis/Wimbledon";
+import AustralianOpen from "./pages/tennis/AustralianOpen";
+import USOpen from "./pages/tennis/USOpen";
+import ATPMasters1000 from "./pages/tennis/ATPMasters1000";
+import WTAFinals from "./pages/tennis/WTAFinals";
 
 // Casino
 import Slots from "./pages/casino/Slots";
@@ -112,10 +119,17 @@ const App = () => (
           {/* Basketball Leagues */}
           <Route path="/basketball/nba" element={<NBA />} />
           <Route path="/basketball/euroleague" element={<EuroLeague />} />
+          <Route path="/basketball/ncaa-basketball" element={<NCAABasketball />} />
+          <Route path="/basketball/wnba" element={<WNBA />} />
+          <Route path="/basketball/spanish-acb" element={<SpanishACB />} />
           
           {/* Tennis Tournaments */}
           <Route path="/tennis/french-open" element={<FrenchOpen />} />
           <Route path="/tennis/wimbledon" element={<Wimbledon />} />
+          <Route path="/tennis/australian-open" element={<AustralianOpen />} />
+          <Route path="/tennis/us-open" element={<USOpen />} />
+          <Route path="/tennis/atp-masters-1000" element={<ATPMasters1000 />} />
+          <Route path="/tennis/wta-finals" element={<WTAFinals />} />
           
           {/* Racing */}
           <Route path="/racing/ascot" element={<Ascot />} />

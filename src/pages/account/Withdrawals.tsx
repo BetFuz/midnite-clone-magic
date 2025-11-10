@@ -10,7 +10,7 @@ import { useState } from "react";
 
 const Withdrawals = () => {
   const [amount, setAmount] = useState("");
-  const balance = 127190; // ₦2,543.80 equivalent at ~₦50/£
+  const balance = 127190; // Example balance in Naira
 
   const handleWithdraw = () => {
     if (!amount || parseFloat(amount) <= 0) {

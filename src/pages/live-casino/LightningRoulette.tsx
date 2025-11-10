@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Users } from "lucide-react";
+import { formatCurrency } from "@/lib/currency";
 
 const LightningRoulette = () => {
   return (
@@ -35,7 +36,7 @@ const LightningRoulette = () => {
               </div>
               <div>
                 <div className="text-sm text-muted-foreground">Stakes</div>
-                <div className="text-lg font-bold text-foreground">£0.20 - £5,000</div>
+                <div className="text-lg font-bold text-foreground">{formatCurrency(100)} - {formatCurrency(5000000)}</div>
               </div>
               <Badge variant="secondary">
                 <Users className="h-4 w-4 mr-1" />

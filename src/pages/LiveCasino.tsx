@@ -5,19 +5,20 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Users, Play } from "lucide-react";
+import { formatCurrency } from "@/lib/currency";
 
 const LiveCasino = () => {
   const categories = ["All Tables", "Roulette", "Blackjack", "Baccarat", "Game Shows", "Poker"];
   
   const liveTables = [
-    { name: "Lightning Roulette", dealer: "Sarah", players: 847, provider: "Evolution", stakes: "£0.20 - £5,000", category: "Roulette" },
-    { name: "Blackjack VIP", dealer: "Michael", players: 234, provider: "Evolution", stakes: "£25 - £10,000", category: "Blackjack" },
-    { name: "Crazy Time", dealer: "Anna", players: 1432, provider: "Evolution", stakes: "£0.10 - £1,000", category: "Game Shows" },
-    { name: "Baccarat Squeeze", dealer: "Chen", players: 567, provider: "Evolution", stakes: "£1 - £5,000", category: "Baccarat" },
-    { name: "Mega Ball", dealer: "Emma", players: 923, provider: "Evolution", stakes: "£0.10 - £100", category: "Game Shows" },
-    { name: "Speed Roulette", dealer: "David", players: 689, provider: "Evolution", stakes: "£0.50 - £2,500", category: "Roulette" },
-    { name: "Infinite Blackjack", dealer: "Lisa", players: 1156, provider: "Evolution", stakes: "£1 - £5,000", category: "Blackjack" },
-    { name: "Dragon Tiger", dealer: "Wei", players: 445, provider: "Evolution", stakes: "£1 - £2,500", category: "Baccarat" },
+    { name: "Lightning Roulette", dealer: "Sarah", players: 847, provider: "Evolution", minStake: 100, maxStake: 5000000, category: "Roulette" },
+    { name: "Blackjack VIP", dealer: "Michael", players: 234, provider: "Evolution", minStake: 2500, maxStake: 10000000, category: "Blackjack" },
+    { name: "Crazy Time", dealer: "Anna", players: 1432, provider: "Evolution", minStake: 100, maxStake: 1000000, category: "Game Shows" },
+    { name: "Baccarat Squeeze", dealer: "Chen", players: 567, provider: "Evolution", minStake: 1000, maxStake: 5000000, category: "Baccarat" },
+    { name: "Mega Ball", dealer: "Emma", players: 923, provider: "Evolution", minStake: 100, maxStake: 100000, category: "Game Shows" },
+    { name: "Speed Roulette", dealer: "David", players: 689, provider: "Evolution", minStake: 500, maxStake: 2500000, category: "Roulette" },
+    { name: "Infinite Blackjack", dealer: "Lisa", players: 1156, provider: "Evolution", minStake: 1000, maxStake: 5000000, category: "Blackjack" },
+    { name: "Dragon Tiger", dealer: "Wei", players: 445, provider: "Evolution", minStake: 1000, maxStake: 2500000, category: "Baccarat" },
   ];
 
   const featuredTables = liveTables.slice(0, 4);
@@ -82,7 +83,7 @@ const LiveCasino = () => {
                       <span className="text-muted-foreground">{table.provider}</span>
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      Stakes: {table.stakes}
+                      Stakes: {formatCurrency(table.minStake)} - {formatCurrency(table.maxStake)}
                     </div>
                   </div>
                 </Card>
@@ -119,7 +120,7 @@ const LiveCasino = () => {
                       <span className="text-muted-foreground">{table.provider}</span>
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      Stakes: {table.stakes}
+                      Stakes: {formatCurrency(table.minStake)} - {formatCurrency(table.maxStake)}
                     </div>
                   </div>
                 </Card>
