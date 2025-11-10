@@ -1,14 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import BetSlip from "./BetSlip";
 import { Badge } from "@/components/ui/badge";
 import { useBetSlip } from "@/contexts/BetSlipContext";
+import { useLocation } from "react-router-dom";
 
 const MobileBetSlip = () => {
   const [open, setOpen] = useState(false);
   const { selections } = useBetSlip();
+  const location = useLocation();
+
+  // Close the sheet automatically on route change to avoid appearing as if navigation opened it
+  useEffect(() => {
+    if (open) setOpen(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]);
 
   if (selections.length === 0) {
     // Hide mobile floating cart entirely when there are no selections to prevent accidental opens
