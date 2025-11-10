@@ -10,6 +10,11 @@ const MobileBetSlip = () => {
   const [open, setOpen] = useState(false);
   const { selections } = useBetSlip();
 
+  if (selections.length === 0) {
+    // Hide mobile floating cart entirely when there are no selections to prevent accidental opens
+    return null;
+  }
+
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <Button 
