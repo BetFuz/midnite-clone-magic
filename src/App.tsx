@@ -59,6 +59,8 @@ import Privacy from "./pages/info/Privacy";
 import Contact from "./pages/info/Contact";
 import FAQ from "./pages/info/FAQ";
 
+import MobileBetSlip from "./components/MobileBetSlip";
+
 // Match & Live Casino
 import MatchDetail from "./pages/matches/MatchDetail";
 import LightningRoulette from "./pages/live-casino/LightningRoulette";
@@ -134,6 +136,7 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <MobileBetSlip />
       </BrowserRouter>
   </QueryClientProvider>
 );

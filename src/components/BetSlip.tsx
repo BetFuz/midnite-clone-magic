@@ -9,7 +9,7 @@ interface BetSlipProps {
 
 const BetSlip = ({ className }: BetSlipProps) => {
   return (
-    <aside className={cn("w-full md:w-80 border-l border-border bg-card h-[calc(100vh-4rem)] flex flex-col", className)}>
+    <aside className={cn("hidden md:flex w-full md:w-80 border-l border-border bg-card h-[calc(100vh-4rem)] flex-col", className)}>
       <div className="p-4 border-b border-border flex items-center justify-between">
         <h2 className="text-lg font-bold text-foreground">Bet Slip</h2>
         <Button variant="ghost" size="icon" className="h-8 w-8">

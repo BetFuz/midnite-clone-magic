@@ -1,7 +1,6 @@
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import BetSlip from "@/components/BetSlip";
-import MobileBetSlip from "@/components/MobileBetSlip";
 import HeroBanner from "@/components/HeroBanner";
 import MatchCard from "@/components/MatchCard";
 import BoostCard from "@/components/BoostCard";
@@ -111,7 +110,6 @@ const Index = () => {
         </main>
 
         <BetSlip className="hidden md:flex" />
-        <MobileBetSlip />
       </div>
     </div>
   );
