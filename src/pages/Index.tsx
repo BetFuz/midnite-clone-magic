@@ -158,24 +158,21 @@ const Index = () => {
           {/* Popular Leagues */}
           <section className="mb-8">
             <h2 className="text-xl font-semibold text-foreground mb-4">Popular Leagues</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
               {leagues.map((league) => (
                 <Link
                   key={league.name}
                   to={league.url}
-                  className="flex flex-col items-center gap-2 p-4 rounded-lg border border-border bg-card hover:border-primary/30 hover:bg-accent/50 transition-all group"
+                  className="flex flex-col items-center gap-1.5 p-2.5 rounded-lg border border-border bg-card hover:border-primary hover:bg-accent transition-all group min-w-[90px]"
                 >
-                  <div className="w-12 h-12 flex items-center justify-center">
+                  <div className="w-14 h-14 flex items-center justify-center">
                     <img 
                       src={league.logo} 
                       alt={league.name} 
                       className="w-full h-full object-contain opacity-90 group-hover:opacity-100 transition-opacity" 
                     />
                   </div>
-                  <div className="text-center space-y-0.5">
-                    <p className="text-xs font-medium text-foreground leading-tight">{league.name}</p>
-                    <p className="text-[10px] text-muted-foreground">{league.country}</p>
-                  </div>
+                  <p className="text-[10px] font-medium text-foreground text-center leading-tight w-full">{league.name}</p>
                 </Link>
               ))}
             </div>
