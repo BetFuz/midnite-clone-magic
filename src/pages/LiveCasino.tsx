@@ -51,7 +51,7 @@ const LiveCasino = () => {
       <div className="flex">
         <Sidebar />
         
-        <main className="flex-1 p-6 overflow-y-auto h-[calc(100vh-4rem)]">
+        <main className="flex-1 p-6 overflow-y-auto h-[calc(100vh-4rem)] pb-24">
           <div className="mb-6">
             <div className="flex items-center gap-3 mb-2">
               <h1 className="text-3xl font-bold text-foreground">Live Casino</h1>
@@ -63,7 +63,7 @@ const LiveCasino = () => {
             <p className="text-muted-foreground">Real dealers, real-time gaming</p>
           </div>
 
-          <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+          <div className="flex gap-2 mb-6 overflow-x-auto pb-2 pr-24">
             {categories.map((category) => (
               <Button
                 key={category}

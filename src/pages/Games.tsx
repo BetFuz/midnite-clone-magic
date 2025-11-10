@@ -66,13 +66,13 @@ const Games = () => {
       <div className="flex">
         <Sidebar />
         
-        <main className="flex-1 p-6 overflow-y-auto h-[calc(100vh-4rem)]">
+        <main className="flex-1 p-6 overflow-y-auto h-[calc(100vh-4rem)] pb-24">
           <div className="mb-6">
             <h1 className="text-3xl font-bold text-foreground mb-2">Casino Games</h1>
             <p className="text-muted-foreground">Thousands of games to choose from</p>
           </div>
 
-          <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+          <div className="flex gap-2 mb-6 overflow-x-auto pb-2 pr-24">
             {gameCategories.map((category) => (
               <Button
                 key={category}
