@@ -281,16 +281,17 @@ const Index = () => {
                 <Link
                   key={league.name}
                   to={league.url}
-                  className="flex flex-col items-center gap-1.5 p-2 rounded-lg border border-border bg-card hover:border-primary hover:shadow-md transition-all group min-w-[85px] flex-shrink-0"
+                  className="flex flex-col items-center gap-1.5 p-2 rounded-lg border border-border bg-card hover:border-primary hover:shadow-md transition-all group min-w-[85px] flex-shrink-0 cursor-pointer relative z-10"
+                  style={{ pointerEvents: 'auto' }}
                 >
-                  <div className="w-12 h-12 flex items-center justify-center">
+                  <div className="w-12 h-12 flex items-center justify-center pointer-events-none">
                     <img 
                       src={league.logo} 
                       alt={league.name} 
                       className="w-full h-full object-contain opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all" 
                     />
                   </div>
-                  <p className="text-[10px] font-medium text-foreground text-center leading-tight w-full truncate px-1">{league.name}</p>
+                  <p className="text-[10px] font-medium text-foreground text-center leading-tight w-full truncate px-1 pointer-events-none">{league.name}</p>
                 </Link>
               ))}
             </div>
@@ -307,16 +308,17 @@ const Index = () => {
                 <Link
                   key={team.name}
                   to={team.url}
-                  className="flex flex-col items-center gap-1.5 p-2 rounded-lg border border-border bg-card hover:border-primary hover:shadow-md transition-all group min-w-[85px] flex-shrink-0"
+                  className="flex flex-col items-center gap-1.5 p-2 rounded-lg border border-border bg-card hover:border-primary hover:shadow-md transition-all group min-w-[85px] flex-shrink-0 cursor-pointer relative z-10"
+                  style={{ pointerEvents: 'auto' }}
                 >
-                  <div className="w-12 h-12 flex items-center justify-center">
+                  <div className="w-12 h-12 flex items-center justify-center pointer-events-none">
                     <img 
                       src={team.logo} 
                       alt={team.name} 
                       className="w-full h-full object-contain opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all" 
                     />
                   </div>
-                  <p className="text-[10px] font-medium text-foreground text-center leading-tight w-full truncate px-1">{team.name}</p>
+                  <p className="text-[10px] font-medium text-foreground text-center leading-tight w-full truncate px-1 pointer-events-none">{team.name}</p>
                 </Link>
               ))}
             </div>

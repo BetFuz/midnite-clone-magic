@@ -24,12 +24,12 @@ const Header = () => {
   const { user, profile } = useUserProfile();
 
   const navItems = [
-    { label: "🏠 Home", path: "/" },
-    { label: "⚽ Sports", path: "/" },
-    { label: "🏇 Racing", path: "/racing" },
-    { label: "🎮 Games", path: "/games" },
-    { label: "🎰 Live Casino", path: "/live-casino" },
-    { label: "🎲 Virtuals", path: "/virtuals" },
+    { label: "🏠 Home", path: "/", key: "home" },
+    { label: "⚽ Sports", path: "/", key: "sports" },
+    { label: "🏇 Racing", path: "/racing", key: "racing" },
+    { label: "🎮 Games", path: "/games", key: "games" },
+    { label: "🎰 Live Casino", path: "/live-casino", key: "live-casino" },
+    { label: "🎲 Virtuals", path: "/virtuals", key: "virtuals" },
   ];
 
   const handleLogin = () => {
@@ -61,7 +61,7 @@ const Header = () => {
           <nav className="hidden md:flex items-center gap-1">
             {navItems.map((item) => (
               <Button
-                key={item.path}
+                key={item.key}
                 variant="ghost"
                 className={cn(
                   "text-foreground hover:text-primary",
