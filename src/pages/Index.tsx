@@ -17,7 +17,10 @@ const Index = () => {
   ];
 
   const featuredMatches = [
+    // Football
     {
+      sport: "Football",
+      league: "Premier League",
       time: "Today 15:00",
       homeTeam: "Manchester United",
       awayTeam: "Liverpool FC",
@@ -26,20 +29,57 @@ const Index = () => {
       awayOdds: "2.00",
     },
     {
+      sport: "Football",
+      league: "La Liga",
       time: "Today 17:30",
-      homeTeam: "Arsenal",
-      awayTeam: "Chelsea",
-      homeOdds: "1.97",
-      drawOdds: "3.80",
-      awayOdds: "5.00",
-    },
-    {
-      time: "Today 20:00",
       homeTeam: "Real Madrid",
       awayTeam: "Barcelona",
-      homeOdds: "3.50",
-      drawOdds: "2.88",
-      awayOdds: "2.15",
+      homeOdds: "2.15",
+      drawOdds: "3.40",
+      awayOdds: "3.20",
+    },
+    // NBA
+    {
+      sport: "Basketball",
+      league: "NBA",
+      time: "Today 19:00",
+      homeTeam: "LA Lakers",
+      awayTeam: "Golden State Warriors",
+      homeOdds: "1.85",
+      drawOdds: null,
+      awayOdds: "1.95",
+    },
+    {
+      sport: "Basketball",
+      league: "NBA",
+      time: "Today 21:30",
+      homeTeam: "Boston Celtics",
+      awayTeam: "Miami Heat",
+      homeOdds: "1.70",
+      drawOdds: null,
+      awayOdds: "2.20",
+    },
+    // NFL
+    {
+      sport: "American Football",
+      league: "NFL",
+      time: "Today 18:00",
+      homeTeam: "Kansas City Chiefs",
+      awayTeam: "Buffalo Bills",
+      homeOdds: "1.90",
+      drawOdds: null,
+      awayOdds: "1.90",
+    },
+    // Tennis
+    {
+      sport: "Tennis",
+      league: "ATP Masters",
+      time: "Today 16:00",
+      homeTeam: "Novak Djokovic",
+      awayTeam: "Carlos Alcaraz",
+      homeOdds: "2.10",
+      drawOdds: null,
+      awayOdds: "1.75",
     },
   ];
 
@@ -89,10 +129,53 @@ const Index = () => {
 
           <section className="mb-8">
             <h2 className="text-xl font-bold text-foreground mb-4">Featured Matches</h2>
-            <div className="grid gap-4">
-              {featuredMatches.map((match, index) => (
-                <MatchCard key={index} {...match} />
-              ))}
+            
+            {/* Football Matches */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+                <span>⚽</span> Football
+              </h3>
+              <div className="grid gap-4">
+                {featuredMatches.filter(m => m.sport === "Football").map((match, index) => (
+                  <MatchCard key={index} {...match} />
+                ))}
+              </div>
+            </div>
+
+            {/* Basketball Matches */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+                <span>🏀</span> Basketball
+              </h3>
+              <div className="grid gap-4">
+                {featuredMatches.filter(m => m.sport === "Basketball").map((match, index) => (
+                  <MatchCard key={index} {...match} />
+                ))}
+              </div>
+            </div>
+
+            {/* NFL Matches */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+                <span>🏈</span> American Football
+              </h3>
+              <div className="grid gap-4">
+                {featuredMatches.filter(m => m.sport === "American Football").map((match, index) => (
+                  <MatchCard key={index} {...match} />
+                ))}
+              </div>
+            </div>
+
+            {/* Tennis Matches */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+                <span>🎾</span> Tennis
+              </h3>
+              <div className="grid gap-4">
+                {featuredMatches.filter(m => m.sport === "Tennis").map((match, index) => (
+                  <MatchCard key={index} {...match} />
+                ))}
+              </div>
             </div>
           </section>
 
