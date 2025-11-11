@@ -124,6 +124,7 @@ import NetworkStatus from "./components/NetworkStatus";
 import MatchDetail from "./pages/matches/MatchDetail";
 import LightningRoulette from "./pages/live-casino/LightningRoulette";
 import BetFeatures from "./pages/BetFeatures";
+import EnhancedAccountHub from "./pages/account/EnhancedAccountHub";
 
 const queryClient = new QueryClient();
 
@@ -232,6 +233,7 @@ const App = () => (
           <Route path="/account/tiers/silver" element={<SilverTier />} />
           <Route path="/account/tiers/bronze" element={<BronzeTier />} />
           <Route path="/account/tiers/rookie" element={<RookieTier />} />
+          <Route path="/account/enhanced" element={<EnhancedAccountHub />} />
           
           {/* Promotions */}
           <Route path="/promotions" element={<Promotions />} />
