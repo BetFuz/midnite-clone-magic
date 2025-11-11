@@ -147,6 +147,51 @@ export type Database = {
         }
         Relationships: []
       }
+      leaderboard_entries: {
+        Row: {
+          bonus_points: number | null
+          created_at: string | null
+          id: string
+          rank: number | null
+          reward_tier: string | null
+          total_bets: number | null
+          total_points: number | null
+          total_wins: number | null
+          updated_at: string | null
+          user_id: string
+          week_start: string
+          win_streak: number | null
+        }
+        Insert: {
+          bonus_points?: number | null
+          created_at?: string | null
+          id?: string
+          rank?: number | null
+          reward_tier?: string | null
+          total_bets?: number | null
+          total_points?: number | null
+          total_wins?: number | null
+          updated_at?: string | null
+          user_id: string
+          week_start: string
+          win_streak?: number | null
+        }
+        Update: {
+          bonus_points?: number | null
+          created_at?: string | null
+          id?: string
+          rank?: number | null
+          reward_tier?: string | null
+          total_bets?: number | null
+          total_points?: number | null
+          total_wins?: number | null
+          updated_at?: string | null
+          user_id?: string
+          week_start?: string
+          win_streak?: number | null
+        }
+        Relationships: []
+      }
       match_statistics: {
         Row: {
           away_form: string | null
@@ -294,6 +339,72 @@ export type Database = {
         }
         Relationships: []
       }
+      user_achievements: {
+        Row: {
+          achievement_description: string | null
+          achievement_name: string
+          achievement_type: string
+          created_at: string | null
+          id: string
+          points_earned: number | null
+          unlocked_at: string | null
+          user_id: string
+        }
+        Insert: {
+          achievement_description?: string | null
+          achievement_name: string
+          achievement_type: string
+          created_at?: string | null
+          id?: string
+          points_earned?: number | null
+          unlocked_at?: string | null
+          user_id: string
+        }
+        Update: {
+          achievement_description?: string | null
+          achievement_name?: string
+          achievement_type?: string
+          created_at?: string | null
+          id?: string
+          points_earned?: number | null
+          unlocked_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_challenge_progress: {
+        Row: {
+          challenge_id: string
+          completed_at: string | null
+          created_at: string | null
+          current_progress: number | null
+          id: string
+          is_completed: boolean | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          challenge_id: string
+          completed_at?: string | null
+          created_at?: string | null
+          current_progress?: number | null
+          id?: string
+          is_completed?: boolean | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          challenge_id?: string
+          completed_at?: string | null
+          created_at?: string | null
+          current_progress?: number | null
+          id?: string
+          is_completed?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_statistics: {
         Row: {
           best_streak: number | null
@@ -354,6 +465,45 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
           win_rate?: number | null
+        }
+        Relationships: []
+      }
+      weekly_challenges: {
+        Row: {
+          challenge_description: string | null
+          challenge_name: string
+          challenge_type: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          reward_points: number | null
+          target_value: number
+          updated_at: string | null
+          week_start: string
+        }
+        Insert: {
+          challenge_description?: string | null
+          challenge_name: string
+          challenge_type: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          reward_points?: number | null
+          target_value: number
+          updated_at?: string | null
+          week_start: string
+        }
+        Update: {
+          challenge_description?: string | null
+          challenge_name?: string
+          challenge_type?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          reward_points?: number | null
+          target_value?: number
+          updated_at?: string | null
+          week_start?: string
         }
         Relationships: []
       }

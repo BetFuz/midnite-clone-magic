@@ -5,6 +5,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PersonalStats } from "@/components/stats/PersonalStats";
 import { SportStats } from "@/components/stats/SportStats";
 import AIRecommendations from "@/components/AIRecommendations";
+import { Leaderboard } from "@/components/Leaderboard";
+import { AchievementBadges } from "@/components/AchievementBadges";
+import { WeeklyChallenges } from "@/components/WeeklyChallenges";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
 import { BarChart3, TrendingUp, Trophy, Target } from "lucide-react";
 import { formatCurrency } from "@/lib/currency";
@@ -72,9 +75,10 @@ const Statistics = () => {
             </div>
 
             <Tabs defaultValue="overview" className="space-y-6">
-              <TabsList className="grid w-full max-w-md grid-cols-4">
+              <TabsList className="grid w-full max-w-3xl grid-cols-5">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
                 <TabsTrigger value="ai">AI Tips</TabsTrigger>
+                <TabsTrigger value="compete">Compete</TabsTrigger>
                 <TabsTrigger value="sports">By Sport</TabsTrigger>
                 <TabsTrigger value="trends">Trends</TabsTrigger>
               </TabsList>
@@ -181,6 +185,16 @@ const Statistics = () => {
 
               <TabsContent value="ai">
                 <AIRecommendations />
+              </TabsContent>
+
+              <TabsContent value="compete" className="space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <Leaderboard />
+                  <div className="space-y-6">
+                    <WeeklyChallenges />
+                    <AchievementBadges />
+                  </div>
+                </div>
               </TabsContent>
 
               <TabsContent value="sports">
