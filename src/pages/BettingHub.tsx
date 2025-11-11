@@ -102,7 +102,7 @@ const BettingHub = () => {
       name: 'FuzSocial', 
       icon: Users, 
       url: '/social', 
-      markets: 67,
+      markets: 26,
       color: 'text-pink-500'
     },
     { 
