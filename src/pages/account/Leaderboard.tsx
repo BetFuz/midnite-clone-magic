@@ -60,6 +60,16 @@ const Leaderboard = () => {
       bgColor: "bg-amber-600/10",
       borderColor: "border-amber-600/20"
     },
+    { 
+      tier: "Rookie", 
+      minPoints: 0, 
+      reward: "₦2,000",
+      badge: "Starter", 
+      icon: Star,
+      color: "text-green-500",
+      bgColor: "bg-green-500/10",
+      borderColor: "border-green-500/20"
+    },
   ];
 
   return (
@@ -94,7 +104,7 @@ const Leaderboard = () => {
             </div>
 
             {/* Compact Reward Tiers */}
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
               {rewardTiers.map((tier, index) => {
                 const IconComponent = tier.icon;
                 return (
