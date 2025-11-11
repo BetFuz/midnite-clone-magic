@@ -5,12 +5,22 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { formatCurrency } from "@/lib/currency";
-import { ArrowUpRight, ArrowDownLeft, Filter, Download } from "lucide-react";
+import { ArrowUpRight, ArrowDownLeft, Filter, Download, Search, Calendar as CalendarIcon, TrendingUp } from "lucide-react";
 import { useState } from "react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 const Transactions = () => {
   const [filter, setFilter] = useState<"all" | "deposits" | "withdrawals">("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [methodFilter, setMethodFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [dateFrom, setDateFrom] = useState<Date>();
 
   // Mock transaction data
   const transactions = [
@@ -22,9 +32,14 @@ const Transactions = () => {
     { id: "WTH003", type: "withdrawal", method: "PayPal", amount: 75000, status: "pending", date: "2025-01-09 18:30", reference: "WTH-2025-003" },
   ];
 
-  const filteredTransactions = filter === "all" 
-    ? transactions 
-    : transactions.filter(t => t.type === filter.slice(0, -1));
+  // Apply all filters
+  const filteredTransactions = transactions.filter(t => {
+    if (filter !== "all" && t.type !== filter.slice(0, -1)) return false;
+    if (methodFilter !== "all" && t.method !== methodFilter) return false;
+    if (statusFilter !== "all" && t.status !== statusFilter) return false;
+    if (searchQuery && !t.reference.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+    return true;
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -99,10 +114,71 @@ const Transactions = () => {
               </TabsList>
             </Tabs>
 
+            {/* Advanced Filters */}
+            <Card className="p-6 bg-card border-border mb-6">
+              <div className="flex items-center gap-2 mb-4">
+                <Filter className="h-5 w-5 text-primary" />
+                <h3 className="text-lg font-bold text-foreground">Advanced Filters</h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search by reference..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+
+                <Select value={methodFilter} onValueChange={setMethodFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Payment Method" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Methods</SelectItem>
+                    <SelectItem value="Mobile Money">Mobile Money</SelectItem>
+                    <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
+                    <SelectItem value="Debit Card">Debit Card</SelectItem>
+                    <SelectItem value="PayPal">PayPal</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="processing">Processing</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="failed">Failed</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className={cn("justify-start text-left font-normal", !dateFrom && "text-muted-foreground")}>
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {dateFrom ? format(dateFrom, "PPP") : "From Date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar mode="single" selected={dateFrom} onSelect={setDateFrom} initialFocus />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </Card>
+
             {/* Transactions List */}
             <Card className="p-6 bg-card border-border">
-              <div className="space-y-4">
-                {filteredTransactions.map((txn, index) => (
+              <h3 className="text-lg font-bold text-foreground mb-4">
+                Transaction History ({filteredTransactions.length} results)
+              </h3>
+              {filteredTransactions.length > 0 ? (
+                <div className="space-y-4">
+                  {filteredTransactions.map((txn, index) => (
                   <div key={txn.id}>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
@@ -145,8 +221,15 @@ const Transactions = () => {
                       <Separator className="mt-4" />
                     )}
                   </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <TrendingUp className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-foreground mb-2">No transactions found</h3>
+                  <p className="text-muted-foreground">Try adjusting your filters</p>
+                </div>
+              )}
             </Card>
           </div>
         </main>
