@@ -235,10 +235,21 @@ const BetTickets = () => {
               <Button 
                 className="flex-1 bg-success text-success-foreground hover:bg-success/90"
                 onClick={() => {
-                  toast({
-                    title: "Share Your Win!",
-                    description: "Sharing feature coming soon!",
-                  });
+                  // Ready for n8n integration - social media sharing
+                  const shareText = `I just won ${formatCurrency(selectedWin?.actualWin)} on Betfuz! 🏆💰\nBetter than ${selectedWin?.percentile}% of all users!`;
+                  
+                  if (navigator.share) {
+                    navigator.share({
+                      title: 'My Betfuz Win!',
+                      text: shareText,
+                    });
+                  } else {
+                    navigator.clipboard.writeText(shareText);
+                    toast({
+                      title: "Copied!",
+                      description: "Win details copied - ready to share!",
+                    });
+                  }
                 }}
               >
                 Show Off

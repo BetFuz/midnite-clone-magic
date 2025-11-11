@@ -38,44 +38,44 @@ const Promotions = () => {
       icon: Trophy,
       title: "Weekend Specials",
       description: "Enhanced odds every weekend",
-      tagline: "Coming Soon",
+      tagline: "Boost Your Weekend",
       badge: "Weekly",
       badgeColor: "bg-orange-500",
       gradient: "from-orange-500 via-orange-600 to-orange-500",
-      path: null,
+      path: "/promotions/weekend-specials",
     },
     {
       id: "cashback",
       icon: Target,
       title: "Cashback Offers",
       description: "Get 10% back on losing bets",
-      tagline: "Coming Soon",
+      tagline: "10% Monthly Cashback",
       badge: "Monthly",
       badgeColor: "bg-blue-500",
       gradient: "from-blue-500 via-blue-600 to-blue-500",
-      path: null,
+      path: "/promotions/cashback",
     },
     {
       id: "loyalty",
       icon: Zap,
       title: "Loyalty Rewards",
       description: "Earn points with every bet",
-      tagline: "Coming Soon",
+      tagline: "Unlock VIP Rewards",
       badge: "VIP",
       badgeColor: "bg-purple-500",
       gradient: "from-purple-500 via-purple-600 to-purple-500",
-      path: null,
+      path: "/promotions/loyalty-rewards",
     },
     {
       id: "referral",
       icon: Calendar,
       title: "Refer a Friend",
       description: "Earn ₦5,000 for each friend",
-      tagline: "Coming Soon",
+      tagline: "Share & Earn",
       badge: "Limited",
       badgeColor: "bg-pink-500",
       gradient: "from-pink-500 via-pink-600 to-pink-500",
-      path: null,
+      path: "/promotions/refer-friend",
     },
   ];
 
@@ -141,29 +141,38 @@ const Promotions = () => {
               </div>
             </div>
 
-            {/* Coming Soon */}
+            {/* More Promotions */}
             <div>
               <h2 className="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
                 <Calendar className="h-6 w-6 text-primary" />
-                Coming Soon
+                More Offers
               </h2>
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {promotions.slice(2).map((promo) => (
                   <Card 
                     key={promo.id} 
-                    className="p-6 bg-card border-border hover:border-primary/30 transition-all hover:shadow-lg group"
+                    className="p-6 bg-card border-border hover:border-primary/30 transition-all hover:shadow-lg group cursor-pointer"
+                    onClick={() => promo.path && navigate(promo.path)}
                   >
-                    <div className={`p-3 bg-gradient-to-br ${promo.gradient} rounded-lg inline-flex mb-4 opacity-60`}>
+                    <div className={`p-3 bg-gradient-to-br ${promo.gradient} rounded-lg inline-flex mb-4`}>
                       <promo.icon className="h-6 w-6 text-white" />
                     </div>
-                    <Badge className={`${promo.badgeColor} text-white border-0 mb-3 opacity-60`}>
+                    <Badge className={`${promo.badgeColor} text-white border-0 mb-3`}>
                       {promo.badge}
                     </Badge>
                     <h3 className="text-lg font-bold text-foreground mb-2">{promo.title}</h3>
                     <p className="text-sm text-muted-foreground mb-4">{promo.description}</p>
-                    <Badge variant="outline" className="text-muted-foreground">
-                      Coming Soon
-                    </Badge>
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        promo.path && navigate(promo.path);
+                      }}
+                    >
+                      Learn More
+                      <ArrowRight className="h-4 w-4 ml-2" />
+                    </Button>
                   </Card>
                 ))}
               </div>

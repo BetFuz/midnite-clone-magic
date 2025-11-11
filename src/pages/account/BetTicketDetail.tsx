@@ -66,10 +66,21 @@ const BetTicketDetail = () => {
   };
 
   const handleShare = () => {
-    toast({
-      title: "Share Ticket",
-      description: "Sharing feature coming soon!",
-    });
+    // Ready for n8n integration - social media sharing
+    const shareText = `Check out my ${ticket.type} bet on Betfuz! 🎯\nOdds: ${ticket.odds}x\nPotential Win: ${formatCurrency(ticket.potentialWin)}`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: 'My Betfuz Ticket',
+        text: shareText,
+      });
+    } else {
+      navigator.clipboard.writeText(shareText);
+      toast({
+        title: "Copied!",
+        description: "Bet details copied to clipboard - ready to share!",
+      });
+    }
   };
 
   const handleRebet = () => {

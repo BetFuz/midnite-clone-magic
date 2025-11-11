@@ -99,6 +99,10 @@ import RookieTier from "./pages/account/tiers/RookieTier";
 import Promotions from "./pages/promotions/Promotions";
 import Welcome from "./pages/promotions/Welcome";
 import AccaBoost from "./pages/promotions/AccaBoost";
+import WeekendSpecials from "./pages/promotions/WeekendSpecials";
+import Cashback from "./pages/promotions/Cashback";
+import LoyaltyRewards from "./pages/promotions/LoyaltyRewards";
+import ReferFriend from "./pages/promotions/ReferFriend";
 
 // Info
 import About from "./pages/info/About";
@@ -227,6 +231,10 @@ const App = () => (
           <Route path="/promotions" element={<Promotions />} />
           <Route path="/promotions/welcome" element={<Welcome />} />
           <Route path="/promotions/acca-boost" element={<AccaBoost />} />
+          <Route path="/promotions/weekend-specials" element={<WeekendSpecials />} />
+          <Route path="/promotions/cashback" element={<Cashback />} />
+          <Route path="/promotions/loyalty-rewards" element={<LoyaltyRewards />} />
+          <Route path="/promotions/refer-friend" element={<ReferFriend />} />
           
           {/* Info */}
           <Route path="/info/about" element={<About />} />
