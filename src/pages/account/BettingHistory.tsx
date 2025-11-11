@@ -211,7 +211,7 @@ const BettingHistory = () => {
                 <Filter className="h-5 w-5 text-primary" />
                 <h3 className="text-lg font-bold text-foreground">Filters</h3>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -282,9 +282,9 @@ const BettingHistory = () => {
                   className="p-5 bg-card border-border hover:border-primary/50 transition-colors cursor-pointer"
                   onClick={() => navigate(`/bet-ticket/${bet.ticketId}`)}
                 >
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <div className="flex items-center gap-2 mb-2">
+                  <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center flex-wrap gap-2 mb-2">
                         <span className="text-sm font-mono text-muted-foreground">#{bet.id}</span>
                         <Badge 
                           className={
@@ -300,10 +300,10 @@ const BettingHistory = () => {
                         <Badge variant="outline">{bet.betType}</Badge>
                         <Badge variant="secondary">{bet.sport}</Badge>
                       </div>
-                      <h3 className="text-lg font-semibold text-foreground mb-1">{bet.event}</h3>
+                      <h3 className="text-lg font-semibold text-foreground mb-1 break-words">{bet.event}</h3>
                       <p className="text-sm text-muted-foreground">{bet.date} • {bet.selections} selection{bet.selections > 1 ? 's' : ''}</p>
                     </div>
-                    <div className="text-right">
+                    <div className="text-left md:text-right flex-shrink-0">
                       <div className="text-xs text-muted-foreground mb-1">
                         {bet.status === "running" ? "Potential Win" : "Returns"}
                       </div>
@@ -325,7 +325,7 @@ const BettingHistory = () => {
                       )}
                     </div>
                   </div>
-                  <div className="flex gap-6 text-sm border-t border-border pt-3">
+                  <div className="flex flex-wrap gap-4 md:gap-6 text-sm border-t border-border pt-3">
                     <div>
                       <span className="text-muted-foreground">Stake:</span>{" "}
                       <span className="font-semibold text-foreground">{formatCurrency(bet.stake)}</span>
