@@ -118,6 +118,7 @@ import WebhookSettings from "./pages/admin/WebhookSettings";
 
 import MobileBetSlip from "./components/MobileBetSlip";
 import { BottomNav } from "./components/mobile/BottomNav";
+import NetworkStatus from "./components/NetworkStatus";
 
 // Match & Live Casino
 import MatchDetail from "./pages/matches/MatchDetail";
@@ -131,6 +132,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <NetworkStatus />
         <div className="pb-20 md:pb-0">
           <Routes>
           <Route path="/" element={<Index />} />
