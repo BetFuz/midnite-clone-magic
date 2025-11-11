@@ -8,55 +8,39 @@ import { Button } from "@/components/ui/button";
 import { Wallet, Award, Lock, TrendingUp, Coins, Shield } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatCurrency } from "@/lib/currency";
+import { useNFTBadges } from "@/hooks/useNFTBadges";
+import { Skeleton } from "@/components/ui/skeleton";
+import { format } from "date-fns";
 
 const Web3Hub = () => {
   const [activeTab, setActiveTab] = useState("wallet");
-  const [walletConnected, setWalletConnected] = useState(false);
-
-  const badges = [
-    {
-      id: 1,
-      name: "First Win NFT",
-      description: "Your first winning bet immortalized as an NFT",
-      rarity: "Common",
-      tokenId: "#45672",
-      minted: "2024-01-15",
-      value: 50000
-    },
-    {
-      id: 2,
-      name: "10-Win Streak Champion",
-      description: "Achieved 10 consecutive winning bets",
-      rarity: "Rare",
-      tokenId: "#28934",
-      minted: "2024-02-20",
-      value: 250000
-    },
-    {
-      id: 3,
-      name: "High Roller Elite",
-      description: "Placed bet over ₦1,000,000",
-      rarity: "Epic",
-      tokenId: "#19283",
-      minted: "2024-03-10",
-      value: 500000
-    },
-    {
-      id: 4,
-      name: "Legendary Predictor",
-      description: "Correctly predicted 5 major upsets",
-      rarity: "Legendary",
-      tokenId: "#7621",
-      minted: "2024-03-25",
-      value: 2000000
-    }
-  ];
+  const [walletConnected, setWalletConnected] = useState(true);
+  const { badges, isLoading } = useNFTBadges();
 
   const transactions = [
     { type: "Mint", item: "First Win NFT", date: "2024-01-15", txHash: "0x7a8b...3c4d" },
     { type: "Transfer", item: "10-Win Streak", date: "2024-02-20", txHash: "0x9e1f...5g6h" },
-    { type: "Mint", item: "High Roller", date: "2024-03-10", txHash: "0x2i3j...7k8l" },
   ];
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <MobileNav />
+        <div className="flex pt-16">
+          <Sidebar />
+          <main className="flex-1 md:ml-64 pb-20 md:pb-6">
+            <div className="max-w-7xl mx-auto p-4 md:p-6">
+              <Skeleton className="h-12 w-64 mb-6" />
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-24" />)}
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -68,7 +52,6 @@ const Web3Hub = () => {
         
         <main className="flex-1 md:ml-64 pb-20 md:pb-6">
           <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
-            {/* Header */}
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
@@ -79,12 +62,7 @@ const Web3Hub = () => {
                   <p className="text-muted-foreground">NFT badges, crypto wallet & blockchain features</p>
                 </div>
               </div>
-              {!walletConnected ? (
-                <Button onClick={() => setWalletConnected(true)} className="gap-2">
-                  <Wallet className="w-4 h-4" />
-                  Connect Wallet
-                </Button>
-              ) : (
+              {walletConnected && (
                 <Badge className="bg-green-500/10 text-green-500 border-green-500/20 px-4 py-2">
                   <Shield className="w-3 h-3 mr-2" />
                   Wallet Connected
@@ -94,14 +72,13 @@ const Web3Hub = () => {
 
             {walletConnected ? (
               <>
-                {/* Wallet Stats */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <Card className="p-4">
                     <div className="flex items-center gap-2 mb-1">
                       <Award className="w-4 h-4 text-purple-500" />
                       <p className="text-xs text-muted-foreground">NFT Badges</p>
                     </div>
-                    <p className="text-2xl font-bold">4</p>
+                    <p className="text-2xl font-bold">{badges.length}</p>
                   </Card>
                   <Card className="p-4">
                     <div className="flex items-center gap-2 mb-1">
@@ -129,7 +106,7 @@ const Web3Hub = () => {
                 <Tabs value={activeTab} onValueChange={setActiveTab}>
                   <TabsList className="grid w-full grid-cols-3 mb-6">
                     <TabsTrigger value="wallet">Wallet</TabsTrigger>
-                    <TabsTrigger value="badges">NFT Badges</TabsTrigger>
+                    <TabsTrigger value="badges">NFT Badges ({badges.length})</TabsTrigger>
                     <TabsTrigger value="transactions">Blockchain</TabsTrigger>
                   </TabsList>
 
@@ -178,62 +155,77 @@ const Web3Hub = () => {
                   </TabsContent>
 
                   <TabsContent value="badges" className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {badges.map(badge => (
-                        <Card key={badge.id} className="p-6 hover:border-primary/50 transition-colors">
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                              <Award className="w-8 h-8 text-white" />
+                    {badges.length === 0 ? (
+                      <Card className="p-12 text-center">
+                        <Award className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                        <h3 className="text-xl font-semibold mb-2">No NFT Badges Yet</h3>
+                        <p className="text-muted-foreground mb-6">
+                          Earn badges by completing achievements and winning bets
+                        </p>
+                        <Button>View Achievements</Button>
+                      </Card>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {badges.map(badge => (
+                          <Card key={badge.id} className="p-6 hover:border-primary/50 transition-colors">
+                            <div className="flex items-start justify-between mb-4">
+                              <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                                <Award className="w-8 h-8 text-white" />
+                              </div>
+                              <Badge className={`${
+                                badge.rarity === "Legendary" ? "bg-yellow-500/10 text-yellow-500 border-yellow-500/20" :
+                                badge.rarity === "Epic" ? "bg-purple-500/10 text-purple-500 border-purple-500/20" :
+                                badge.rarity === "Rare" ? "bg-blue-500/10 text-blue-500 border-blue-500/20" :
+                                "bg-muted"
+                              }`}>
+                                {badge.rarity || "Common"}
+                              </Badge>
                             </div>
-                            <Badge className={`${
-                              badge.rarity === "Legendary" ? "bg-yellow-500/10 text-yellow-500 border-yellow-500/20" :
-                              badge.rarity === "Epic" ? "bg-purple-500/10 text-purple-500 border-purple-500/20" :
-                              badge.rarity === "Rare" ? "bg-blue-500/10 text-blue-500 border-blue-500/20" :
-                              "bg-muted"
-                            }`}>
-                              {badge.rarity}
-                            </Badge>
-                          </div>
-                          <h3 className="font-bold text-lg mb-2">{badge.name}</h3>
-                          <p className="text-sm text-muted-foreground mb-3">{badge.description}</p>
-                          <div className="flex items-center justify-between text-sm mb-3">
-                            <span className="text-muted-foreground">Token ID: {badge.tokenId}</span>
-                            <span className="text-muted-foreground">Minted: {badge.minted}</span>
-                          </div>
-                          <div className="flex items-center justify-between pt-3 border-t">
-                            <span className="text-sm text-muted-foreground">Estimated Value</span>
-                            <span className="font-bold text-green-500">{formatCurrency(badge.value)}</span>
-                          </div>
-                          <div className="mt-4 flex gap-2">
-                            <Button variant="outline" size="sm" className="flex-1">View on OpenSea</Button>
-                            <Button variant="outline" size="sm" className="flex-1">Transfer</Button>
-                          </div>
-                        </Card>
-                      ))}
-                    </div>
+                            <h3 className="font-bold text-lg mb-2">{badge.badge_name}</h3>
+                            <p className="text-sm text-muted-foreground mb-3">{badge.badge_type}</p>
+                            <div className="flex items-center justify-between text-sm mb-3">
+                              <span className="text-muted-foreground">Token: {badge.token_id || "Pending"}</span>
+                              <span className="text-muted-foreground">
+                                {format(new Date(badge.minted_at), "MMM dd, yyyy")}
+                              </span>
+                            </div>
+                            <div className="mt-4 flex gap-2">
+                              <Button variant="outline" size="sm" className="flex-1">View Details</Button>
+                              <Button variant="outline" size="sm" className="flex-1">Transfer</Button>
+                            </div>
+                          </Card>
+                        ))}
+                      </div>
+                    )}
                   </TabsContent>
 
                   <TabsContent value="transactions" className="space-y-4">
                     <Card className="p-6">
                       <h3 className="text-lg font-bold mb-4">Recent Blockchain Transactions</h3>
-                      <div className="space-y-3">
-                        {transactions.map((tx, idx) => (
-                          <div key={idx} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                                <Shield className="w-5 h-5 text-primary" />
+                      {transactions.length === 0 ? (
+                        <div className="text-center py-8 text-muted-foreground">
+                          No transactions yet
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {transactions.map((tx, idx) => (
+                            <div key={idx} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                  <Shield className="w-5 h-5 text-primary" />
+                                </div>
+                                <div>
+                                  <p className="font-semibold">{tx.type}: {tx.item}</p>
+                                  <p className="text-sm text-muted-foreground">{tx.date}</p>
+                                </div>
                               </div>
-                              <div>
-                                <p className="font-semibold">{tx.type}: {tx.item}</p>
-                                <p className="text-sm text-muted-foreground">{tx.date}</p>
-                              </div>
+                              <Button variant="ghost" size="sm">
+                                View: {tx.txHash}
+                              </Button>
                             </div>
-                            <Button variant="ghost" size="sm">
-                              View: {tx.txHash}
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
+                          ))}
+                        </div>
+                      )}
                     </Card>
                   </TabsContent>
                 </Tabs>
