@@ -24,6 +24,8 @@ export const BottomNav = () => {
     { label: "Specials", items: [
       { label: "FuzPolitics", url: "/politics" },
       { label: "FuzEconomy", url: "/economy" },
+      { label: "FuzSocial", url: "/social" },
+      { label: "FuzPredict", url: "/predict" },
     ]},
     { label: "Sports", items: [
       { label: "Football", url: "/sports/football" },
