@@ -1,4 +1,4 @@
-import { Home, Trophy, CircleDot, Flame, Hammer, Target, TrendingUp, Dumbbell, Volleyball, Table2, TicketCheck, BarChart3, History, CreditCard, Vote, LayoutGrid, DollarSign, Users, Sparkles, Globe, Bot } from "lucide-react";
+import { Home, Trophy, CircleDot, Flame, Hammer, Target, TrendingUp, Dumbbell, Volleyball, Table2, TicketCheck, BarChart3, History, CreditCard, Vote, LayoutGrid, DollarSign, Users, Sparkles, Globe, Bot, ShoppingCart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NavLink } from "@/components/NavLink";
 
@@ -13,6 +13,7 @@ const Sidebar = ({ className, showOnMobile = false }: SidebarProps) => {
     { icon: LayoutGrid, label: "Betting Hub", url: "/betting-hub", badge: "NEW" },
     { icon: Bot, label: "AI Features", url: "/ai-features", badge: "AI" },
     { icon: Users, label: "Social Betting", url: "/social-betting", badge: "HOT" },
+    { icon: ShoppingCart, label: "Bet Marketplace", url: "/bet-marketplace", badge: "P2P" },
     { icon: Flame, label: "In-Play", url: "/live", badge: "LIVE" },
     { icon: TicketCheck, label: "My Bets", url: "/account/bet-tickets" },
     { icon: History, label: "History", url: "/account/history" },

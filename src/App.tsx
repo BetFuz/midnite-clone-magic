@@ -132,6 +132,7 @@ import Social from "./pages/social/Social";
 import Predict from "./pages/predict/Predict";
 import AIFeatures from "./pages/AIFeatures";
 import SocialBetting from "./pages/SocialBetting";
+import BetMarketplace from "./pages/BetMarketplace";
 
 const queryClient = new QueryClient();
 
@@ -159,6 +160,7 @@ const App = () => (
           <Route path="/predict" element={<Predict />} />
           <Route path="/ai-features" element={<AIFeatures />} />
           <Route path="/social-betting" element={<SocialBetting />} />
+          <Route path="/bet-marketplace" element={<BetMarketplace />} />
           
           {/* Sports */}
           <Route path="/sports/football" element={<Football />} />
