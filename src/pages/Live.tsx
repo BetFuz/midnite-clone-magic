@@ -4,6 +4,7 @@ import Sidebar from "@/components/Sidebar";
 import BetSlip from "@/components/BetSlip";
 import LiveMatchCard from "@/components/LiveMatchCard";
 import PersonalizedSuggestions from "@/components/PersonalizedSuggestions";
+import AIRecommendations from "@/components/AIRecommendations";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, Flame } from "lucide-react";
@@ -161,6 +162,11 @@ const Live = () => {
           {/* Personalized Suggestions */}
           <section className="mb-8">
             <PersonalizedSuggestions />
+          </section>
+
+          {/* AI Recommendations Section */}
+          <section className="mb-8">
+            <AIRecommendations />
           </section>
 
           {/* Trending Now Section */}

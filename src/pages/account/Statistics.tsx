@@ -4,26 +4,31 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PersonalStats } from "@/components/stats/PersonalStats";
 import { SportStats } from "@/components/stats/SportStats";
+import AIRecommendations from "@/components/AIRecommendations";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
 import { BarChart3, TrendingUp, Trophy, Target } from "lucide-react";
 import { formatCurrency } from "@/lib/currency";
+import { useUserStatistics } from "@/hooks/useUserStatistics";
 
 const Statistics = () => {
-  // Mock data - in production, fetch from Supabase
-  const personalStats = {
-    totalBets: 127,
-    totalWins: 68,
-    totalLosses: 45,
-    totalPending: 14,
-    totalStaked: 1250000,
-    totalReturns: 1580000,
-    profitLoss: 330000,
-    winRate: 53.5,
-    roi: 26.4,
+  const { statistics, isLoading } = useUserStatistics();
+
+  // Use real data or defaults
+  const personalStats = statistics || {
+    totalBets: 0,
+    totalWins: 0,
+    totalLosses: 0,
+    totalPending: 0,
+    totalStaked: 0,
+    totalReturns: 0,
+    profitLoss: 0,
+    winRate: 0,
+    roi: 0,
     favoriteSport: "Football",
-    biggestWin: 185000,
-    currentStreak: 3,
-    bestStreak: 8,
+    biggestWin: 0,
+    biggestLoss: 0,
+    currentStreak: 0,
+    bestStreak: 0,
   };
 
   const sportStats = [
@@ -67,14 +72,21 @@ const Statistics = () => {
             </div>
 
             <Tabs defaultValue="overview" className="space-y-6">
-              <TabsList className="grid w-full max-w-md grid-cols-3">
+              <TabsList className="grid w-full max-w-md grid-cols-4">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="ai">AI Tips</TabsTrigger>
                 <TabsTrigger value="sports">By Sport</TabsTrigger>
                 <TabsTrigger value="trends">Trends</TabsTrigger>
               </TabsList>
 
               <TabsContent value="overview" className="space-y-6">
-                <PersonalStats stats={personalStats} />
+                {isLoading ? (
+                  <Card className="p-8 text-center">
+                    <p className="text-muted-foreground">Loading statistics...</p>
+                  </Card>
+                ) : (
+                  <PersonalStats stats={personalStats} />
+                )}
 
                 {/* Charts Grid */}
                 <div className="grid lg:grid-cols-2 gap-6">
@@ -165,6 +177,10 @@ const Statistics = () => {
                     </BarChart>
                   </ResponsiveContainer>
                 </Card>
+              </TabsContent>
+
+              <TabsContent value="ai">
+                <AIRecommendations />
               </TabsContent>
 
               <TabsContent value="sports">
