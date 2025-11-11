@@ -4,11 +4,14 @@ import MobileNav from "@/components/MobileNav";
 import { Leaderboard as LeaderboardComponent } from "@/components/Leaderboard";
 import { WeeklyChallenges } from "@/components/WeeklyChallenges";
 import { AchievementBadges } from "@/components/AchievementBadges";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Trophy, Award, Gift, Sparkles, Crown, Star } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Leaderboard = () => {
+  const navigate = useNavigate();
+  
   const rewardTiers = [
     { 
       tier: "Diamond", 
@@ -18,7 +21,8 @@ const Leaderboard = () => {
       icon: Crown,
       color: "text-blue-400",
       bgColor: "bg-blue-500/10",
-      borderColor: "border-blue-500/20"
+      borderColor: "border-blue-500/20",
+      path: "/account/tiers/diamond"
     },
     { 
       tier: "Platinum", 
@@ -28,7 +32,8 @@ const Leaderboard = () => {
       icon: Sparkles,
       color: "text-gray-300",
       bgColor: "bg-gray-400/10",
-      borderColor: "border-gray-400/20"
+      borderColor: "border-gray-400/20",
+      path: "/account/tiers/platinum"
     },
     { 
       tier: "Gold", 
@@ -38,7 +43,8 @@ const Leaderboard = () => {
       icon: Trophy,
       color: "text-yellow-400",
       bgColor: "bg-yellow-500/10",
-      borderColor: "border-yellow-500/20"
+      borderColor: "border-yellow-500/20",
+      path: "/account/tiers/gold"
     },
     { 
       tier: "Silver", 
@@ -48,7 +54,8 @@ const Leaderboard = () => {
       icon: Award,
       color: "text-gray-400",
       bgColor: "bg-gray-500/10",
-      borderColor: "border-gray-500/20"
+      borderColor: "border-gray-500/20",
+      path: "/account/tiers/silver"
     },
     { 
       tier: "Bronze", 
@@ -58,7 +65,8 @@ const Leaderboard = () => {
       icon: Star,
       color: "text-amber-600",
       bgColor: "bg-amber-600/10",
-      borderColor: "border-amber-600/20"
+      borderColor: "border-amber-600/20",
+      path: "/account/tiers/bronze"
     },
     { 
       tier: "Rookie", 
@@ -68,7 +76,8 @@ const Leaderboard = () => {
       icon: Star,
       color: "text-green-500",
       bgColor: "bg-green-500/10",
-      borderColor: "border-green-500/20"
+      borderColor: "border-green-500/20",
+      path: "/account/tiers/rookie"
     },
   ];
 
@@ -110,10 +119,11 @@ const Leaderboard = () => {
                 return (
                   <Card
                     key={index}
-                    className={`${tier.bgColor} ${tier.borderColor} border-2 hover:scale-105 transition-transform cursor-pointer`}
+                    onClick={() => navigate(tier.path)}
+                    className={`${tier.bgColor} ${tier.borderColor} border-2 hover:scale-105 transition-all cursor-pointer group`}
                   >
                     <CardContent className="p-4 text-center">
-                      <IconComponent className={`h-6 w-6 md:h-8 md:w-8 mx-auto mb-2 ${tier.color}`} />
+                      <IconComponent className={`h-6 w-6 md:h-8 md:w-8 mx-auto mb-2 ${tier.color} group-hover:animate-pulse`} />
                       <h3 className={`font-bold text-sm md:text-base ${tier.color} mb-1`}>
                         {tier.tier}
                       </h3>
@@ -125,6 +135,9 @@ const Leaderboard = () => {
                       </p>
                       <p className="text-xs text-muted-foreground mt-1">
                         + {tier.badge} Badge
+                      </p>
+                      <p className="text-xs text-primary mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        Click to learn more
                       </p>
                     </CardContent>
                   </Card>

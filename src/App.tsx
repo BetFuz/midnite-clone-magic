@@ -87,6 +87,14 @@ import BetTicketDetail from "./pages/account/BetTicketDetail";
 import AccountSettings from "./pages/account/AccountSettings";
 import Leaderboard from "./pages/account/Leaderboard";
 
+// Account Tiers
+import DiamondTier from "./pages/account/tiers/DiamondTier";
+import PlatinumTier from "./pages/account/tiers/PlatinumTier";
+import GoldTier from "./pages/account/tiers/GoldTier";
+import SilverTier from "./pages/account/tiers/SilverTier";
+import BronzeTier from "./pages/account/tiers/BronzeTier";
+import RookieTier from "./pages/account/tiers/RookieTier";
+
 // Promotions
 import Promotions from "./pages/promotions/Promotions";
 import Welcome from "./pages/promotions/Welcome";
@@ -206,6 +214,14 @@ const App = () => (
           <Route path="/account/bet-tickets" element={<BetTickets />} />
           <Route path="/bet-ticket/:ticketId" element={<BetTicketDetail />} />
           <Route path="/account/settings" element={<AccountSettings />} />
+          
+          {/* Account Tiers */}
+          <Route path="/account/tiers/diamond" element={<DiamondTier />} />
+          <Route path="/account/tiers/platinum" element={<PlatinumTier />} />
+          <Route path="/account/tiers/gold" element={<GoldTier />} />
+          <Route path="/account/tiers/silver" element={<SilverTier />} />
+          <Route path="/account/tiers/bronze" element={<BronzeTier />} />
+          <Route path="/account/tiers/rookie" element={<RookieTier />} />
           
           {/* Promotions */}
           <Route path="/promotions" element={<Promotions />} />
