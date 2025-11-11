@@ -2,9 +2,11 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useBetSlip } from "@/contexts/BetSlipContext";
-import { TrendingUp, Activity } from "lucide-react";
+import { TrendingUp, Activity, ChevronDown } from "lucide-react";
 import GameFlowBar from "./GameFlowBar";
 import LiveStats from "./LiveStats";
+import MatchEventsTimeline from "./MatchEventsTimeline";
+import ExpandedLiveMarkets from "./ExpandedLiveMarkets";
 import { useState } from "react";
 
 interface LiveMatchCardProps {
@@ -44,6 +46,8 @@ const LiveMatchCard = ({
 }: LiveMatchCardProps) => {
   const { addSelection } = useBetSlip();
   const [showStats, setShowStats] = useState(false);
+  const [showMarkets, setShowMarkets] = useState(false);
+  const [showEvents, setShowEvents] = useState(false);
 
   const handleOddsClick = (
     selectionType: "home" | "away" | "draw",
@@ -134,6 +138,26 @@ const LiveMatchCard = ({
         />
       )}
 
+      {/* Match Events Timeline */}
+      {showEvents && sport === "Football" && (
+        <div className="mb-4">
+          <MatchEventsTimeline homeTeam={homeTeam} awayTeam={awayTeam} />
+        </div>
+      )}
+
+      {/* Expanded Markets */}
+      {showMarkets && (
+        <div className="mb-4">
+          <ExpandedLiveMarkets
+            matchId={id}
+            sport={sport}
+            league={league}
+            homeTeam={homeTeam}
+            awayTeam={awayTeam}
+          />
+        </div>
+      )}
+
       {/* Live Odds */}
       <div className="flex gap-2 mt-4" onClick={(e) => e.stopPropagation()}>
         <Button
@@ -178,6 +202,27 @@ const LiveMatchCard = ({
             Away
           </span>
           <span className="text-lg font-bold animate-pulse">{awayOdds.toFixed(2)}</span>
+        </Button>
+      </div>
+
+      {/* Additional Actions */}
+      <div className="flex gap-2 mt-3">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="flex-1 text-xs"
+          onClick={() => setShowEvents(!showEvents)}
+        >
+          {showEvents ? "Hide" : "Show"} Events
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="flex-1 text-xs gap-1"
+          onClick={() => setShowMarkets(!showMarkets)}
+        >
+          {showMarkets ? "Hide" : "More"} Markets
+          <ChevronDown className={`h-3 w-3 transition-transform ${showMarkets ? "rotate-180" : ""}`} />
         </Button>
       </div>
     </Card>

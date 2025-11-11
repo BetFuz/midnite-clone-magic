@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/currency";
 import { useBetSlip } from "@/contexts/BetSlipContext";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import CashOutButton from "./CashOutButton";
 
 interface BetSlipProps {
   className?: string;
@@ -115,14 +116,25 @@ const BetSlip = ({ className, showOnMobile = false }: BetSlipProps) => {
               </div>
             </div>
 
-            <Button 
-              className="w-full"
-              size="lg"
-              onClick={placeBet}
-              disabled={isPlacingBet || selections.length === 0}
-            >
-              {isPlacingBet ? "Placing Bet..." : "Place Bet"}
-            </Button>
+            <div className="space-y-2">
+              <Button 
+                className="w-full"
+                size="lg"
+                onClick={placeBet}
+                disabled={isPlacingBet || selections.length === 0}
+              >
+                {isPlacingBet ? "Placing Bet..." : "Place Bet"}
+              </Button>
+
+              {/* Cash Out Option (appears if bet is live) */}
+              {selections.some(s => s.matchTime?.includes("LIVE")) && (
+                <CashOutButton
+                  originalStake={stake}
+                  currentValue={stake * 1.45}
+                  potentialWin={potentialWin}
+                />
+              )}
+            </div>
           </div>
         </>
       )}

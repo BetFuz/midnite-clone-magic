@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import BetSlip from "@/components/BetSlip";
 import LiveMatchCard from "@/components/LiveMatchCard";
+import PersonalizedSuggestions from "@/components/PersonalizedSuggestions";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, Flame } from "lucide-react";
@@ -156,6 +157,11 @@ const Live = () => {
           <p className="text-muted-foreground mb-6">
             Watch and bet on live matches with real-time odds updates
           </p>
+
+          {/* Personalized Suggestions */}
+          <section className="mb-8">
+            <PersonalizedSuggestions />
+          </section>
 
           {/* Trending Now Section */}
           <section className="mb-8">
