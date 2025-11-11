@@ -12,6 +12,7 @@ const Sidebar = ({ className, showOnMobile = false }: SidebarProps) => {
     { icon: Home, label: "Home", url: "/" },
     { icon: LayoutGrid, label: "Betting Hub", url: "/betting-hub", badge: "NEW" },
     { icon: Bot, label: "AI Features", url: "/ai-features", badge: "AI" },
+    { icon: Users, label: "Social Betting", url: "/social-betting", badge: "HOT" },
     { icon: Flame, label: "In-Play", url: "/live", badge: "LIVE" },
     { icon: TicketCheck, label: "My Bets", url: "/account/bet-tickets" },
     { icon: History, label: "History", url: "/account/history" },
