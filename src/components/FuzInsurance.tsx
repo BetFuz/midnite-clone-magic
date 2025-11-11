@@ -20,7 +20,10 @@ const FuzInsurance = ({ selectionCount, stake }: FuzInsuranceProps) => {
           <div className="rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 p-1.5">
             <Shield className="h-4 w-4 text-white" />
           </div>
-          <h3 className="font-semibold">Fuz Insurance</h3>
+          <div className="flex-1">
+            <h3 className="font-semibold">Fuz Insurance</h3>
+            <p className="text-xs text-muted-foreground">Accumulator Protection</p>
+          </div>
           <Badge className="ml-auto bg-gradient-to-r from-blue-500 to-cyan-500">
             Active
           </Badge>

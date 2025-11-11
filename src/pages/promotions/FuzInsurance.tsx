@@ -53,7 +53,11 @@ const FuzInsurance = () => {
   const faqs = [
     {
       question: "What is Fuz Insurance?",
-      answer: "Fuz Insurance protects your accumulator bets. If one selection lets you down, we'll refund your stake up to ₦50,000 as a free bet."
+      answer: "Fuz Insurance (also called Accumulator Insurance or Acca Insurance in traditional betting) protects your multi-selection bets. If exactly one selection lets you down, we'll refund your stake up to ₦50,000 as a free bet. It's our way of giving you a safety net on your accumulator bets!"
+    },
+    {
+      question: "Is this the same as Acca Insurance?",
+      answer: "Yes! Fuz Insurance is our branded name for Accumulator Insurance (commonly called 'Acca Insurance'). An accumulator bet combines multiple selections into one bet, and Fuz Insurance protects you if only one selection loses."
     },
     {
       question: "How many selections do I need?",
@@ -96,6 +100,9 @@ const FuzInsurance = () => {
                     <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
                       Fuz Insurance
                     </h1>
+                    <Badge variant="outline" className="mb-3 bg-white/10 text-white border-white/30">
+                      Also known as Accumulator (Acca) Insurance
+                    </Badge>
                     <p className="text-lg text-white/90 mb-6 max-w-2xl">
                       One selection lets you down? We've got you covered. Get your stake back as a free bet up to ₦50,000!
                     </p>
@@ -109,6 +116,27 @@ const FuzInsurance = () => {
                     </div>
                   </div>
                 </div>
+
+                {/* Explainer Card */}
+                <Card className="bg-gradient-to-br from-blue-500/5 to-purple-500/5 border-blue-500/20">
+                  <CardContent className="p-6">
+                    <div className="flex items-start gap-4">
+                      <div className="rounded-full bg-blue-500/10 p-3 flex-shrink-0">
+                        <AlertCircle className="h-6 w-6 text-blue-500" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-lg mb-2">What is Fuz Insurance?</h3>
+                        <p className="text-sm text-muted-foreground mb-3">
+                          <strong>Fuz Insurance</strong> is our branded version of <strong>Accumulator Insurance</strong> (also called <strong>Acca Insurance</strong> in traditional betting). 
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          An <strong>accumulator bet</strong> combines multiple selections (5+) into one bet slip. All selections must win for the bet to succeed. 
+                          Fuz Insurance protects you if exactly <strong>one selection</strong> loses - we'll refund your stake as a free bet up to ₦50,000!
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
 
                 {/* How It Works */}
                 <Card>
