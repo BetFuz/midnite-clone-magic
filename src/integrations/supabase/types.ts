@@ -281,6 +281,86 @@ export type Database = {
         }
         Relationships: []
       }
+      fantasy_leagues: {
+        Row: {
+          created_at: string | null
+          deadline: string
+          entry_fee: number
+          id: string
+          max_participants: number | null
+          name: string
+          prize_pool: number
+          season: string
+          sport: string
+          status: string
+        }
+        Insert: {
+          created_at?: string | null
+          deadline: string
+          entry_fee?: number
+          id?: string
+          max_participants?: number | null
+          name: string
+          prize_pool?: number
+          season: string
+          sport: string
+          status?: string
+        }
+        Update: {
+          created_at?: string | null
+          deadline?: string
+          entry_fee?: number
+          id?: string
+          max_participants?: number | null
+          name?: string
+          prize_pool?: number
+          season?: string
+          sport?: string
+          status?: string
+        }
+        Relationships: []
+      }
+      fantasy_teams: {
+        Row: {
+          created_at: string | null
+          id: string
+          league_id: string
+          rank: number | null
+          team_name: string
+          total_points: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          league_id: string
+          rank?: number | null
+          team_name: string
+          total_points?: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          league_id?: string
+          rank?: number | null
+          team_name?: string
+          total_points?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fantasy_teams_league_id_fkey"
+            columns: ["league_id"]
+            isOneToOne: false
+            referencedRelation: "fantasy_leagues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leaderboard_entries: {
         Row: {
           bonus_points: number | null
@@ -323,6 +403,57 @@ export type Database = {
           user_id?: string
           week_start?: string
           win_streak?: number | null
+        }
+        Relationships: []
+      }
+      live_streams: {
+        Row: {
+          active_bets_count: number
+          away_team: string
+          created_at: string | null
+          home_team: string
+          id: string
+          league: string
+          match_id: string
+          quality: string
+          scheduled_start: string
+          sport: string
+          status: string
+          stream_url: string | null
+          updated_at: string | null
+          viewer_count: number
+        }
+        Insert: {
+          active_bets_count?: number
+          away_team: string
+          created_at?: string | null
+          home_team: string
+          id?: string
+          league: string
+          match_id: string
+          quality?: string
+          scheduled_start: string
+          sport: string
+          status?: string
+          stream_url?: string | null
+          updated_at?: string | null
+          viewer_count?: number
+        }
+        Update: {
+          active_bets_count?: number
+          away_team?: string
+          created_at?: string | null
+          home_team?: string
+          id?: string
+          league?: string
+          match_id?: string
+          quality?: string
+          scheduled_start?: string
+          sport?: string
+          status?: string
+          stream_url?: string | null
+          updated_at?: string | null
+          viewer_count?: number
         }
         Relationships: []
       }
@@ -430,6 +561,95 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      pool_bets: {
+        Row: {
+          closes_at: string
+          created_at: string | null
+          creator_id: string
+          description: string | null
+          id: string
+          max_members: number
+          min_entry: number
+          name: string
+          potential_win: number
+          selections_count: number
+          sport: string
+          status: string
+          total_odds: number
+          total_stake: number
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          closes_at: string
+          created_at?: string | null
+          creator_id: string
+          description?: string | null
+          id?: string
+          max_members?: number
+          min_entry?: number
+          name: string
+          potential_win?: number
+          selections_count?: number
+          sport: string
+          status?: string
+          total_odds?: number
+          total_stake?: number
+          type?: string
+          updated_at?: string | null
+        }
+        Update: {
+          closes_at?: string
+          created_at?: string | null
+          creator_id?: string
+          description?: string | null
+          id?: string
+          max_members?: number
+          min_entry?: number
+          name?: string
+          potential_win?: number
+          selections_count?: number
+          sport?: string
+          status?: string
+          total_odds?: number
+          total_stake?: number
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      pool_members: {
+        Row: {
+          id: string
+          joined_at: string | null
+          pool_id: string
+          stake_amount: number
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string | null
+          pool_id: string
+          stake_amount: number
+          user_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string | null
+          pool_id?: string
+          stake_amount?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pool_members_pool_id_fkey"
+            columns: ["pool_id"]
+            isOneToOne: false
+            referencedRelation: "pool_bets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -717,6 +937,74 @@ export type Database = {
           win_rate?: number | null
         }
         Relationships: []
+      }
+      vr_experiences: {
+        Row: {
+          created_at: string | null
+          id: string
+          match_id: string | null
+          sport: string
+          stadium_name: string
+          status: string
+          thumbnail_url: string | null
+          viewer_count: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          match_id?: string | null
+          sport: string
+          stadium_name: string
+          status?: string
+          thumbnail_url?: string | null
+          viewer_count?: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          match_id?: string | null
+          sport?: string
+          stadium_name?: string
+          status?: string
+          thumbnail_url?: string | null
+          viewer_count?: number
+        }
+        Relationships: []
+      }
+      vr_sessions: {
+        Row: {
+          duration_minutes: number | null
+          ended_at: string | null
+          experience_id: string
+          id: string
+          started_at: string | null
+          user_id: string
+        }
+        Insert: {
+          duration_minutes?: number | null
+          ended_at?: string | null
+          experience_id: string
+          id?: string
+          started_at?: string | null
+          user_id: string
+        }
+        Update: {
+          duration_minutes?: number | null
+          ended_at?: string | null
+          experience_id?: string
+          id?: string
+          started_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vr_sessions_experience_id_fkey"
+            columns: ["experience_id"]
+            isOneToOne: false
+            referencedRelation: "vr_experiences"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       weekly_challenges: {
         Row: {
