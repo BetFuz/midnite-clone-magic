@@ -7,66 +7,17 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Trophy, Users, TrendingUp, Crown, Plus, Star } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { formatCurrency } from "@/lib/currency";
+import { useFantasySports } from "@/hooks/useFantasySports";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const FantasySports = () => {
   const [activeTab, setActiveTab] = useState("football");
+  const { leagues, isLoading, joinLeague } = useFantasySports();
 
-  const leagues = [
-    {
-      id: 1,
-      sport: "Football",
-      name: "Premier League Fantasy Elite",
-      season: "2024/25",
-      participants: 45672,
-      prizePool: 50000000,
-      entryFee: 10000,
-      deadline: "3 days",
-      status: "open",
-      myTeam: true,
-      myRank: 2847,
-      myPoints: 1284
-    },
-    {
-      id: 2,
-      sport: "Football",
-      name: "Champions League Dream Team",
-      season: "2024/25",
-      participants: 28934,
-      prizePool: 30000000,
-      entryFee: 15000,
-      deadline: "1 week",
-      status: "open",
-      myTeam: false
-    },
-    {
-      id: 3,
-      sport: "Basketball",
-      name: "NBA Fantasy Championship",
-      season: "2024/25",
-      participants: 67823,
-      prizePool: 75000000,
-      entryFee: 20000,
-      deadline: "5 days",
-      status: "open",
-      myTeam: true,
-      myRank: 5621,
-      myPoints: 2156
-    },
-    {
-      id: 4,
-      sport: "Cricket",
-      name: "IPL Fantasy Masters",
-      season: "2024",
-      participants: 92145,
-      prizePool: 100000000,
-      entryFee: 12000,
-      deadline: "2 weeks",
-      status: "open",
-      myTeam: false
-    }
-  ];
+  const footballLeagues = leagues.filter(l => l.sport === "Football");
+  const basketballLeagues = leagues.filter(l => l.sport === "Basketball");
+  const cricketLeagues = leagues.filter(l => l.sport === "Cricket");
 
   const topManagers = [
     { rank: 1, name: "Alex Thompson", team: "Thunder Strikers", points: 3456, profit: 12500000 },

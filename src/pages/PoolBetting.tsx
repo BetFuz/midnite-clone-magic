@@ -7,97 +7,19 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Users, TrendingUp, Lock, Unlock, Plus, Award } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import { formatCurrency } from "@/lib/currency";
+import { usePoolBetting } from "@/hooks/usePoolBetting";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const PoolBetting = () => {
   const [activeTab, setActiveTab] = useState("public");
+  const { pools, myPools, isLoading, joinPool } = usePoolBetting();
 
-  const pools = [
-    {
-      id: 1,
-      name: "Premier League Weekend Warriors",
-      creator: "John Doe",
-      type: "public",
-      sport: "Football",
-      members: 247,
-      maxMembers: 500,
-      totalStake: 1847500,
-      minEntry: 5000,
-      potentialWin: 4561250,
-      status: "active",
-      selections: 8,
-      odds: 2.47,
-      endsIn: "2 hours"
-    },
-    {
-      id: 2,
-      name: "NBA Champions Club",
-      creator: "Sarah Johnson",
-      type: "private",
-      sport: "Basketball",
-      members: 45,
-      maxMembers: 50,
-      totalStake: 562500,
-      minEntry: 10000,
-      potentialWin: 1743750,
-      status: "active",
-      selections: 5,
-      odds: 3.10,
-      endsIn: "5 hours"
-    },
-    {
-      id: 3,
-      name: "Weekend Football Accumulator",
-      creator: "Mike Chen",
-      type: "public",
-      sport: "Football",
-      members: 892,
-      maxMembers: 1000,
-      totalStake: 3568000,
-      minEntry: 4000,
-      potentialWin: 12132800,
-      status: "active",
-      selections: 12,
-      odds: 3.40,
-      endsIn: "1 day"
-    },
-    {
-      id: 4,
-      name: "Tennis Grand Slam Specials",
-      creator: "Emma Wilson",
-      type: "public",
-      sport: "Tennis",
-      members: 156,
-      maxMembers: 200,
-      totalStake: 936000,
-      minEntry: 6000,
-      potentialWin: 2621600,
-      status: "active",
-      selections: 6,
-      odds: 2.80,
-      endsIn: "3 days"
-    },
-    {
-      id: 5,
-      name: "Elite Bettors Only - VIP",
-      creator: "David Martinez",
-      type: "private",
-      sport: "Mixed",
-      members: 12,
-      maxMembers: 20,
-      totalStake: 960000,
-      minEntry: 50000,
-      potentialWin: 5280000,
-      status: "locked",
-      selections: 15,
-      odds: 5.50,
-      endsIn: "12 hours"
-    }
-  ];
+  const publicPools = pools.filter(p => p.type === "public");
+  const privatePools = pools.filter(p => p.type === "private");
 
-  const myPools = pools.filter(p => [1, 2].includes(p.id));
+  const myPoolsList = myPools;
 
   return (
     <div className="min-h-screen bg-background">

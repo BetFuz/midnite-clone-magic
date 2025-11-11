@@ -7,66 +7,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Play, Radio, Users, Eye, TrendingUp, Volume2, Maximize } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useLiveStreams } from "@/hooks/useLiveStreams";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const LiveStreaming = () => {
   const [activeTab, setActiveTab] = useState("live");
-
-  const liveStreams = [
-    {
-      id: 1,
-      sport: "Football",
-      match: "Manchester United vs Liverpool",
-      league: "Premier League",
-      status: "LIVE",
-      viewers: 45672,
-      bets: 12458,
-      thumbnail: "/placeholder.svg",
-      quality: "HD"
-    },
-    {
-      id: 2,
-      sport: "Basketball",
-      match: "Lakers vs Warriors",
-      league: "NBA",
-      status: "LIVE",
-      viewers: 28934,
-      bets: 8734,
-      thumbnail: "/placeholder.svg",
-      quality: "4K"
-    },
-    {
-      id: 3,
-      sport: "Tennis",
-      match: "Djokovic vs Alcaraz",
-      league: "Australian Open",
-      status: "LIVE",
-      viewers: 19283,
-      bets: 5621,
-      thumbnail: "/placeholder.svg",
-      quality: "HD"
-    }
-  ];
-
-  const upcomingStreams = [
-    {
-      id: 4,
-      sport: "Football",
-      match: "Real Madrid vs Barcelona",
-      league: "La Liga",
-      status: "Starts in 2h",
-      subscribers: 67234,
-      thumbnail: "/placeholder.svg"
-    },
-    {
-      id: 5,
-      sport: "Cricket",
-      match: "India vs Australia",
-      league: "Test Match",
-      status: "Starts in 5h",
-      subscribers: 92145,
-      thumbnail: "/placeholder.svg"
-    }
-  ];
+  const { liveStreams, upcomingStreams, isLoading, incrementViewerCount } = useLiveStreams();
 
   return (
     <div className="min-h-screen bg-background">

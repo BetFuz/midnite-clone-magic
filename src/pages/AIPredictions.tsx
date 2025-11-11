@@ -8,80 +8,15 @@ import { Button } from "@/components/ui/button";
 import { Brain, TrendingUp, Target, Zap, Clock, CheckCircle2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
+import { useAIPredictions } from "@/hooks/useAIPredictions";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const AIPredictions = () => {
   const [activeTab, setActiveTab] = useState("today");
-
-  const predictions = [
-    {
-      id: 1,
-      sport: "Football",
-      match: "Manchester United vs Liverpool",
-      league: "Premier League",
-      prediction: "Liverpool to Win",
-      confidence: 87,
-      odds: 2.15,
-      reasoning: "Liverpool's recent form is exceptional with 5 consecutive wins. Man United struggling with injuries to key defenders. Historical H2H favors Liverpool at Old Trafford in recent seasons.",
-      aiModel: "GPT-5 Enhanced",
-      timestamp: "2 hours ago",
-      status: "pending"
-    },
-    {
-      id: 2,
-      sport: "Basketball",
-      match: "Lakers vs Warriors",
-      league: "NBA",
-      prediction: "Over 225.5 Points",
-      confidence: 92,
-      odds: 1.90,
-      reasoning: "Both teams ranked top 3 in offensive efficiency. Warriors averaging 118 PPG at home, Lakers 112 PPG on road. Last 3 meetings all exceeded 230 points. Fast-paced matchup expected.",
-      aiModel: "Claude Neural",
-      timestamp: "4 hours ago",
-      status: "pending"
-    },
-    {
-      id: 3,
-      sport: "Tennis",
-      match: "Djokovic vs Alcaraz",
-      league: "Australian Open - Final",
-      prediction: "Alcaraz to Win in 4 Sets",
-      confidence: 78,
-      odds: 2.45,
-      reasoning: "Alcaraz's youth and speed advantage on hard court. Djokovic showing fatigue in semi-final. Weather conditions favor aggressive baseline play. Alcaraz won last 2 meetings.",
-      aiModel: "GPT-5 Enhanced",
-      timestamp: "6 hours ago",
-      status: "won"
-    },
-    {
-      id: 4,
-      sport: "Football",
-      match: "Real Madrid vs Barcelona",
-      league: "La Liga",
-      prediction: "Both Teams to Score",
-      confidence: 94,
-      odds: 1.72,
-      reasoning: "El Clasico historically high-scoring. Both teams' attacking prowess undeniable. Real Madrid scored in last 12 home games, Barcelona in last 10 away games. Defensive vulnerabilities on both sides.",
-      aiModel: "Claude Neural",
-      timestamp: "1 day ago",
-      status: "won"
-    },
-    {
-      id: 5,
-      sport: "Cricket",
-      match: "India vs Australia",
-      league: "Test Series",
-      prediction: "India to Win by Innings",
-      confidence: 81,
-      odds: 3.20,
-      reasoning: "India's spin attack devastating on home pitches. Australia's batting lineup struggling against spin. Weather forecast shows no rain interruptions. India unbeaten in last 15 home Tests.",
-      aiModel: "GPT-5 Enhanced",
-      timestamp: "1 day ago",
-      status: "pending"
-    }
-  ];
+  const { predictions, isLoading } = useAIPredictions();
 
   const stats = {
-    totalPredictions: 2847,
+    totalPredictions: predictions.length,
     winRate: 73.2,
     avgConfidence: 84.5,
     profitROI: 18.7,

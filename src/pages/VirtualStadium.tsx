@@ -6,9 +6,12 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Glasses, Maximize, Volume2, Users, Eye, Settings } from "lucide-react";
+import { useVRExperiences } from "@/hooks/useVRExperiences";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const VirtualStadium = () => {
   const [vrMode, setVrMode] = useState(false);
+  const { experiences, activeSession, isLoading, startSession, endSession } = useVRExperiences();
 
   return (
     <div className="min-h-screen bg-background">
