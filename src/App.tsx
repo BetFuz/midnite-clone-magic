@@ -126,6 +126,7 @@ import LightningRoulette from "./pages/live-casino/LightningRoulette";
 import BetFeatures from "./pages/BetFeatures";
 import EnhancedAccountHub from "./pages/account/EnhancedAccountHub";
 import Politics from "./pages/politics/Politics";
+import BettingHub from "./pages/BettingHub";
 
 const queryClient = new QueryClient();
 
@@ -147,6 +148,7 @@ const App = () => (
           <Route path="/virtuals" element={<Virtuals />} />
           <Route path="/bet-features" element={<BetFeatures />} />
           <Route path="/politics" element={<Politics />} />
+          <Route path="/betting-hub" element={<BettingHub />} />
           
           {/* Sports */}
           <Route path="/sports/football" element={<Football />} />
