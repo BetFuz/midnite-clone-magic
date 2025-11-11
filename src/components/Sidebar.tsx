@@ -1,4 +1,4 @@
-import { Home, Trophy, CircleDot, Flame, Hammer, Target, TrendingUp, Dumbbell, Volleyball, Table2, TicketCheck, BarChart3, History, CreditCard, Vote, LayoutGrid, DollarSign, Users, Sparkles } from "lucide-react";
+import { Home, Trophy, CircleDot, Flame, Hammer, Target, TrendingUp, Dumbbell, Volleyball, Table2, TicketCheck, BarChart3, History, CreditCard, Vote, LayoutGrid, DollarSign, Users, Sparkles, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NavLink } from "@/components/NavLink";
 
@@ -26,6 +26,11 @@ const Sidebar = ({ className, showOnMobile = false }: SidebarProps) => {
     { icon: CircleDot, label: "Games", url: "/games" },
     { icon: Target, label: "Live Casino", url: "/live-casino" },
     { icon: Dumbbell, label: "Virtuals", url: "/virtuals" },
+  ];
+
+  const featuredTournaments = [
+    { icon: Trophy, label: "World Cup 2026", url: "/football/world-cup", badge: "FEATURED" },
+    { icon: Trophy, label: "AFCON 2027", url: "/football/african-cup-of-nations", badge: "FEATURED" },
   ];
 
   const sportsCategories = [
@@ -80,6 +85,36 @@ const Sidebar = ({ className, showOnMobile = false }: SidebarProps) => {
               </div>
             </NavLink>
           ))}
+        </div>
+
+        <div>
+          <h3 className="px-4 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Featured Tournaments
+          </h3>
+          <div className="space-y-1">
+            {featuredTournaments.map((item) => (
+              <NavLink
+                key={item.label}
+                to={item.url}
+                className="w-full"
+                activeClassName="bg-sidebar-accent text-sidebar-accent-foreground"
+              >
+                <div
+                  className={cn(
+                    "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-sidebar-foreground hover:bg-sidebar-accent/50"
+                  )}
+                >
+                  <item.icon className="h-5 w-5 text-primary" />
+                  <span className="flex-1 text-left">{item.label}</span>
+                  {item.badge && (
+                    <span className="px-2 py-0.5 text-xs font-bold bg-primary text-primary-foreground rounded">
+                      {item.badge}
+                    </span>
+                  )}
+                </div>
+              </NavLink>
+            ))}
+          </div>
         </div>
 
         <div>

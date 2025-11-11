@@ -27,6 +27,10 @@ export const BottomNav = () => {
       { label: "FuzSocial", url: "/social" },
       { label: "FuzPredict", url: "/predict" },
     ]},
+    { label: "Featured Tournaments", items: [
+      { label: "World Cup 2026", url: "/football/world-cup" },
+      { label: "AFCON 2027", url: "/football/african-cup-of-nations" },
+    ]},
     { label: "Sports", items: [
       { label: "Football", url: "/sports/football" },
       { label: "Basketball", url: "/sports/basketball" },
