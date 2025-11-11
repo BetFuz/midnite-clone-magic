@@ -4,6 +4,8 @@ import BetSlip from "@/components/BetSlip";
 import HeroBanner from "@/components/HeroBanner";
 import MatchCard from "@/components/MatchCard";
 import BoostCard from "@/components/BoostCard";
+import QuickBetBuilder from "@/components/QuickBetBuilder";
+import PopularBetsWidget from "@/components/PopularBetsWidget";
 import { buttonVariants } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ChevronRight, Award, TrendingUp as TrendingUpIcon } from "lucide-react";
@@ -377,6 +379,16 @@ const Index = () => {
                 ))}
               </div>
             </div>
+          </section>
+
+          {/* Quick Bet Builder - SportyBet Style */}
+          <section className="mb-6">
+            <QuickBetBuilder />
+          </section>
+
+          {/* Popular Bets Widget - SportyBet Style */}
+          <section className="mb-6">
+            <PopularBetsWidget />
           </section>
 
           {/* Boosts Section - Betano Style: Electrifying promotions */}

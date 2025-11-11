@@ -7,6 +7,8 @@ import { formatCurrency } from "@/lib/currency";
 import { useBetSlip } from "@/contexts/BetSlipContext";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import CashOutButton from "./CashOutButton";
+import FastStakeSelector from "./FastStakeSelector";
+import BetShareCard from "./BetShareCard";
 
 interface BetSlipProps {
   className?: string;
@@ -87,19 +89,11 @@ const BetSlip = ({ className, showOnMobile = false }: BetSlipProps) => {
           </ScrollArea>
 
           <div className="border-t border-border p-4 space-y-4">
-            <div>
-              <label className="text-xs text-muted-foreground mb-1 block">
-                Stake Amount
-              </label>
-              <Input
-                type="number"
-                min="100"
-                step="100"
-                value={stake}
-                onChange={(e) => setStake(Number(e.target.value))}
-                className="font-semibold"
-              />
-            </div>
+            <FastStakeSelector
+              currentStake={stake}
+              onStakeChange={setStake}
+              balance={10000}
+            />
 
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
@@ -116,8 +110,17 @@ const BetSlip = ({ className, showOnMobile = false }: BetSlipProps) => {
               </div>
             </div>
 
+            {selections.length > 0 && (
+              <BetShareCard
+                totalOdds={totalOdds}
+                stake={stake}
+                potentialWin={potentialWin}
+                selectionCount={selections.length}
+              />
+            )}
+
             <div className="space-y-2">
-              <Button 
+              <Button
                 className="w-full"
                 size="lg"
                 onClick={placeBet}
