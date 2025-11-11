@@ -125,6 +125,7 @@ import MatchDetail from "./pages/matches/MatchDetail";
 import LightningRoulette from "./pages/live-casino/LightningRoulette";
 import BetFeatures from "./pages/BetFeatures";
 import EnhancedAccountHub from "./pages/account/EnhancedAccountHub";
+import Politics from "./pages/politics/Politics";
 
 const queryClient = new QueryClient();
 
@@ -145,6 +146,7 @@ const App = () => (
           <Route path="/live-casino" element={<LiveCasino />} />
           <Route path="/virtuals" element={<Virtuals />} />
           <Route path="/bet-features" element={<BetFeatures />} />
+          <Route path="/politics" element={<Politics />} />
           
           {/* Sports */}
           <Route path="/sports/football" element={<Football />} />

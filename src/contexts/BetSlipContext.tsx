@@ -9,7 +9,7 @@ export interface BetSelection {
   league?: string;
   homeTeam: string;
   awayTeam: string;
-  selectionType: "home" | "away" | "draw";
+  selectionType: "home" | "away" | "draw" | "politics" | "economy" | "social" | "other";
   selectionValue: string;
   odds: number;
   matchTime?: string;
