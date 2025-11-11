@@ -10,7 +10,7 @@ import { Shield, CheckCircle, TrendingUp, AlertCircle, DollarSign, Trophy } from
 import { formatCurrency } from "@/lib/currency";
 import { toast } from "sonner";
 
-const AccaInsurance = () => {
+const FuzInsurance = () => {
   const [stakeAmount, setStakeAmount] = useState("");
   const [selections, setSelections] = useState(5);
 
@@ -25,7 +25,7 @@ const AccaInsurance = () => {
       toast.error("Please enter a valid stake amount");
       return;
     }
-    toast.success(`Acca Insurance activated! You're protected up to ${formatCurrency(calculateRefund())}`);
+    toast.success(`Fuz Insurance activated! You're protected up to ${formatCurrency(calculateRefund())}`);
   };
 
   const insuranceTiers = [
@@ -52,8 +52,8 @@ const AccaInsurance = () => {
 
   const faqs = [
     {
-      question: "What is Acca Insurance?",
-      answer: "Acca Insurance protects your accumulator bets. If one selection lets you down, we'll refund your stake up to ₦50,000 as a free bet."
+      question: "What is Fuz Insurance?",
+      answer: "Fuz Insurance protects your accumulator bets. If one selection lets you down, we'll refund your stake up to ₦50,000 as a free bet."
     },
     {
       question: "How many selections do I need?",
@@ -61,11 +61,11 @@ const AccaInsurance = () => {
     },
     {
       question: "What happens if I lose 2 or more selections?",
-      answer: "Acca Insurance only covers single-selection losses. If 2+ selections lose, standard bet rules apply."
+      answer: "Fuz Insurance only covers single-selection losses. If 2+ selections lose, standard bet rules apply."
     },
     {
       question: "Can I combine this with other promotions?",
-      answer: "Acca Insurance cannot be combined with Acca Boost on the same bet slip, but can be used with other promotions."
+      answer: "Fuz Insurance cannot be combined with Acca Boost on the same bet slip, but can be used with other promotions."
     },
     {
       question: "When will I receive my refund?",
@@ -94,7 +94,7 @@ const AccaInsurance = () => {
                       Risk Protection
                     </Badge>
                     <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-                      Acca Insurance
+                      Fuz Insurance
                     </h1>
                     <p className="text-lg text-white/90 mb-6 max-w-2xl">
                       One selection lets you down? We've got you covered. Get your stake back as a free bet up to ₦50,000!
@@ -113,14 +113,14 @@ const AccaInsurance = () => {
                 {/* How It Works */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-2xl">How Acca Insurance Works</CardTitle>
+                    <CardTitle className="text-2xl">How Fuz Insurance Works</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="grid md:grid-cols-3 gap-6">
                       {[
                         {
                           step: 1,
-                          title: "Place Your Acca",
+                          title: "Place Your Accumulator",
                           description: "Build an accumulator with 5+ selections, each at odds 1.30+",
                           icon: Trophy,
                         },
@@ -232,7 +232,7 @@ const AccaInsurance = () => {
 
                     <Button className="w-full" size="lg" onClick={handleActivate}>
                       <Shield className="h-5 w-5 mr-2" />
-                      Activate Acca Insurance
+                      Activate Fuz Insurance
                     </Button>
                   </CardContent>
                 </Card>
@@ -246,7 +246,7 @@ const AccaInsurance = () => {
                     <li>• Refund only applies if exactly one selection loses</li>
                     <li>• Refunds credited as free bets within 24 hours of settlement</li>
                     <li>• Free bets valid for 7 days and cannot be withdrawn as cash</li>
-                    <li>• Acca Insurance and Acca Boost cannot be combined on the same bet</li>
+                    <li>• Fuz Insurance and Acca Boost cannot be combined on the same bet</li>
                     <li>• Available on pre-match bets only (in-play excluded)</li>
                     <li>• Betfuz reserves the right to void insurance if terms are breached</li>
                     <li>• 18+ BeGambleAware.org. Terms apply.</li>
@@ -307,4 +307,4 @@ const AccaInsurance = () => {
   );
 };
 
-export default AccaInsurance;
+export default FuzInsurance;

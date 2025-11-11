@@ -172,7 +172,7 @@ const AccaBoost = () => {
                     <li>• Maximum boost amount of {formatCurrency(500000)} per bet slip</li>
                     <li>• Available on pre-match and in-play bets across all sports</li>
                     <li>• Boost calculated on net winnings (stake not included)</li>
-                    <li>• Acca Insurance and Acca Boost cannot be combined on the same bet</li>
+                    <li>• Fuz Insurance and Acca Boost cannot be combined on the same bet</li>
                     <li>• Betfuz reserves the right to void boosts if terms are breached</li>
                     <li>• 18+ BeGambleAware.org. Terms apply.</li>
                   </ul>

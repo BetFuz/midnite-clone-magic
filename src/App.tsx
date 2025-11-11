@@ -142,7 +142,7 @@ import VirtualStadium from "./pages/VirtualStadium";
 import FuzFlix from "./pages/FuzFlix";
 import CasinoLobby from "./pages/casino/CasinoLobby";
 import Analytics from "./pages/Analytics";
-import AccaInsurance from "./pages/promotions/AccaInsurance";
+import FuzInsurance from "./pages/promotions/FuzInsurance";
 
 const queryClient = new QueryClient();
 
@@ -278,7 +278,7 @@ const App = () => (
           <Route path="/promotions/cashback" element={<Cashback />} />
           <Route path="/promotions/loyalty-rewards" element={<LoyaltyRewards />} />
           <Route path="/promotions/refer-friend" element={<ReferFriend />} />
-          <Route path="/promotions/acca-insurance" element={<AccaInsurance />} />
+          <Route path="/promotions/fuz-insurance" element={<FuzInsurance />} />
           
           {/* Info */}
           <Route path="/info/about" element={<About />} />

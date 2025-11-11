@@ -74,7 +74,7 @@ const AdvancedTransactions = () => {
       type: 'refund',
       amount: 1000,
       status: 'completed',
-      description: 'Acca Insurance Refund',
+      description: 'Fuz Insurance Refund',
       date: new Date('2025-11-08'),
       reference: 'REF-2025-003',
     },

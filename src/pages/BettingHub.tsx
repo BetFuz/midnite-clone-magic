@@ -383,7 +383,7 @@ const BettingHub = () => {
                       'Bet Alerts',
                       'Match Intelligence',
                       'Cash Out',
-                      'Acca Insurance',
+                      'Fuz Insurance',
                       'Multi-Bet Bonus',
                       'Live Streaming',
                       'Statistics',

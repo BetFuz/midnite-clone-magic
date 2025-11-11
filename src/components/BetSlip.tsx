@@ -10,7 +10,7 @@ import CashOutButton from "./CashOutButton";
 import FastStakeSelector from "./FastStakeSelector";
 import BetShareCard from "./BetShareCard";
 import MultiBetBonus from "./MultiBetBonus";
-import AccaInsurance from "./AccaInsurance";
+import AccaInsurance from "./FuzInsurance";
 
 interface BetSlipProps {
   className?: string;
