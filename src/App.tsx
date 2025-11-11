@@ -123,6 +123,7 @@ import NetworkStatus from "./components/NetworkStatus";
 // Match & Live Casino
 import MatchDetail from "./pages/matches/MatchDetail";
 import LightningRoulette from "./pages/live-casino/LightningRoulette";
+import BetFeatures from "./pages/BetFeatures";
 
 const queryClient = new QueryClient();
 
@@ -142,6 +143,7 @@ const App = () => (
           <Route path="/games" element={<Games />} />
           <Route path="/live-casino" element={<LiveCasino />} />
           <Route path="/virtuals" element={<Virtuals />} />
+          <Route path="/bet-features" element={<BetFeatures />} />
           
           {/* Sports */}
           <Route path="/sports/football" element={<Football />} />

@@ -9,6 +9,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import CashOutButton from "./CashOutButton";
 import FastStakeSelector from "./FastStakeSelector";
 import BetShareCard from "./BetShareCard";
+import MultiBetBonus from "./MultiBetBonus";
+import AccaInsurance from "./AccaInsurance";
 
 interface BetSlipProps {
   className?: string;
@@ -109,6 +111,21 @@ const BetSlip = ({ className, showOnMobile = false }: BetSlipProps) => {
                 <span className="font-bold text-primary">{formatCurrency(potentialWin)}</span>
               </div>
             </div>
+
+            {selections.length >= 4 && (
+              <MultiBetBonus
+                selectionCount={selections.length}
+                originalOdds={totalOdds}
+                stake={stake}
+              />
+            )}
+
+            {selections.length >= 5 && (
+              <AccaInsurance
+                selectionCount={selections.length}
+                stake={stake}
+              />
+            )}
 
             {selections.length > 0 && (
               <BetShareCard
