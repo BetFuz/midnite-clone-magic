@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_audit_log: {
+        Row: {
+          action: string
+          admin_id: string
+          created_at: string | null
+          error_message: string | null
+          id: string
+          ip_address: string | null
+          mfa_verified: boolean | null
+          payload_hash: string | null
+          resource_id: string | null
+          resource_type: string
+          status: string
+          user_agent: string | null
+        }
+        Insert: {
+          action: string
+          admin_id: string
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          ip_address?: string | null
+          mfa_verified?: boolean | null
+          payload_hash?: string | null
+          resource_id?: string | null
+          resource_type: string
+          status: string
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          admin_id?: string
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          ip_address?: string | null
+          mfa_verified?: boolean | null
+          payload_hash?: string | null
+          resource_id?: string | null
+          resource_type?: string
+          status?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       ai_chat_messages: {
         Row: {
           content: string
@@ -875,6 +920,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          granted_at: string | null
+          granted_by: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_statistics: {
         Row: {
           best_streak: number | null
@@ -1050,10 +1119,31 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      log_admin_action: {
+        Args: {
+          _action: string
+          _admin_id: string
+          _error_message?: string
+          _ip_address?: string
+          _mfa_verified?: boolean
+          _payload_hash?: string
+          _resource_id?: string
+          _resource_type: string
+          _status?: string
+          _user_agent?: string
+        }
+        Returns: string
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "user" | "admin" | "superadmin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1180,6 +1270,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["user", "admin", "superadmin"],
+    },
   },
 } as const

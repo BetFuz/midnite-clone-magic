@@ -11,3 +11,9 @@ verify_jwt = false
 
 [functions.voice-betting-token]
 verify_jwt = true
+
+[functions.admin-webhook-settings]
+verify_jwt = true
+
+[functions.admin-audit-logs]
+verify_jwt = true

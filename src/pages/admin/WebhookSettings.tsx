@@ -1,215 +1,273 @@
-import Header from "@/components/Header";
-import Sidebar from "@/components/Sidebar";
-import { Card } from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Settings, Webhook, CheckCircle2, Save, TestTube } from "lucide-react";
-import { useState } from "react";
-import { toast } from "@/hooks/use-toast";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { toast } from "sonner";
+import { ExternalLink, Save, TestTube, Shield, AlertCircle } from "lucide-react";
+import Sidebar from "@/components/Sidebar";
+import MobileNav from "@/components/MobileNav";
+import { AdminGuard } from "@/components/admin/AdminGuard";
+import { supabase } from "@/integrations/supabase/client";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const WebhookSettings = () => {
-  const [webhooks, setWebhooks] = useState({
-    promotionClaim: localStorage.getItem("webhook_promotion_claim") || "",
-    promoCodeApplied: localStorage.getItem("webhook_promo_code") || "",
-    referralGenerated: localStorage.getItem("webhook_referral") || "",
-    depositCompleted: localStorage.getItem("webhook_deposit") || "",
-    withdrawalRequest: localStorage.getItem("webhook_withdrawal") || "",
+  const [webhookUrls, setWebhookUrls] = useState({
+    bet_placed: "",
+    bet_won: "",
+    bet_lost: "",
+    deposit: "",
+    withdrawal: "",
+    user_registered: "",
   });
 
-  const [isTesting, setIsTesting] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
 
-  const handleSave = () => {
-    Object.entries(webhooks).forEach(([key, value]) => {
-      if (value) {
-        localStorage.setItem(`webhook_${key.replace(/([A-Z])/g, "_$1").toLowerCase()}`, value);
+  useEffect(() => {
+    loadWebhookSettings();
+  }, []);
+
+  const loadWebhookSettings = async () => {
+    try {
+      setFetching(true);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("You must be logged in");
+        return;
       }
-    });
 
-    toast({
-      title: "Settings Saved",
-      description: "n8n webhook URLs have been saved successfully",
-    });
+      const response = await supabase.functions.invoke('admin-webhook-settings', {
+        method: 'GET',
+      });
+
+      if (response.error) {
+        throw response.error;
+      }
+
+      if (response.data?.data) {
+        setWebhookUrls({
+          bet_placed: response.data.data.bet_placed || "",
+          bet_won: response.data.data.bet_won || "",
+          bet_lost: response.data.data.bet_lost || "",
+          deposit: response.data.data.deposit || "",
+          withdrawal: response.data.data.withdrawal || "",
+          user_registered: response.data.data.user_registered || "",
+        });
+      }
+    } catch (error: any) {
+      console.error("Error loading webhook settings:", error);
+      if (error?.message?.includes('Forbidden')) {
+        toast.error("Access denied: Admin privileges required");
+      } else {
+        toast.error("Failed to load webhook settings");
+      }
+    } finally {
+      setFetching(false);
+    }
   };
 
-  const handleTest = async (key: string, url: string) => {
-    if (!url) {
-      toast({
-        title: "No URL",
-        description: "Please enter a webhook URL first",
-        variant: "destructive",
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("You must be logged in");
+        return;
+      }
+
+      const response = await supabase.functions.invoke('admin-webhook-settings', {
+        body: webhookUrls,
       });
+
+      if (response.error) {
+        throw response.error;
+      }
+
+      toast.success("Webhook settings saved securely and logged to audit trail");
+    } catch (error: any) {
+      console.error("Error saving webhook settings:", error);
+      if (error?.message?.includes('Forbidden')) {
+        toast.error("Access denied: Admin privileges required");
+      } else {
+        toast.error(error.message || "Failed to save webhook settings");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleTest = async (url: string, eventType: string) => {
+    if (!url) {
+      toast.error("Please enter a webhook URL first");
       return;
     }
 
-    setIsTesting(key);
-
     try {
-      await fetch(url, {
+      const response = await fetch(url, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        mode: "no-cors",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           test: true,
-          event: key,
+          eventType,
           timestamp: new Date().toISOString(),
-          source: "betfuz_test",
         }),
       });
 
-      toast({
-        title: "Test Sent",
-        description: "Check your n8n workflow to confirm the webhook was triggered",
-      });
+      if (response.ok) {
+        toast.success(`Test webhook sent successfully to ${eventType}`);
+      } else {
+        toast.error(`Failed to send test webhook: ${response.statusText}`);
+      }
     } catch (error) {
-      toast({
-        title: "Test Failed",
-        description: "Failed to send test webhook. Check the URL and try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsTesting(null);
+      toast.error("Failed to send test webhook");
     }
   };
 
   const webhookConfigs = [
-    { 
-      key: "promotionClaim", 
-      label: "Promotion Claim", 
-      description: "Triggered when a user claims a promotion",
-      example: "User clicks 'Claim Offer' button"
+    {
+      key: "bet_placed",
+      label: "Bet Placed",
+      description: "Triggered when a user places a bet",
+      example: { userId: "uuid", betId: "uuid", stake: 5000, odds: 2.5 },
     },
-    { 
-      key: "promoCodeApplied", 
-      label: "Promo Code Applied", 
-      description: "Triggered when a promo code is successfully applied",
-      example: "User enters valid promo code"
+    {
+      key: "bet_won",
+      label: "Bet Won",
+      description: "Triggered when a bet wins",
+      example: { userId: "uuid", betId: "uuid", winnings: 12500 },
     },
-    { 
-      key: "referralGenerated", 
-      label: "Referral Generated", 
-      description: "Triggered when a referral link is created/shared",
-      example: "User generates referral link"
+    {
+      key: "bet_lost",
+      label: "Bet Lost",
+      description: "Triggered when a bet loses",
+      example: { userId: "uuid", betId: "uuid", stake: 5000 },
     },
-    { 
-      key: "depositCompleted", 
-      label: "Deposit Completed", 
-      description: "Triggered when a deposit is successful",
-      example: "User completes deposit transaction"
+    {
+      key: "deposit",
+      label: "Deposit",
+      description: "Triggered when a deposit is completed",
+      example: { userId: "uuid", amount: 10000, method: "bank_transfer" },
     },
-    { 
-      key: "withdrawalRequest", 
-      label: "Withdrawal Request", 
+    {
+      key: "withdrawal",
+      label: "Withdrawal",
       description: "Triggered when a withdrawal is requested",
-      example: "User submits withdrawal request"
+      example: { userId: "uuid", amount: 50000, method: "bank_transfer" },
+    },
+    {
+      key: "user_registered",
+      label: "User Registered",
+      description: "Triggered when a new user signs up",
+      example: { userId: "uuid", email: "user@example.com", timestamp: new Date().toISOString() },
     },
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <div className="flex">
+    <AdminGuard requireSuperAdmin={true}>
+      <div className="flex min-h-screen bg-background">
         <Sidebar />
-        <main className="flex-1 p-6 overflow-y-auto h-[calc(100vh-4rem)]">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <div className="p-3 bg-primary/10 rounded-lg">
-                  <Settings className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <h1 className="text-3xl font-bold text-foreground">n8n Webhook Settings</h1>
-                  <p className="text-muted-foreground">Configure webhook URLs for automation</p>
-                </div>
-              </div>
-              <Button onClick={handleSave} className="gap-2">
-                <Save className="h-4 w-4" />
-                Save All
-              </Button>
+        <MobileNav />
+        
+        <main className="flex-1 p-6 lg:ml-64 pb-20 md:pb-6">
+          <div className="max-w-4xl mx-auto space-y-6">
+            <div className="flex items-center gap-2 mb-6">
+              <Shield className="w-6 h-6 text-primary" />
+              <h1 className="text-2xl font-bold">Secure Admin Area - Webhook Settings</h1>
             </div>
 
-            <Card className="p-6 bg-gradient-to-br from-primary/10 to-accent/10 border-primary/20 mb-6">
-              <div className="flex items-start gap-3">
-                <Webhook className="h-5 w-5 text-primary mt-1" />
-                <div>
-                  <h3 className="font-bold text-foreground mb-2">How to Setup n8n Webhooks</h3>
-                  <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
-                    <li>Create a new workflow in n8n</li>
-                    <li>Add a "Webhook" trigger node</li>
-                    <li>Copy the webhook URL from the node</li>
-                    <li>Paste it in the corresponding field below</li>
-                    <li>Click "Test" to verify the connection</li>
-                    <li>Save your settings</li>
-                  </ol>
-                </div>
-              </div>
-            </Card>
+            <Alert className="bg-primary/10 border-primary/20">
+              <AlertCircle className="h-4 w-4 text-primary" />
+              <AlertDescription className="text-foreground">
+                <strong>Security Notice:</strong> All webhook configuration changes are logged to an immutable audit trail. 
+                Access is restricted to Super Admins only. Webhooks must use HTTPS.
+              </AlertDescription>
+            </Alert>
 
-            <div className="space-y-4">
-              {webhookConfigs.map((config) => (
-                <Card key={config.key} className="p-6 bg-card border-border">
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-lg font-bold text-foreground">{config.label}</h3>
-                        {webhooks[config.key as keyof typeof webhooks] && (
-                          <Badge variant="secondary" className="text-xs">
-                            <CheckCircle2 className="h-3 w-3 mr-1" />
-                            Configured
-                          </Badge>
-                        )}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ExternalLink className="w-5 h-5 text-primary" />
+                  n8n Webhook Configuration
+                </CardTitle>
+                <CardDescription>
+                  Configure n8n webhook URLs for automated betting platform workflows. 
+                  All changes are server-validated and audit-logged.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {fetching ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    Loading secure webhook settings...
+                  </div>
+                ) : (
+                  <>
+                    {webhookConfigs.map((config) => (
+                      <div key={config.key} className="space-y-3 p-4 border border-border rounded-lg">
+                        <div>
+                          <Label htmlFor={config.key} className="text-base font-semibold">
+                            {config.label}
+                          </Label>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {config.description}
+                          </p>
+                        </div>
+                        
+                        <Input
+                          id={config.key}
+                          type="url"
+                          value={webhookUrls[config.key as keyof typeof webhookUrls]}
+                          onChange={(e) =>
+                            setWebhookUrls({ ...webhookUrls, [config.key]: e.target.value })
+                          }
+                          placeholder="https://your-n8n-instance.com/webhook/..."
+                          className="font-mono text-sm"
+                        />
+
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() =>
+                              handleTest(
+                                webhookUrls[config.key as keyof typeof webhookUrls],
+                                config.key
+                              )
+                            }
+                            disabled={!webhookUrls[config.key as keyof typeof webhookUrls]}
+                          >
+                            <TestTube className="w-4 h-4 mr-2" />
+                            Test Webhook
+                          </Button>
+                        </div>
+
+                        <div className="mt-2 p-3 bg-muted/50 rounded-md">
+                          <p className="text-xs font-semibold mb-1">Example Payload:</p>
+                          <pre className="text-xs text-muted-foreground overflow-x-auto">
+                            {JSON.stringify(config.example, null, 2)}
+                          </pre>
+                        </div>
                       </div>
-                      <p className="text-sm text-muted-foreground mb-1">{config.description}</p>
-                      <p className="text-xs text-muted-foreground italic">Example: {config.example}</p>
-                    </div>
-                  </div>
+                    ))}
 
-                  <div className="space-y-3">
-                    <div>
-                      <Label htmlFor={config.key}>Webhook URL</Label>
-                      <Input
-                        id={config.key}
-                        type="url"
-                        value={webhooks[config.key as keyof typeof webhooks]}
-                        onChange={(e) => setWebhooks({ ...webhooks, [config.key]: e.target.value })}
-                        placeholder="https://your-n8n-instance.com/webhook/..."
-                        className="mt-2"
-                      />
-                    </div>
-
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleTest(config.key, webhooks[config.key as keyof typeof webhooks])}
-                      disabled={isTesting === config.key || !webhooks[config.key as keyof typeof webhooks]}
-                      className="gap-2"
+                    <Button 
+                      onClick={handleSave}
+                      className="w-full"
+                      disabled={loading}
                     >
-                      <TestTube className="h-4 w-4" />
-                      {isTesting === config.key ? "Testing..." : "Test Webhook"}
+                      <Save className="w-4 h-4 mr-2" />
+                      {loading ? "Saving & Logging to Audit Trail..." : "Save All Settings (Audit Logged)"}
                     </Button>
-                  </div>
-
-                  <Separator className="my-4" />
-
-                  <div className="bg-muted/50 p-3 rounded-lg">
-                    <p className="text-xs font-semibold text-foreground mb-2">Example Payload:</p>
-                    <pre className="text-xs text-muted-foreground overflow-x-auto">
-                      {JSON.stringify({
-                        event: config.key,
-                        timestamp: new Date().toISOString(),
-                        data: { userId: "user123", amount: 10000 }
-                      }, null, 2)}
-                    </pre>
-                  </div>
-                </Card>
-              ))}
-            </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
           </div>
         </main>
       </div>
-    </div>
+    </AdminGuard>
   );
 };
 
