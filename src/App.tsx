@@ -131,6 +131,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <div className="pb-20 md:pb-0">
           <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
@@ -256,6 +257,7 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </div>
         <MobileBetSlip />
         <BottomNav />
       </BrowserRouter>
