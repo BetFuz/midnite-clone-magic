@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PersonalStats } from "@/components/stats/PersonalStats";
 import { SportStats } from "@/components/stats/SportStats";
+import { BettingTrends } from "@/components/stats/BettingTrends";
 import AIRecommendations from "@/components/AIRecommendations";
 import { Leaderboard } from "@/components/Leaderboard";
 import { AchievementBadges } from "@/components/AchievementBadges";
@@ -53,6 +54,15 @@ const Statistics = () => {
     { name: "Single", value: 45, color: "#00D9FF" },
     { name: "Accumulator", value: 35, color: "#10B981" },
     { name: "System", value: 20, color: "#F59E0B" },
+  ];
+
+  const bettingTrends = [
+    { selectionType: "Match Winner", selectionValue: "Manchester City", betCount: 2847, percentage: 68.5 },
+    { selectionType: "Over/Under", selectionValue: "Over 2.5 Goals", betCount: 1923, percentage: 58.2 },
+    { selectionType: "Both Teams Score", selectionValue: "Yes", betCount: 1654, percentage: 52.7 },
+    { selectionType: "Match Winner", selectionValue: "Liverpool", betCount: 1432, percentage: 48.3 },
+    { selectionType: "Correct Score", selectionValue: "2-1", betCount: 987, percentage: 35.6 },
+    { selectionType: "Double Chance", selectionValue: "Home/Draw", betCount: 876, percentage: 32.1 },
   ];
 
   const COLORS = betTypeData.map(item => item.color);
@@ -202,12 +212,7 @@ const Statistics = () => {
               </TabsContent>
 
               <TabsContent value="trends">
-                <Card className="p-6 bg-card border-border">
-                  <h3 className="text-xl font-bold text-foreground mb-4">Coming Soon</h3>
-                  <p className="text-muted-foreground">
-                    Advanced betting trends and insights will be available here soon.
-                  </p>
-                </Card>
+                <BettingTrends trends={bettingTrends} />
               </TabsContent>
             </Tabs>
           </div>
