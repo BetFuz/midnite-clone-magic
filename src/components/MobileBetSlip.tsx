@@ -24,7 +24,7 @@ const MobileBetSlip = () => {
   }
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
+    <Sheet open={open} onOpenChange={(next) => { if (!next) setOpen(false); }}>
       <Button 
         size="icon" 
         className="md:hidden fixed bottom-4 sm:bottom-6 right-4 h-14 w-14 rounded-full shadow-lg bg-primary z-50"
@@ -39,6 +39,8 @@ const MobileBetSlip = () => {
         )}
       </Button>
       <SheetContent side="right" className="p-0 w-full sm:w-96">
+        <h2 className="sr-only">Bet Slip</h2>
+        <p className="sr-only">Review selections and place your bet</p>
         <BetSlip />
       </SheetContent>
     </Sheet>
