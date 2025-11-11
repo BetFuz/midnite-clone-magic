@@ -12,6 +12,11 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import worldCupHero from "@/assets/promos/world-cup-hero.jpg";
 import worldCupBetting from "@/assets/promos/world-cup-betting.jpg";
 import worldCupCities from "@/assets/promos/world-cup-cities.jpg";
+import worldCupGroups from "@/assets/promos/world-cup-groups.jpg";
+import worldCupFinal from "@/assets/promos/world-cup-final.jpg";
+import worldCupAfricanTeams from "@/assets/promos/world-cup-african-teams.jpg";
+import worldCupLegends from "@/assets/promos/world-cup-legends.jpg";
+import worldCupStadiums from "@/assets/promos/world-cup-stadiums.jpg";
 import { Link } from "react-router-dom";
 
 const WorldCup = () => {
@@ -145,6 +150,76 @@ const WorldCup = () => {
                       <p className="text-white/90 mb-4">Explore iconic stadiums across North America</p>
                       <Button className="bg-white text-primary hover:bg-gray-100" asChild>
                         <Link to="/football/world-cup">View Venues</Link>
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CarouselItem>
+              <CarouselItem>
+                <div className="relative overflow-hidden rounded-2xl h-64">
+                  <img src={worldCupGroups} alt="48 Teams, 12 Groups" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex items-center px-8">
+                    <div>
+                      <h2 className="text-3xl font-bold text-white mb-2">48 Teams, 12 Groups</h2>
+                      <p className="text-white/90 mb-4">The most competitive World Cup in history</p>
+                      <Button className="bg-white text-primary hover:bg-gray-100" onClick={() => handlePlaceBet("group stage")}>
+                        View Groups
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CarouselItem>
+              <CarouselItem>
+                <div className="relative overflow-hidden rounded-2xl h-64">
+                  <img src={worldCupFinal} alt="The Final - Miami 2026" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex items-center px-8">
+                    <div>
+                      <h2 className="text-3xl font-bold text-white mb-2">The Final - Miami 2026</h2>
+                      <p className="text-white/90 mb-4">Who will lift the trophy at Hard Rock Stadium?</p>
+                      <Button className="bg-white text-primary hover:bg-gray-100" onClick={() => handlePlaceBet("final")}>
+                        Bet on Winner
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CarouselItem>
+              <CarouselItem>
+                <div className="relative overflow-hidden rounded-2xl h-64">
+                  <img src={worldCupAfricanTeams} alt="Africa Rising" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex items-center px-8">
+                    <div>
+                      <h2 className="text-3xl font-bold text-white mb-2">Africa Rising - 9 Teams</h2>
+                      <p className="text-white/90 mb-4">Record African representation at World Cup 2026</p>
+                      <Button className="bg-white text-primary hover:bg-gray-100" onClick={() => handlePlaceBet("african teams")}>
+                        Bet on Africa
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CarouselItem>
+              <CarouselItem>
+                <div className="relative overflow-hidden rounded-2xl h-64">
+                  <img src={worldCupLegends} alt="Legends Collide" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex items-center px-8">
+                    <div>
+                      <h2 className="text-3xl font-bold text-white mb-2">Legends Collide</h2>
+                      <p className="text-white/90 mb-4">Messi, Mbappe, Ronaldo - the final showdown</p>
+                      <Button className="bg-white text-primary hover:bg-gray-100" onClick={() => handlePlaceBet("top scorer")}>
+                        Bet on Stars
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CarouselItem>
+              <CarouselItem>
+                <div className="relative overflow-hidden rounded-2xl h-64">
+                  <img src={worldCupStadiums} alt="Historic Venues" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex items-center px-8">
+                    <div>
+                      <h2 className="text-3xl font-bold text-white mb-2">Historic Venues Across 3 Nations</h2>
+                      <p className="text-white/90 mb-4">16 iconic stadiums ready for the world's game</p>
+                      <Button className="bg-white text-primary hover:bg-gray-100" onClick={() => handlePlaceBet("stadiums")}>
+                        Explore Venues
                       </Button>
                     </div>
                   </div>
