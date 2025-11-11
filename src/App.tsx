@@ -128,6 +128,8 @@ import EnhancedAccountHub from "./pages/account/EnhancedAccountHub";
 import Politics from "./pages/politics/Politics";
 import BettingHub from "./pages/BettingHub";
 import Economy from "./pages/economy/Economy";
+import Social from "./pages/social/Social";
+import Predict from "./pages/predict/Predict";
 
 const queryClient = new QueryClient();
 
@@ -151,6 +153,8 @@ const App = () => (
           <Route path="/politics" element={<Politics />} />
           <Route path="/betting-hub" element={<BettingHub />} />
           <Route path="/economy" element={<Economy />} />
+          <Route path="/social" element={<Social />} />
+          <Route path="/predict" element={<Predict />} />
           
           {/* Sports */}
           <Route path="/sports/football" element={<Football />} />

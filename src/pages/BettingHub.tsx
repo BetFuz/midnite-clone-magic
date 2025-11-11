@@ -96,7 +96,6 @@ const BettingHub = () => {
       icon: DollarSign, 
       url: '/economy', 
       markets: 45,
-      new: true,
       color: 'text-emerald-500'
     },
     { 
@@ -338,38 +337,21 @@ const BettingHub = () => {
                               Trending
                             </Badge>
                           )}
-                          {market.new && (
-                            <Badge className="bg-gradient-to-r from-purple-500 to-pink-500">
-                              New
-                            </Badge>
-                          )}
                         </div>
-                      </div>
-                      <h3 className="text-2xl font-bold mb-2 group-hover:text-primary transition-colors">
-                        {market.name}
-                      </h3>
-                      <p className="text-muted-foreground mb-3">
-                        {market.markets} active markets
-                      </p>
-                      <Button className="w-full group-hover:bg-primary group-hover:text-primary-foreground">
-                        Explore Markets
-                      </Button>
-                    </Card>
-                  ))}
-                </div>
-
-                <Card className="p-6 bg-gradient-to-br from-primary/10 to-primary/5">
-                  <h3 className="text-xl font-bold mb-2">Coming Soon</h3>
-                  <p className="text-muted-foreground mb-4">
-                    More exclusive markets launching soon: FuzFlix Live, Instant Games, and more
-                  </p>
-                  <div className="flex gap-2">
-                    <Badge variant="outline">Entertainment</Badge>
-                    <Badge variant="outline">Gaming</Badge>
-                    <Badge variant="outline">Music</Badge>
                   </div>
+                  <h3 className="text-2xl font-bold mb-2 group-hover:text-primary transition-colors">
+                    {market.name}
+                  </h3>
+                  <p className="text-muted-foreground mb-3">
+                    {market.markets} active markets
+                  </p>
+                  <Button className="w-full group-hover:bg-primary group-hover:text-primary-foreground">
+                    Explore Markets
+                  </Button>
                 </Card>
-              </TabsContent>
+              ))}
+            </div>
+          </TabsContent>
 
               {/* FEATURES TAB */}
               <TabsContent value="features" className="space-y-4">
