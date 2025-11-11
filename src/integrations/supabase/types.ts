@@ -59,6 +59,45 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_webhook_settings: {
+        Row: {
+          bet_lost: string | null
+          bet_placed: string | null
+          bet_won: string | null
+          created_at: string | null
+          deposit: string | null
+          id: number
+          updated_at: string | null
+          updated_by: string | null
+          user_registered: string | null
+          withdrawal: string | null
+        }
+        Insert: {
+          bet_lost?: string | null
+          bet_placed?: string | null
+          bet_won?: string | null
+          created_at?: string | null
+          deposit?: string | null
+          id?: number
+          updated_at?: string | null
+          updated_by?: string | null
+          user_registered?: string | null
+          withdrawal?: string | null
+        }
+        Update: {
+          bet_lost?: string | null
+          bet_placed?: string | null
+          bet_won?: string | null
+          created_at?: string | null
+          deposit?: string | null
+          id?: number
+          updated_at?: string | null
+          updated_by?: string | null
+          user_registered?: string | null
+          withdrawal?: string | null
+        }
+        Relationships: []
+      }
       ai_chat_messages: {
         Row: {
           content: string
