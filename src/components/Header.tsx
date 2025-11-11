@@ -1,4 +1,4 @@
-import { Search, LogIn, User, LogOut, Wallet } from "lucide-react";
+import { Search, LogIn, User, LogOut, Wallet, ArrowDownToLine, ArrowUpFromLine, CreditCard, History as HistoryIcon, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -109,14 +109,33 @@ const Header = () => {
                     <User className="mr-2 h-4 w-4" />
                     Profile
                   </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => navigate("/account/deposits")}>
-                    <Wallet className="mr-2 h-4 w-4" />
+                    <ArrowDownToLine className="mr-2 h-4 w-4" />
                     Deposit
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/account/bet-tickets")}>
-                    My Bets
+                  <DropdownMenuItem onClick={() => navigate("/account/withdrawals")}>
+                    <ArrowUpFromLine className="mr-2 h-4 w-4" />
+                    Withdraw
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/account/transactions")}>
+                    <CreditCard className="mr-2 h-4 w-4" />
+                    Transactions
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate("/account/bet-tickets")}>
+                    <Wallet className="mr-2 h-4 w-4" />
+                    My Bets
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/account/history")}>
+                    <HistoryIcon className="mr-2 h-4 w-4" />
+                    Betting History
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate("/account/settings")}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    Settings
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleLogout} className="text-destructive">
                     <LogOut className="mr-2 h-4 w-4" />
                     Log Out
