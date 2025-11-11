@@ -117,6 +117,7 @@ import FAQ from "./pages/info/FAQ";
 import WebhookSettings from "./pages/admin/WebhookSettings";
 
 import MobileBetSlip from "./components/MobileBetSlip";
+import { BottomNav } from "./components/mobile/BottomNav";
 
 // Match & Live Casino
 import MatchDetail from "./pages/matches/MatchDetail";
@@ -256,6 +257,7 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
         <MobileBetSlip />
+        <BottomNav />
       </BrowserRouter>
     </BetSlipProvider>
   </QueryClientProvider>
