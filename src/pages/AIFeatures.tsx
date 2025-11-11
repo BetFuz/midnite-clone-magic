@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import MobileNav from "@/components/MobileNav";
@@ -6,9 +6,22 @@ import AIBettingChat from "@/components/AIBettingChat";
 import VoiceBetting from "@/components/VoiceBetting";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Bot, Mic, TrendingUp, Users, ShoppingCart } from "lucide-react";
+import { useSocialBetting } from "@/hooks/useSocialBetting";
+import SocialBetCard from "@/components/social/SocialBetCard";
+import { supabase } from "@/integrations/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const AIFeatures = () => {
   const [activeTab, setActiveTab] = useState("chat");
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  
+  const { socialBets, isLoading: socialLoading, followingIds, followUser, unfollowUser, likeBet, unlikeBet, copyBet } = useSocialBetting();
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) setCurrentUserId(user.id);
+    });
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -68,10 +81,42 @@ const AIFeatures = () => {
               </TabsContent>
 
               <TabsContent value="social">
-                <div className="text-center py-12">
-                  <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="text-xl font-semibold mb-2">Social Betting Community</h3>
-                  <p className="text-muted-foreground">Coming soon...</p>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="text-xl font-semibold">Social Betting Community</h3>
+                      <p className="text-sm text-muted-foreground">Follow, copy, and engage with top bettors</p>
+                    </div>
+                  </div>
+
+                  {socialLoading ? (
+                    <div className="space-y-4">
+                      {[1, 2, 3].map((i) => (
+                        <Skeleton key={i} className="h-32 w-full" />
+                      ))}
+                    </div>
+                  ) : socialBets.length === 0 ? (
+                    <div className="text-center py-12 border border-border rounded-lg">
+                      <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                      <h3 className="text-lg font-semibold mb-2">No social bets yet</h3>
+                      <p className="text-sm text-muted-foreground">Be the first to share a bet with the community!</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {socialBets.slice(0, 10).map((bet) => (
+                        <SocialBetCard
+                          key={bet.id}
+                          bet={bet}
+                          isFollowing={followingIds.includes(bet.user_id)}
+                          onFollow={() => followUser(bet.user_id)}
+                          onUnfollow={() => unfollowUser(bet.user_id)}
+                          onLike={() => likeBet(bet.id)}
+                          onCopy={() => copyBet(bet.id, bet.bet_slip_id)}
+                          currentUserId={currentUserId}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
               </TabsContent>
 
