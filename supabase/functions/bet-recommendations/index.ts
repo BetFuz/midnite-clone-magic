@@ -22,47 +22,51 @@ serve(async (req) => {
       }
     );
 
-    // Get the authenticated user
+    // Get the authenticated user (optional for mockup phase)
     const {
       data: { user },
     } = await supabaseClient.auth.getUser();
 
-    if (!user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    let userStats = null;
+    let sportStats = null;
+    let recentBets = null;
+
+    if (user) {
+      console.log("[bet-recommendations] Fetching user statistics for user:", user.id);
+
+      // Fetch user statistics
+      const userStatsResult = await supabaseClient
+        .from("user_statistics")
+        .select("*")
+        .eq("user_id", user.id)
+        .single();
+      userStats = userStatsResult.data;
+
+      // Fetch sport statistics
+      const sportStatsResult = await supabaseClient
+        .from("sport_statistics")
+        .select("*")
+        .eq("user_id", user.id);
+      sportStats = sportStatsResult.data;
+
+      // Fetch recent bet slips
+      const recentBetsResult = await supabaseClient
+        .from("bet_slips")
+        .select(`
+          *,
+          bet_selections(*)
+        `)
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(20);
+      recentBets = recentBetsResult.data;
+
+      console.log("[bet-recommendations] User stats:", userStats);
+      console.log("[bet-recommendations] Sport stats:", sportStats);
+      console.log("[bet-recommendations] Recent bets:", recentBets?.length);
+    } else {
+      console.log("[bet-recommendations] No authenticated user, providing mock recommendations");
     }
-
-    console.log("[bet-recommendations] Fetching user statistics for user:", user.id);
-
-    // Fetch user statistics
-    const { data: userStats } = await supabaseClient
-      .from("user_statistics")
-      .select("*")
-      .eq("user_id", user.id)
-      .single();
-
-    // Fetch sport statistics
-    const { data: sportStats } = await supabaseClient
-      .from("sport_statistics")
-      .select("*")
-      .eq("user_id", user.id);
-
-    // Fetch recent bet slips
-    const { data: recentBets } = await supabaseClient
-      .from("bet_slips")
-      .select(`
-        *,
-        bet_selections(*)
-      `)
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false })
-      .limit(20);
-
-    console.log("[bet-recommendations] User stats:", userStats);
-    console.log("[bet-recommendations] Sport stats:", sportStats);
-    console.log("[bet-recommendations] Recent bets:", recentBets?.length);
 
     // Build context for AI
     const userContext = {
