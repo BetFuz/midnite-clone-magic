@@ -1,4 +1,4 @@
-import { Search, LogIn, User, LogOut, Wallet, ArrowDownToLine, ArrowUpFromLine, CreditCard, History as HistoryIcon, Settings } from "lucide-react";
+import { Search, LogIn, User, LogOut, Wallet, ArrowDownToLine, ArrowUpFromLine, CreditCard, History as HistoryIcon, Settings, Home, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -50,16 +50,70 @@ const Header = () => {
     navigate("/");
   };
 
+  // Generate breadcrumbs from current path
+  const getBreadcrumbs = () => {
+    const paths = location.pathname.split('/').filter(Boolean);
+    if (paths.length === 0) return [];
+    
+    const breadcrumbs = paths.map((path, index) => {
+      const href = '/' + paths.slice(0, index + 1).join('/');
+      const label = path
+        .split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+      return { label, href };
+    });
+    
+    return breadcrumbs;
+  };
+
+  const breadcrumbs = getBreadcrumbs();
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-16 items-center px-4 md:px-6">
-        <div className="flex items-center gap-2 md:gap-8">
+        <div className="flex items-center gap-2 md:gap-4">
           <MobileNav />
-          <Link to="/" className="flex items-center gap-2">
-            <div className="text-xl md:text-2xl font-bold text-primary">Betfuz</div>
+          
+          {/* Home Button - Always Visible */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="gap-2 text-primary hover:text-primary hover:bg-primary/10"
+            onClick={() => navigate("/")}
+          >
+            <Home className="h-5 w-5" />
+            <span className="hidden sm:inline font-semibold">Home</span>
+          </Button>
+
+          {/* Breadcrumbs for context */}
+          {breadcrumbs.length > 0 && (
+            <div className="hidden md:flex items-center gap-1 text-sm text-muted-foreground">
+              <ChevronRight className="h-4 w-4" />
+              {breadcrumbs.map((crumb, index) => (
+                <div key={crumb.href} className="flex items-center gap-1">
+                  <Link 
+                    to={crumb.href}
+                    className={cn(
+                      "hover:text-primary transition-colors",
+                      index === breadcrumbs.length - 1 && "text-foreground font-medium"
+                    )}
+                  >
+                    {crumb.label}
+                  </Link>
+                  {index < breadcrumbs.length - 1 && (
+                    <ChevronRight className="h-3 w-3" />
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+          
+          <Link to="/" className="hidden md:flex items-center gap-2">
+            <div className="text-xl font-bold text-primary">Betfuz</div>
           </Link>
           
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-1">
             {navItems.map((item) => (
               <Button
                 key={item.key}
