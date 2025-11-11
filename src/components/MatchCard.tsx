@@ -4,8 +4,10 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useNavigate } from "react-router-dom";
 import { useBetSlip } from "@/contexts/BetSlipContext";
-import { TrendingUp, Users, Info } from "lucide-react";
+import { TrendingUp, Users, Info, ChevronDown, BarChart3 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import ExpandedLiveMarkets from "./ExpandedLiveMarkets";
+import { useState } from "react";
 
 interface MatchCardProps {
   sport?: string;
@@ -38,6 +40,8 @@ const MatchCard = ({
 }: MatchCardProps) => {
   const navigate = useNavigate();
   const { addSelection } = useBetSlip();
+  const [showMarkets, setShowMarkets] = useState(false);
+  const [showStats, setShowStats] = useState(false);
   
   const handleOddsClick = (selectionType: "home" | "away" | "draw", selectionValue: string, odds: string) => {
     const matchId = `${homeTeam.toLowerCase().replace(/\s+/g, '-')}-vs-${awayTeam.toLowerCase().replace(/\s+/g, '-')}`;
@@ -177,14 +181,67 @@ const MatchCard = ({
         </div>
       </div>
 
-      {(homeForm || awayForm || popularBet) && (
-        <div className="mt-3 pt-3 border-t border-border">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Info className="h-3 w-3" />
-            <span>Click for detailed stats & trends</span>
+      {/* Quick Stats Preview */}
+      {showStats && (homeForm || awayForm) && (
+        <div className="mt-3 pt-3 border-t border-border animate-in fade-in slide-in-from-top-2" onClick={(e) => e.stopPropagation()}>
+          <div className="grid grid-cols-3 gap-3 text-center text-xs">
+            <div>
+              <div className="text-muted-foreground mb-1">Form (Last 5)</div>
+              <div className="flex justify-center">
+                {homeForm && <FormIndicator form={homeForm} />}
+              </div>
+              <div className="flex justify-center mt-1">
+                {awayForm && <FormIndicator form={awayForm} />}
+              </div>
+            </div>
+            <div>
+              <div className="text-muted-foreground mb-1">H2H Record</div>
+              <div className="font-semibold text-blue-600">3</div>
+              <div className="font-semibold text-orange-600">2</div>
+            </div>
+            <div>
+              <div className="text-muted-foreground mb-1">Avg Goals</div>
+              <div className="font-semibold">2.8</div>
+              <div className="font-semibold">2.3</div>
+            </div>
           </div>
         </div>
       )}
+
+      {/* Expanded Markets */}
+      {showMarkets && (
+        <div className="mt-3 pt-3 border-t border-border" onClick={(e) => e.stopPropagation()}>
+          <ExpandedLiveMarkets
+            matchId={`${homeTeam.toLowerCase().replace(/\s+/g, '-')}-vs-${awayTeam.toLowerCase().replace(/\s+/g, '-')}`}
+            sport={sport || "Football"}
+            league={league || ""}
+            homeTeam={homeTeam}
+            awayTeam={awayTeam}
+          />
+        </div>
+      )}
+
+      {/* Action Buttons */}
+      <div className="mt-3 pt-3 border-t border-border flex gap-2" onClick={(e) => e.stopPropagation()}>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="flex-1 text-xs gap-1"
+          onClick={() => setShowStats(!showStats)}
+        >
+          <BarChart3 className="h-3 w-3" />
+          {showStats ? "Hide" : "Show"} Stats
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="flex-1 text-xs gap-1"
+          onClick={() => setShowMarkets(!showMarkets)}
+        >
+          {showMarkets ? "Hide" : "More"} Markets
+          <ChevronDown className={`h-3 w-3 transition-transform ${showMarkets ? "rotate-180" : ""}`} />
+        </Button>
+      </div>
     </Card>
   );
 };

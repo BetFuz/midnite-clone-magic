@@ -164,6 +164,8 @@ const Index = () => {
       homeOdds: "3.60",
       drawOdds: "3.30",
       awayOdds: "2.00",
+      homeForm: "WDWLL",
+      awayForm: "WWDWW",
     },
     {
       sport: "Football",
@@ -174,6 +176,8 @@ const Index = () => {
       homeOdds: "2.15",
       drawOdds: "3.40",
       awayOdds: "3.20",
+      homeForm: "WWWDW",
+      awayForm: "WDWWL",
     },
     // NBA
     {
@@ -185,6 +189,8 @@ const Index = () => {
       homeOdds: "1.85",
       drawOdds: null,
       awayOdds: "1.95",
+      homeForm: "WWLWW",
+      awayForm: "WLWLL",
     },
     {
       sport: "Basketball",
@@ -195,6 +201,8 @@ const Index = () => {
       homeOdds: "1.70",
       drawOdds: null,
       awayOdds: "2.20",
+      homeForm: "WWWWL",
+      awayForm: "LWWDL",
     },
     // NFL
     {
@@ -206,6 +214,8 @@ const Index = () => {
       homeOdds: "1.90",
       drawOdds: null,
       awayOdds: "1.90",
+      homeForm: "WWLWW",
+      awayForm: "WLWWL",
     },
     // Tennis
     {
@@ -217,6 +227,8 @@ const Index = () => {
       homeOdds: "2.10",
       drawOdds: null,
       awayOdds: "1.75",
+      homeForm: "WWWLW",
+      awayForm: "WWWWL",
     },
   ];
 
