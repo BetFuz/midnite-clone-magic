@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import BetSlip from "./BetSlip";
 import { Badge } from "@/components/ui/badge";
 import { useBetSlip } from "@/contexts/BetSlipContext";
@@ -18,10 +18,19 @@ const MobileBetSlip = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
+  
+  
+  // Debug logging
+  console.log("MobileBetSlip - selections:", selections);
+  console.log("MobileBetSlip - selections length:", selections.length);
+
   if (selections.length === 0) {
+    console.log("MobileBetSlip - hiding button, no selections");
     // Hide mobile floating cart entirely when there are no selections to prevent accidental opens
     return null;
   }
+
+  console.log("MobileBetSlip - showing button with", selections.length, "selections");
 
   return (
     <Sheet open={open} onOpenChange={(next) => { if (!next) setOpen(false); }}>
@@ -39,8 +48,8 @@ const MobileBetSlip = () => {
         )}
       </Button>
       <SheetContent side="right" className="p-0 w-full sm:w-96">
-        <h2 className="sr-only">Bet Slip</h2>
-        <p className="sr-only">Review selections and place your bet</p>
+        <SheetTitle className="sr-only">Bet Slip</SheetTitle>
+        <SheetDescription className="sr-only">Review selections and place your bet</SheetDescription>
         <BetSlip showOnMobile />
       </SheetContent>
     </Sheet>
