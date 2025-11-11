@@ -139,6 +139,10 @@ import FantasySports from "./pages/FantasySports";
 import LiveStreaming from "./pages/LiveStreaming";
 import Web3Hub from "./pages/Web3Hub";
 import VirtualStadium from "./pages/VirtualStadium";
+import FuzFlix from "./pages/FuzFlix";
+import CasinoLobby from "./pages/casino/CasinoLobby";
+import Analytics from "./pages/Analytics";
+import AccaInsurance from "./pages/promotions/AccaInsurance";
 
 const queryClient = new QueryClient();
 
@@ -173,6 +177,9 @@ const App = () => (
           <Route path="/live-streaming" element={<LiveStreaming />} />
           <Route path="/web3-hub" element={<Web3Hub />} />
           <Route path="/virtual-stadium" element={<VirtualStadium />} />
+          <Route path="/fuzflix" element={<FuzFlix />} />
+          <Route path="/casino-lobby" element={<CasinoLobby />} />
+          <Route path="/analytics" element={<Analytics />} />
           
           {/* Sports */}
           <Route path="/sports/football" element={<Football />} />
@@ -271,6 +278,7 @@ const App = () => (
           <Route path="/promotions/cashback" element={<Cashback />} />
           <Route path="/promotions/loyalty-rewards" element={<LoyaltyRewards />} />
           <Route path="/promotions/refer-friend" element={<ReferFriend />} />
+          <Route path="/promotions/acca-insurance" element={<AccaInsurance />} />
           
           {/* Info */}
           <Route path="/info/about" element={<About />} />

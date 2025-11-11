@@ -21,6 +21,12 @@ export const BottomNav = () => {
       { label: "Betting Hub", url: "/betting-hub" },
       { label: "Bet Features", url: "/bet-features" },
     ]},
+    { label: "Entertainment", items: [
+      { label: "FuzFlix Live", url: "/fuzflix" },
+      { label: "Casino Lobby", url: "/casino-lobby" },
+      { label: "Live Casino", url: "/live-casino" },
+      { label: "Games", url: "/games" },
+    ]},
     { label: "Specials", items: [
       { label: "FuzPolitics", url: "/politics" },
       { label: "FuzEconomy", url: "/economy" },

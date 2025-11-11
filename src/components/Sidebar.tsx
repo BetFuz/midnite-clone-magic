@@ -1,4 +1,4 @@
-import { Home, Trophy, CircleDot, Flame, Hammer, Target, TrendingUp, Dumbbell, Volleyball, Table2, TicketCheck, BarChart3, History, CreditCard, Vote, LayoutGrid, DollarSign, Users, Sparkles, Globe, Bot, ShoppingCart, Brain, Wallet, Glasses, Play } from "lucide-react";
+import { Home, Trophy, CircleDot, Flame, Hammer, Target, TrendingUp, Dumbbell, Volleyball, Table2, TicketCheck, BarChart3, History, CreditCard, Vote, LayoutGrid, DollarSign, Users, Sparkles, Globe, Bot, ShoppingCart, Brain, Wallet, Glasses, Play, Film, Gamepad2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NavLink } from "@/components/NavLink";
 
@@ -25,10 +25,13 @@ const Sidebar = ({ className, showOnMobile = false }: SidebarProps) => {
     { icon: DollarSign, label: "FuzEconomy", url: "/economy" },
     { icon: Users, label: "FuzSocial", url: "/social" },
     { icon: Sparkles, label: "FuzPredict", url: "/predict" },
+    { icon: Film, label: "FuzFlix Live", url: "/fuzflix", badge: "NEW" },
     { icon: TrendingUp, label: "Racing", url: "/racing" },
     { icon: CircleDot, label: "Games", url: "/games" },
+    { icon: Gamepad2, label: "Casino Lobby", url: "/casino-lobby" },
     { icon: Target, label: "Live Casino", url: "/live-casino" },
     { icon: Dumbbell, label: "Virtuals", url: "/virtuals" },
+    { icon: BarChart3, label: "Analytics", url: "/analytics", badge: "NEW" },
   ];
 
   const futuristicFeatures = [
