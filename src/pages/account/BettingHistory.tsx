@@ -159,7 +159,7 @@ const BettingHistory = () => {
                   <div className="p-2 bg-primary/10 rounded-lg">
                     <Target className="h-5 w-5 text-primary" />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs text-muted-foreground">Total Bets</p>
                     <p className="text-2xl font-bold text-foreground">{totalBets}</p>
                   </div>
@@ -171,7 +171,7 @@ const BettingHistory = () => {
                   <div className="p-2 bg-success/10 rounded-lg">
                     <Trophy className="h-5 w-5 text-success" />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs text-muted-foreground">Win Rate</p>
                     <p className="text-2xl font-bold text-success">{winRate}%</p>
                   </div>
@@ -180,24 +180,24 @@ const BettingHistory = () => {
 
               <Card className="p-4 bg-card border-border">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-muted rounded-lg">
+                  <div className="p-2 bg-muted rounded-lg flex-shrink-0">
                     <TrendingUp className="h-5 w-5 text-foreground" />
                   </div>
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <p className="text-xs text-muted-foreground">Total Staked</p>
-                    <p className="text-xl font-bold text-foreground">{formatCurrency(totalStaked)}</p>
+                    <p className="text-base md:text-lg font-bold text-foreground truncate">{formatCurrency(totalStaked)}</p>
                   </div>
                 </div>
               </Card>
 
               <Card className="p-4 bg-card border-border">
                 <div className="flex items-center gap-3">
-                  <div className={`p-2 ${totalProfitLoss >= 0 ? 'bg-success/10' : 'bg-destructive/10'} rounded-lg`}>
+                  <div className={`p-2 flex-shrink-0 ${totalProfitLoss >= 0 ? 'bg-success/10' : 'bg-destructive/10'} rounded-lg`}>
                     <TrendingUp className={`h-5 w-5 ${totalProfitLoss >= 0 ? 'text-success' : 'text-destructive'}`} />
                   </div>
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <p className="text-xs text-muted-foreground">Profit/Loss</p>
-                    <p className={`text-xl font-bold ${totalProfitLoss >= 0 ? 'text-success' : 'text-destructive'}`}>
+                    <p className={`text-base md:text-lg font-bold truncate ${totalProfitLoss >= 0 ? 'text-success' : 'text-destructive'}`}>
                       {formatCurrency(totalProfitLoss)}
                     </p>
                   </div>
