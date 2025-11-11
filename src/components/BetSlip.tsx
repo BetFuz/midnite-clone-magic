@@ -9,9 +9,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface BetSlipProps {
   className?: string;
+  showOnMobile?: boolean;
 }
 
-const BetSlip = ({ className }: BetSlipProps) => {
+const BetSlip = ({ className, showOnMobile = false }: BetSlipProps) => {
   const {
     selections,
     removeSelection,
@@ -25,7 +26,7 @@ const BetSlip = ({ className }: BetSlipProps) => {
   } = useBetSlip();
 
   return (
-    <aside className={cn("flex w-full md:w-80 border-l border-border bg-card h-full flex-col", className)}>
+    <aside className={cn(showOnMobile ? "flex" : "hidden md:flex", "w-full md:w-80 border-l border-border bg-card h-full flex-col", className)}>
       <div className="p-4 border-b border-border flex items-center justify-between">
         <h2 className="text-lg font-bold text-foreground">
           Bet Slip {selections.length > 0 && `(${selections.length})`}

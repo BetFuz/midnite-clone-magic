@@ -41,7 +41,7 @@ const MobileBetSlip = () => {
       <SheetContent side="right" className="p-0 w-full sm:w-96">
         <h2 className="sr-only">Bet Slip</h2>
         <p className="sr-only">Review selections and place your bet</p>
-        <BetSlip />
+        <BetSlip showOnMobile />
       </SheetContent>
     </Sheet>
   );
