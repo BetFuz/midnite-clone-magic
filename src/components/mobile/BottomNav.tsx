@@ -21,6 +21,10 @@ export const BottomNav = () => {
       { label: "Betting Hub", url: "/betting-hub" },
       { label: "Bet Features", url: "/bet-features" },
     ]},
+    { label: "Specials", items: [
+      { label: "FuzPolitics", url: "/politics" },
+      { label: "FuzEconomy", url: "/economy" },
+    ]},
     { label: "Sports", items: [
       { label: "Football", url: "/sports/football" },
       { label: "Basketball", url: "/sports/basketball" },
@@ -28,7 +32,6 @@ export const BottomNav = () => {
       { label: "Cricket", url: "/sports/cricket" },
     ]},
     { label: "Features", items: [
-      { label: "FuzPolitics", url: "/politics" },
       { label: "Promotions", url: "/promotions" },
       { label: "Leaderboard", url: "/account/leaderboard" },
       { label: "History", url: "/account/history" },

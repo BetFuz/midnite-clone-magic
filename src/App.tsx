@@ -127,6 +127,7 @@ import BetFeatures from "./pages/BetFeatures";
 import EnhancedAccountHub from "./pages/account/EnhancedAccountHub";
 import Politics from "./pages/politics/Politics";
 import BettingHub from "./pages/BettingHub";
+import Economy from "./pages/economy/Economy";
 
 const queryClient = new QueryClient();
 
@@ -149,6 +150,7 @@ const App = () => (
           <Route path="/bet-features" element={<BetFeatures />} />
           <Route path="/politics" element={<Politics />} />
           <Route path="/betting-hub" element={<BettingHub />} />
+          <Route path="/economy" element={<Economy />} />
           
           {/* Sports */}
           <Route path="/sports/football" element={<Football />} />
