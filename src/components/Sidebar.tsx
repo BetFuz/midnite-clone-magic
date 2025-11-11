@@ -1,4 +1,4 @@
-import { Home, Trophy, CircleDot, Flame, Hammer, Target, TrendingUp, Dumbbell, Volleyball, Table2, TicketCheck, BarChart3, History, CreditCard, Vote, LayoutGrid, DollarSign, Users, Sparkles, Globe, Bot, ShoppingCart } from "lucide-react";
+import { Home, Trophy, CircleDot, Flame, Hammer, Target, TrendingUp, Dumbbell, Volleyball, Table2, TicketCheck, BarChart3, History, CreditCard, Vote, LayoutGrid, DollarSign, Users, Sparkles, Globe, Bot, ShoppingCart, Brain, Wallet, Glasses, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NavLink } from "@/components/NavLink";
 
@@ -29,6 +29,15 @@ const Sidebar = ({ className, showOnMobile = false }: SidebarProps) => {
     { icon: CircleDot, label: "Games", url: "/games" },
     { icon: Target, label: "Live Casino", url: "/live-casino" },
     { icon: Dumbbell, label: "Virtuals", url: "/virtuals" },
+  ];
+
+  const futuristicFeatures = [
+    { icon: Brain, label: "AI Predictions", url: "/ai-predictions", badge: "AI" },
+    { icon: Users, label: "Pool Betting", url: "/pool-betting" },
+    { icon: Trophy, label: "Fantasy Sports", url: "/fantasy-sports" },
+    { icon: Play, label: "Live Streaming", url: "/live-streaming", badge: "LIVE" },
+    { icon: Wallet, label: "Web3 Hub", url: "/web3-hub", badge: "NFT" },
+    { icon: Glasses, label: "Virtual Stadium", url: "/virtual-stadium", badge: "VR" },
   ];
 
   const featuredTournaments = [
@@ -108,6 +117,36 @@ const Sidebar = ({ className, showOnMobile = false }: SidebarProps) => {
                   )}
                 >
                   <item.icon className="h-5 w-5 text-primary" />
+                  <span className="flex-1 text-left">{item.label}</span>
+                  {item.badge && (
+                    <span className="px-2 py-0.5 text-xs font-bold bg-primary text-primary-foreground rounded">
+                      {item.badge}
+                    </span>
+                  )}
+                </div>
+              </NavLink>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <h3 className="px-4 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Futuristic Features
+          </h3>
+          <div className="space-y-1">
+            {futuristicFeatures.map((item) => (
+              <NavLink
+                key={item.label}
+                to={item.url}
+                className="w-full"
+                activeClassName="bg-sidebar-accent text-sidebar-accent-foreground"
+              >
+                <div
+                  className={cn(
+                    "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-sidebar-foreground hover:bg-sidebar-accent/50"
+                  )}
+                >
+                  <item.icon className="h-5 w-5" />
                   <span className="flex-1 text-left">{item.label}</span>
                   {item.badge && (
                     <span className="px-2 py-0.5 text-xs font-bold bg-primary text-primary-foreground rounded">

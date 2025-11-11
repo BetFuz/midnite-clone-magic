@@ -133,6 +133,12 @@ import Predict from "./pages/predict/Predict";
 import AIFeatures from "./pages/AIFeatures";
 import SocialBetting from "./pages/SocialBetting";
 import BetMarketplace from "./pages/BetMarketplace";
+import AIPredictions from "./pages/AIPredictions";
+import PoolBetting from "./pages/PoolBetting";
+import FantasySports from "./pages/FantasySports";
+import LiveStreaming from "./pages/LiveStreaming";
+import Web3Hub from "./pages/Web3Hub";
+import VirtualStadium from "./pages/VirtualStadium";
 
 const queryClient = new QueryClient();
 
@@ -161,6 +167,12 @@ const App = () => (
           <Route path="/ai-features" element={<AIFeatures />} />
           <Route path="/social-betting" element={<SocialBetting />} />
           <Route path="/bet-marketplace" element={<BetMarketplace />} />
+          <Route path="/ai-predictions" element={<AIPredictions />} />
+          <Route path="/pool-betting" element={<PoolBetting />} />
+          <Route path="/fantasy-sports" element={<FantasySports />} />
+          <Route path="/live-streaming" element={<LiveStreaming />} />
+          <Route path="/web3-hub" element={<Web3Hub />} />
+          <Route path="/virtual-stadium" element={<VirtualStadium />} />
           
           {/* Sports */}
           <Route path="/sports/football" element={<Football />} />
