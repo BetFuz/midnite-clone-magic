@@ -116,6 +116,7 @@ import FAQ from "./pages/info/FAQ";
 // Admin
 import WebhookSettings from "./pages/admin/WebhookSettings";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminSetup from "./pages/admin/AdminSetup";
 
 import MobileBetSlip from "./components/MobileBetSlip";
 import { BottomNav } from "./components/mobile/BottomNav";
@@ -291,6 +292,7 @@ const App = () => (
           <Route path="/info/faq" element={<FAQ />} />
 
           {/* Admin */}
+          <Route path="/admin/setup" element={<AdminSetup />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/webhooks" element={<WebhookSettings />} />
           

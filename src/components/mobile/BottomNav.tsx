@@ -48,6 +48,10 @@ export const BottomNav = () => {
       { label: "Leaderboard", url: "/account/leaderboard" },
       { label: "History", url: "/account/history" },
     ]},
+    { label: "Admin Area", items: [
+      { label: "🛡️ Admin Dashboard", url: "/admin/dashboard" },
+      { label: "🔒 Webhook Settings", url: "/admin/webhooks" },
+    ]},
     { label: "Account", items: [
       { label: "Deposits", url: "/account/deposits" },
       { label: "Withdrawals", url: "/account/withdrawals" },
