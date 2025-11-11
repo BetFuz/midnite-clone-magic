@@ -130,6 +130,7 @@ import BettingHub from "./pages/BettingHub";
 import Economy from "./pages/economy/Economy";
 import Social from "./pages/social/Social";
 import Predict from "./pages/predict/Predict";
+import AIFeatures from "./pages/AIFeatures";
 
 const queryClient = new QueryClient();
 
@@ -155,6 +156,7 @@ const App = () => (
           <Route path="/economy" element={<Economy />} />
           <Route path="/social" element={<Social />} />
           <Route path="/predict" element={<Predict />} />
+          <Route path="/ai-features" element={<AIFeatures />} />
           
           {/* Sports */}
           <Route path="/sports/football" element={<Football />} />

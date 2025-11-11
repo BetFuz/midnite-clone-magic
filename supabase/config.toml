@@ -2,3 +2,12 @@ project_id = "aacjfdrctnmnenebzdxg"
 
 [functions.bet-recommendations]
 verify_jwt = false
+
+[functions.ai-betting-chat]
+verify_jwt = true
+
+[functions.ai-predictions]
+verify_jwt = false
+
+[functions.voice-betting-token]
+verify_jwt = true

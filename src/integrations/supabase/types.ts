@@ -14,6 +14,140 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_chat_messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          role: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ai_predictions: {
+        Row: {
+          away_team: string
+          confidence_score: number | null
+          created_at: string | null
+          home_team: string
+          id: string
+          match_id: string
+          predicted_outcome: string
+          prediction_type: string
+          reasoning: string | null
+          sport: string
+        }
+        Insert: {
+          away_team: string
+          confidence_score?: number | null
+          created_at?: string | null
+          home_team: string
+          id?: string
+          match_id: string
+          predicted_outcome: string
+          prediction_type: string
+          reasoning?: string | null
+          sport: string
+        }
+        Update: {
+          away_team?: string
+          confidence_score?: number | null
+          created_at?: string | null
+          home_team?: string
+          id?: string
+          match_id?: string
+          predicted_outcome?: string
+          prediction_type?: string
+          reasoning?: string | null
+          sport?: string
+        }
+        Relationships: []
+      }
+      bet_copies: {
+        Row: {
+          bet_slip_id: string
+          created_at: string | null
+          id: string
+          original_bet_id: string
+          user_id: string
+        }
+        Insert: {
+          bet_slip_id: string
+          created_at?: string | null
+          id?: string
+          original_bet_id: string
+          user_id: string
+        }
+        Update: {
+          bet_slip_id?: string
+          created_at?: string | null
+          id?: string
+          original_bet_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bet_copies_original_bet_id_fkey"
+            columns: ["original_bet_id"]
+            isOneToOne: false
+            referencedRelation: "social_bets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bet_listings: {
+        Row: {
+          asking_price: number
+          bet_slip_id: string
+          buyer_id: string | null
+          created_at: string | null
+          id: string
+          original_stake: number
+          potential_win: number
+          seller_id: string
+          sold_at: string | null
+          status: string | null
+        }
+        Insert: {
+          asking_price: number
+          bet_slip_id: string
+          buyer_id?: string | null
+          created_at?: string | null
+          id?: string
+          original_stake: number
+          potential_win: number
+          seller_id: string
+          sold_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          asking_price?: number
+          bet_slip_id?: string
+          buyer_id?: string | null
+          created_at?: string | null
+          id?: string
+          original_stake?: number
+          potential_win?: number
+          seller_id?: string
+          sold_at?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
       bet_selections: {
         Row: {
           away_team: string
@@ -264,6 +398,39 @@ export type Database = {
         }
         Relationships: []
       }
+      nft_badges: {
+        Row: {
+          badge_name: string
+          badge_type: string
+          id: string
+          metadata: Json | null
+          minted_at: string | null
+          rarity: string | null
+          token_id: string | null
+          user_id: string
+        }
+        Insert: {
+          badge_name: string
+          badge_type: string
+          id?: string
+          metadata?: Json | null
+          minted_at?: string | null
+          rarity?: string | null
+          token_id?: string | null
+          user_id: string
+        }
+        Update: {
+          badge_name?: string
+          badge_type?: string
+          id?: string
+          metadata?: Json | null
+          minted_at?: string | null
+          rarity?: string | null
+          token_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           balance: number | null
@@ -296,6 +463,68 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      social_bets: {
+        Row: {
+          bet_slip_id: string
+          caption: string | null
+          copies_count: number | null
+          created_at: string | null
+          id: string
+          is_public: boolean | null
+          likes_count: number | null
+          user_id: string
+        }
+        Insert: {
+          bet_slip_id: string
+          caption?: string | null
+          copies_count?: number | null
+          created_at?: string | null
+          id?: string
+          is_public?: boolean | null
+          likes_count?: number | null
+          user_id: string
+        }
+        Update: {
+          bet_slip_id?: string
+          caption?: string | null
+          copies_count?: number | null
+          created_at?: string | null
+          id?: string
+          is_public?: boolean | null
+          likes_count?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      social_feed_likes: {
+        Row: {
+          created_at: string | null
+          id: string
+          social_bet_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          social_bet_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          social_bet_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_feed_likes_social_bet_id_fkey"
+            columns: ["social_bet_id"]
+            isOneToOne: false
+            referencedRelation: "social_bets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sport_statistics: {
         Row: {
@@ -402,6 +631,27 @@ export type Database = {
           is_completed?: boolean | null
           updated_at?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_follows: {
+        Row: {
+          created_at: string | null
+          follower_id: string
+          following_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string | null
+          follower_id: string
+          following_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string | null
+          follower_id?: string
+          following_id?: string
+          id?: string
         }
         Relationships: []
       }
