@@ -105,7 +105,7 @@ const BetAlerts = () => {
           />
         </div>
 
-        <Button className="w-full" onClick={handleAddAlert}>
+        <Button type="button" className="w-full" onClick={handleAddAlert}>
           <Plus className="h-4 w-4 mr-2" />
           Create Alert
         </Button>
