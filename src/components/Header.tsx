@@ -1,7 +1,11 @@
-import { Search, LogIn, User, LogOut, Wallet, ArrowDownToLine, ArrowUpFromLine, CreditCard, History as HistoryIcon, Settings, Home, ChevronRight } from "lucide-react";
+import { Search, LogIn, User, LogOut, Wallet, ArrowDownToLine, ArrowUpFromLine, CreditCard, History as HistoryIcon, Settings, Home, ChevronRight, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useBetSlip } from "@/contexts/BetSlipContext";
+import { Badge } from "@/components/ui/badge";
+import { Sheet, SheetContent, SheetTitle, SheetDescription, SheetTrigger } from "@/components/ui/sheet";
+import BetSlip from "./BetSlip";
 import { cn } from "@/lib/utils";
 import MobileNav from "./MobileNav";
 import ThemeToggle from "./ThemeToggle";
@@ -22,6 +26,7 @@ const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, profile } = useUserProfile();
+  const { selections } = useBetSlip();
 
   const navItems = [
     { label: "🏠 Home", path: "/", key: "home" },
@@ -131,6 +136,25 @@ const Header = () => {
         </div>
 
         <div className="ml-auto flex items-center gap-2 md:gap-4">
+          {/* Bet Slip Button */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="relative">
+                <ShoppingCart className="h-5 w-5" />
+                {selections.length > 0 && (
+                  <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs">
+                    {selections.length}
+                  </Badge>
+                )}
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="p-0 w-full sm:w-96">
+              <SheetTitle className="sr-only">Bet Slip</SheetTitle>
+              <SheetDescription className="sr-only">Review and place your bets</SheetDescription>
+              <BetSlip showOnMobile />
+            </SheetContent>
+          </Sheet>
+
           <ThemeToggle />
           <div className="relative hidden md:block">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />

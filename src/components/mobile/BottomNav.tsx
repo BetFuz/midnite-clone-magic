@@ -1,9 +1,10 @@
-import { Home, TrendingUp, Trophy, User, Menu } from "lucide-react";
+import { Home, TrendingUp, ShoppingCart, User, Menu } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { cn } from "@/lib/utils";
 import { useBetSlip } from "@/contexts/BetSlipContext";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { useState } from "react";
+import BetSlip from "@/components/BetSlip";
 
 export const BottomNav = () => {
   const { selections } = useBetSlip();
@@ -12,7 +13,6 @@ export const BottomNav = () => {
   const mainNavItems = [
     { icon: Home, label: "Home", url: "/" },
     { icon: TrendingUp, label: "Live", url: "/live" },
-    { icon: Trophy, label: "Stats", url: "/account/statistics" },
     { icon: User, label: "Account", url: "/account/profile" },
   ];
 
@@ -76,11 +76,6 @@ export const BottomNav = () => {
                     "h-6 w-6 transition-colors",
                     isActive ? "text-primary" : "text-muted-foreground"
                   )} />
-                  {item.label === "Stats" && selections.length > 0 && (
-                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
-                      {selections.length}
-                    </span>
-                  )}
                 </div>
                 <span className={cn(
                   "text-xs font-medium mt-1 transition-colors",
@@ -92,6 +87,26 @@ export const BottomNav = () => {
             )}
           </NavLink>
         ))}
+
+        {/* Bet Slip */}
+        <Sheet>
+          <SheetTrigger asChild>
+            <button className="flex flex-col items-center justify-center p-3 rounded-xl transition-all active:scale-95 hover:bg-muted/50 relative">
+              <ShoppingCart className="h-6 w-6 text-muted-foreground" />
+              {selections.length > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                  {selections.length}
+                </span>
+              )}
+              <span className="text-xs font-medium mt-1 text-muted-foreground">Bet Slip</span>
+            </button>
+          </SheetTrigger>
+          <SheetContent side="right" className="p-0 w-full sm:w-96">
+            <SheetTitle className="sr-only">Bet Slip</SheetTitle>
+            <SheetDescription className="sr-only">Review and place your bets</SheetDescription>
+            <BetSlip showOnMobile />
+          </SheetContent>
+        </Sheet>
 
         <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
           <SheetTrigger asChild>
