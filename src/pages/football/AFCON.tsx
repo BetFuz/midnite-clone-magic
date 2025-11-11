@@ -8,6 +8,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Trophy, MapPin, Users, Calendar, Newspaper, Scale, TrendingUp, History, Star } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import afconHero from "@/assets/promos/afcon-hero.jpg";
+import afconBetting from "@/assets/promos/afcon-betting.jpg";
+import afconGoldenBoot from "@/assets/promos/afcon-golden-boot.jpg";
+import { Link } from "react-router-dom";
 
 const AFCON = () => {
   const upcomingMatches = [
@@ -100,6 +105,56 @@ const AFCON = () => {
       <div className="flex">
         <Sidebar />
         <main className="flex-1 p-6 overflow-y-auto h-[calc(100vh-4rem)] pb-24">
+          {/* Promotional Carousel */}
+          <Carousel className="mb-6">
+            <CarouselContent>
+              <CarouselItem>
+                <div className="relative overflow-hidden rounded-2xl h-64">
+                  <img src={afconHero} alt="AFCON 2027" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex items-center px-8">
+                    <div>
+                      <h2 className="text-3xl font-bold text-white mb-2">Africa Cup of Nations 2027</h2>
+                      <p className="text-white/90 mb-4">Nigeria hosts the continent's biggest football celebration</p>
+                      <Button className="bg-white text-primary hover:bg-gray-100" asChild>
+                        <Link to="/football/african-cup-of-nations">Explore Tournament</Link>
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CarouselItem>
+              <CarouselItem>
+                <div className="relative overflow-hidden rounded-2xl h-64">
+                  <img src={afconBetting} alt="Bet on AFCON" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex items-center px-8">
+                    <div>
+                      <h2 className="text-3xl font-bold text-white mb-2">Bet on AFCON 2027</h2>
+                      <p className="text-white/90 mb-4">Enhanced odds on all tournament matches</p>
+                      <Button className="bg-white text-primary hover:bg-gray-100" onClick={() => handlePlaceBet("tournament winner")}>
+                        View Markets
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CarouselItem>
+              <CarouselItem>
+                <div className="relative overflow-hidden rounded-2xl h-64">
+                  <img src={afconGoldenBoot} alt="Golden Boot Race" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex items-center px-8">
+                    <div>
+                      <h2 className="text-3xl font-bold text-white mb-2">Golden Boot Race</h2>
+                      <p className="text-white/90 mb-4">Bet on Africa's top goal scorer</p>
+                      <Button className="bg-white text-primary hover:bg-gray-100" onClick={() => handlePlaceBet("golden boot")}>
+                        Place Bet
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CarouselItem>
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+
           {/* Hero Section */}
           <div className="mb-6 bg-gradient-to-r from-green-600/20 via-green-600/10 to-background rounded-lg p-6 border border-green-600/20">
             <div className="flex items-start justify-between">

@@ -8,6 +8,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Trophy, MapPin, Users, Calendar, Newspaper, Scale, TrendingUp, History, Play } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import worldCupHero from "@/assets/promos/world-cup-hero.jpg";
+import worldCupBetting from "@/assets/promos/world-cup-betting.jpg";
+import worldCupCities from "@/assets/promos/world-cup-cities.jpg";
+import { Link } from "react-router-dom";
 
 const WorldCup = () => {
   const upcomingMatches = [
@@ -100,6 +105,56 @@ const WorldCup = () => {
       <div className="flex">
         <Sidebar />
         <main className="flex-1 p-6 overflow-y-auto h-[calc(100vh-4rem)] pb-24">
+          {/* Promotional Carousel */}
+          <Carousel className="mb-6">
+            <CarouselContent>
+              <CarouselItem>
+                <div className="relative overflow-hidden rounded-2xl h-64">
+                  <img src={worldCupHero} alt="World Cup 2026" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex items-center px-8">
+                    <div>
+                      <h2 className="text-3xl font-bold text-white mb-2">FIFA World Cup 2026</h2>
+                      <p className="text-white/90 mb-4">The world's biggest football tournament across three nations</p>
+                      <Button className="bg-white text-primary hover:bg-gray-100" asChild>
+                        <Link to="/football/world-cup">Explore Tournament</Link>
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CarouselItem>
+              <CarouselItem>
+                <div className="relative overflow-hidden rounded-2xl h-64">
+                  <img src={worldCupBetting} alt="Bet on World Cup" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex items-center px-8">
+                    <div>
+                      <h2 className="text-3xl font-bold text-white mb-2">Bet on the World Cup</h2>
+                      <p className="text-white/90 mb-4">Enhanced odds on all tournament matches and specials</p>
+                      <Button className="bg-white text-primary hover:bg-gray-100" onClick={() => handlePlaceBet("tournament winner")}>
+                        View Markets
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CarouselItem>
+              <CarouselItem>
+                <div className="relative overflow-hidden rounded-2xl h-64">
+                  <img src={worldCupCities} alt="Host Cities" className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex items-center px-8">
+                    <div>
+                      <h2 className="text-3xl font-bold text-white mb-2">Host City Experience</h2>
+                      <p className="text-white/90 mb-4">Explore iconic stadiums across North America</p>
+                      <Button className="bg-white text-primary hover:bg-gray-100" asChild>
+                        <Link to="/football/world-cup">View Venues</Link>
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </CarouselItem>
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+
           {/* Hero Section */}
           <div className="mb-6 bg-gradient-to-r from-primary/20 via-primary/10 to-background rounded-lg p-6 border border-primary/20">
             <div className="flex items-start justify-between">

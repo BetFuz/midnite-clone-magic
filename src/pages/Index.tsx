@@ -49,6 +49,12 @@ import championsPromo from "@/assets/promos/champions-league-promo.jpg";
 import nbaPromo from "@/assets/promos/nba-promo.jpg";
 import betBuilderPromo from "@/assets/promos/bet-builder-promo.jpg";
 import welcomePromo from "@/assets/promos/welcome-bonus-promo.jpg";
+import afconHero from "@/assets/promos/afcon-hero.jpg";
+import afconBetting from "@/assets/promos/afcon-betting.jpg";
+import worldCupHero from "@/assets/promos/world-cup-hero.jpg";
+import worldCupBetting from "@/assets/promos/world-cup-betting.jpg";
+import premierLeagueBoost from "@/assets/promos/premier-league-boost.jpg";
+import laLigaSpecials from "@/assets/promos/la-liga-specials.jpg";
 
 // Import sport balls
 import footballBall from "@/assets/sports/football-ball.png";
@@ -75,10 +81,16 @@ import virtualSports from "@/assets/sports/virtual-sports.png";
 
 const Index = () => {
   const promoCards = [
+    { title: "AFCON 2027", image: afconHero, url: "/football/african-cup-of-nations" },
+    { title: "World Cup 2026", image: worldCupHero, url: "/football/world-cup" },
+    { title: "Welcome Bonus", image: welcomePromo, url: "/promotions/welcome" },
+    { title: "Premier League Boost", image: premierLeagueBoost, url: "/football/premier-league" },
+    { title: "La Liga Specials", image: laLigaSpecials, url: "/football/la-liga" },
     { title: "UEFA Champions League", image: championsPromo, url: "/football/champions-league" },
     { title: "NBA Basketball", image: nbaPromo, url: "/basketball/nba" },
     { title: "Bet Builder", image: betBuilderPromo, url: "/promotions" },
-    { title: "Welcome Bonus", image: welcomePromo, url: "/promotions/welcome" },
+    { title: "Bet on AFCON", image: afconBetting, url: "/football/african-cup-of-nations" },
+    { title: "World Cup Markets", image: worldCupBetting, url: "/football/world-cup" },
   ];
 
   const mainSports = [
