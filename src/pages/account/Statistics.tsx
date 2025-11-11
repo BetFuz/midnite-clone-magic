@@ -74,23 +74,30 @@ const Statistics = () => {
         <Sidebar />
         <main className="flex-1 p-6 overflow-y-auto h-[calc(100vh-4rem)]">
           <div className="max-w-7xl mx-auto">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-3 bg-primary/10 rounded-lg">
-                <BarChart3 className="h-6 w-6 text-primary" />
+            {/* Hero Header */}
+            <div className="relative mb-8 overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 via-primary/5 to-background border border-primary/20 p-8">
+              <div className="relative z-10">
+                <div className="flex items-center gap-4 mb-3">
+                  <div className="p-4 bg-gradient-to-br from-primary to-primary/80 rounded-2xl shadow-lg shadow-primary/20">
+                    <BarChart3 className="h-8 w-8 text-primary-foreground" />
+                  </div>
+                  <div>
+                    <h1 className="text-4xl font-bold text-foreground tracking-tight">Your Statistics</h1>
+                    <p className="text-base text-muted-foreground mt-1">Track your betting performance and discover insights</p>
+                  </div>
+                </div>
               </div>
-              <div>
-                <h1 className="text-3xl font-bold text-foreground">Your Statistics</h1>
-                <p className="text-muted-foreground">Track your betting performance and trends</p>
-              </div>
+              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
             </div>
 
-            <Tabs defaultValue="overview" className="space-y-6">
-              <TabsList className="grid w-full max-w-3xl grid-cols-5">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="ai">AI Tips</TabsTrigger>
-                <TabsTrigger value="compete">Compete</TabsTrigger>
-                <TabsTrigger value="sports">By Sport</TabsTrigger>
-                <TabsTrigger value="trends">Trends</TabsTrigger>
+            <Tabs defaultValue="overview" className="space-y-8">
+              <TabsList className="grid w-full max-w-3xl grid-cols-5 bg-card/50 backdrop-blur-sm border-border p-1 h-auto">
+                <TabsTrigger value="overview" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground py-3">Overview</TabsTrigger>
+                <TabsTrigger value="ai" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground py-3">AI Tips</TabsTrigger>
+                <TabsTrigger value="compete" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground py-3">Compete</TabsTrigger>
+                <TabsTrigger value="sports" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground py-3">By Sport</TabsTrigger>
+                <TabsTrigger value="trends" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground py-3">Trends</TabsTrigger>
               </TabsList>
 
               <TabsContent value="overview" className="space-y-6">
@@ -105,10 +112,12 @@ const Statistics = () => {
                 {/* Charts Grid */}
                 <div className="grid lg:grid-cols-2 gap-6">
                   {/* Monthly Performance */}
-                  <Card className="p-6 bg-card border-border">
-                    <div className="flex items-center gap-2 mb-6">
-                      <TrendingUp className="h-5 w-5 text-primary" />
-                      <h3 className="text-lg font-bold text-foreground">Monthly Performance</h3>
+                  <Card className="p-8 bg-gradient-to-br from-card to-card/50 border-border/50 shadow-lg hover:shadow-xl transition-all">
+                    <div className="flex items-center gap-3 mb-8">
+                      <div className="p-2 bg-primary/10 rounded-lg">
+                        <TrendingUp className="h-6 w-6 text-primary" />
+                      </div>
+                      <h3 className="text-xl font-bold text-foreground tracking-tight">Monthly Performance</h3>
                     </div>
                     <ResponsiveContainer width="100%" height={300}>
                       <LineChart data={monthlyData}>
@@ -129,10 +138,12 @@ const Statistics = () => {
                   </Card>
 
                   {/* Bet Types Distribution */}
-                  <Card className="p-6 bg-card border-border">
-                    <div className="flex items-center gap-2 mb-6">
-                      <Target className="h-5 w-5 text-primary" />
-                      <h3 className="text-lg font-bold text-foreground">Bet Types</h3>
+                  <Card className="p-8 bg-gradient-to-br from-card to-card/50 border-border/50 shadow-lg hover:shadow-xl transition-all">
+                    <div className="flex items-center gap-3 mb-8">
+                      <div className="p-2 bg-primary/10 rounded-lg">
+                        <Target className="h-6 w-6 text-primary" />
+                      </div>
+                      <h3 className="text-xl font-bold text-foreground tracking-tight">Bet Types</h3>
                     </div>
                     <div className="flex items-center justify-between">
                       <ResponsiveContainer width="60%" height={250}>
@@ -169,10 +180,12 @@ const Statistics = () => {
                 </div>
 
                 {/* Wins vs Losses Chart */}
-                <Card className="p-6 bg-card border-border">
-                  <div className="flex items-center gap-2 mb-6">
-                    <Trophy className="h-5 w-5 text-primary" />
-                    <h3 className="text-lg font-bold text-foreground">Wins vs Losses by Month</h3>
+                <Card className="p-8 bg-gradient-to-br from-card to-card/50 border-border/50 shadow-lg hover:shadow-xl transition-all">
+                  <div className="flex items-center gap-3 mb-8">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Trophy className="h-6 w-6 text-primary" />
+                    </div>
+                    <h3 className="text-xl font-bold text-foreground tracking-tight">Wins vs Losses by Month</h3>
                   </div>
                   <ResponsiveContainer width="100%" height={300}>
                     <BarChart data={monthlyData}>

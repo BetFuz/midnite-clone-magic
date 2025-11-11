@@ -19,42 +19,49 @@ interface SportStatsProps {
 
 export const SportStats = ({ stats }: SportStatsProps) => {
   return (
-    <Card className="p-6 bg-card border-border">
-      <h3 className="text-xl font-bold text-foreground mb-6">Performance by Sport</h3>
-      <div className="space-y-6">
-        {stats.map((sport, index) => (
-          <div key={index} className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="font-semibold text-foreground">{sport.sport}</h4>
-                <p className="text-sm text-muted-foreground">
-                  {sport.betsPlaced} bets • {sport.betsWon} wins
-                </p>
-              </div>
-              <div className="text-right">
-                <div className={`flex items-center gap-1 font-bold ${
-                  sport.profitLoss >= 0 ? 'text-success' : 'text-destructive'
-                }`}>
-                  {sport.profitLoss >= 0 ? (
-                    <TrendingUp className="h-4 w-4" />
-                  ) : (
-                    <TrendingDown className="h-4 w-4" />
-                  )}
-                  {formatCurrency(Math.abs(sport.profitLoss))}
+    <Card className="relative overflow-hidden p-8 bg-gradient-to-br from-card via-card/80 to-card/50 border-border/50 shadow-lg">
+      <div className="relative z-10">
+        <h3 className="text-2xl font-bold text-foreground mb-8 tracking-tight">Performance by Sport</h3>
+        <div className="space-y-8">
+          {stats.map((sport, index) => (
+            <div key={index} className="group p-6 rounded-xl bg-card/50 border border-border/50 hover:border-primary/30 hover:shadow-md transition-all space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-lg font-bold text-foreground mb-1">{sport.sport}</h4>
+                  <p className="text-sm text-muted-foreground">
+                    {sport.betsPlaced} bets • {sport.betsWon} wins
+                  </p>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  {sport.winRate.toFixed(1)}% win rate
-                </p>
+                <div className="text-right">
+                  <div className={`flex items-center gap-2 text-xl font-bold ${
+                    sport.profitLoss >= 0 ? 'text-success' : 'text-destructive'
+                  }`}>
+                    {sport.profitLoss >= 0 ? (
+                      <TrendingUp className="h-5 w-5" />
+                    ) : (
+                      <TrendingDown className="h-5 w-5" />
+                    )}
+                    {formatCurrency(Math.abs(sport.profitLoss))}
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {sport.winRate.toFixed(1)}% win rate
+                  </p>
+                </div>
+              </div>
+              <Progress value={sport.winRate} className="h-3 bg-muted/50" />
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">
+                  Staked: <span className="font-semibold text-foreground">{formatCurrency(sport.totalStaked)}</span>
+                </span>
+                <span className="text-muted-foreground">
+                  Returns: <span className="font-semibold text-success">{formatCurrency(sport.totalReturns)}</span>
+                </span>
               </div>
             </div>
-            <Progress value={sport.winRate} className="h-2" />
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>Staked: {formatCurrency(sport.totalStaked)}</span>
-              <span>Returns: {formatCurrency(sport.totalReturns)}</span>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
+      <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
     </Card>
   );
 };
