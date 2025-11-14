@@ -91,17 +91,20 @@ function generateSampleMatches() {
     'EuroLeague': [
       ['Real Madrid', 'Barcelona'], ['Olympiacos', 'Panathinaikos'], ['Bayern Munich', 'Fenerbahce'],
       ['Maccabi Tel Aviv', 'Zalgiris Kaunas'], ['CSKA Moscow', 'Anadolu Efes'],
-      ['Partizan', 'Virtus Bologna'], ['Monaco', 'Baskonia'], ['Alba Berlin', 'Red Star']
+      ['Partizan', 'Virtus Bologna'], ['Monaco', 'Baskonia'], ['Alba Berlin', 'Red Star'],
+      ['Armani Milan', 'Valencia'], ['ASVEL', 'Zalgiris']
     ],
     'ATP Masters 1000': [
       ['Djokovic', 'Alcaraz'], ['Sinner', 'Medvedev'], ['Rune', 'Tsitsipas'],
       ['Zverev', 'Rublev'], ['Fritz', 'Ruud'], ['Hurkacz', 'Dimitrov'],
-      ['De Minaur', 'Paul'], ['Shelton', 'Tiafoe']
+      ['De Minaur', 'Paul'], ['Shelton', 'Tiafoe'], ['Norrie', 'Auger-Aliassime'],
+      ['Musetti', 'Khachanov']
     ],
     'Wimbledon': [
       ['Djokovic', 'Sinner'], ['Alcaraz', 'Medvedev'], ['Swiatek', 'Sabalenka'],
       ['Rybakina', 'Gauff'], ['Pegula', 'Rybakina'], ['Vondrousova', 'Jabeur'],
-      ['Coco Gauff', 'Ons Jabeur']
+      ['Coco Gauff', 'Ons Jabeur'], ['Aryna Sabalenka', 'Jessica Pegula'],
+      ['Marketa Vondrousova', 'Elena Rybakina']
     ]
   };
 
