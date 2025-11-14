@@ -42,6 +42,9 @@ import ChampionsLeague from "./pages/football/ChampionsLeague";
 import LaLiga from "./pages/football/LaLiga";
 import SerieA from "./pages/football/SerieA";
 import Bundesliga from "./pages/football/Bundesliga";
+import Ligue1 from "./pages/football/Ligue1";
+import Championship from "./pages/football/Championship";
+import EuropaLeague from "./pages/football/EuropaLeague";
 import WorldCup from "./pages/football/WorldCup";
 import U20WorldCup from "./pages/football/U20WorldCup";
 import U17WorldCup from "./pages/football/U17WorldCup";
@@ -218,6 +221,9 @@ const App = () => (
           <Route path="/football/la-liga" element={<LaLiga />} />
           <Route path="/football/serie-a" element={<SerieA />} />
           <Route path="/football/bundesliga" element={<Bundesliga />} />
+          <Route path="/football/ligue-1" element={<Ligue1 />} />
+          <Route path="/football/championship" element={<Championship />} />
+          <Route path="/football/europa-league" element={<EuropaLeague />} />
           <Route path="/football/world-cup" element={<WorldCup />} />
           <Route path="/football/u20-world-cup" element={<U20WorldCup />} />
           <Route path="/football/u17-world-cup" element={<U17WorldCup />} />
