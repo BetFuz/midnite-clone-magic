@@ -72,7 +72,65 @@ Authorization: Bearer N8N_BEARER_TOKEN
 
 ---
 
-### 2. Marketing Post Endpoint
+### 2. Update Matches Endpoint
+
+**Purpose**: Receive match schedules from n8n for upcoming fixtures
+
+**URL**:
+```
+https://aacjfdrctnmnenebzdxg.supabase.co/functions/v1/update-matches
+```
+
+**Method**: `POST`
+
+**Authentication**: 
+```http
+Authorization: Bearer N8N_BEARER_TOKEN
+```
+
+**Request Body**:
+```json
+{
+  "matches": [
+    {
+      "match_id": "match_123",
+      "sport_key": "soccer_epl",
+      "sport_title": "English Premier League",
+      "league_name": "Premier League",
+      "home_team": "Arsenal",
+      "away_team": "Chelsea",
+      "commence_time": "2025-01-20T15:00:00Z",
+      "home_odds": 2.10,
+      "draw_odds": 3.40,
+      "away_odds": 3.20,
+      "status": "upcoming"
+    }
+  ]
+}
+```
+
+**Response Success (200)**:
+```json
+{
+  "success": true,
+  "message": "Updated 1 matches"
+}
+```
+
+**What It Does**:
+1. Validates Bearer token
+2. Upserts match data into `matches` table
+3. Updates existing matches or creates new entries
+4. Returns success confirmation with count
+
+**Database Impact**:
+- Table: `matches`
+- Action: UPSERT (based on `match_id`)
+- Columns updated: all match fields, `updated_at`
+
+---
+
+### 3. Marketing Post Endpoint
 
 **Purpose**: Receive hourly AI-generated marketing content from n8n
 
@@ -233,7 +291,7 @@ X-N8N-Source: workflow-name
 
 These endpoints are called BY Lovable to send data TO n8n.
 
-### 4. User Registration Webhook Handler
+### 5. User Registration Webhook Handler
 
 **Internal Endpoint** (Called by Lovable's auth system):
 ```
@@ -278,6 +336,30 @@ https://pannaafric.app.n8n.cloud/webhook/user-registration
 ---
 
 ## 📊 Database Tables Created
+
+### matches
+```sql
+- id: UUID (PK)
+- match_id: TEXT (UNIQUE)
+- sport_key: TEXT
+- sport_title: TEXT
+- league_name: TEXT
+- home_team: TEXT
+- away_team: TEXT
+- commence_time: TIMESTAMPTZ
+- home_odds: NUMERIC
+- draw_odds: NUMERIC
+- away_odds: NUMERIC
+- status: TEXT (default: 'upcoming')
+- created_at: TIMESTAMPTZ
+- updated_at: TIMESTAMPTZ
+```
+
+**Purpose**: Store upcoming match schedules and odds
+
+**RLS**: Public read access
+
+---
 
 ### sports_leagues
 ```sql
