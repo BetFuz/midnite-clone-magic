@@ -13,6 +13,14 @@ These endpoints receive data FROM n8n and are called BY n8n workflows.
 
 **Purpose**: Receive hourly sports and leagues data from The Odds API via n8n
 
+**Supported Football Confederations**:
+- **AFC** (Asia + Oceania) - 47 FIFA members
+- **CAF** (Africa) - 54 FIFA members  
+- **CONCACAF** (N/C America & Caribbean) - 41 FIFA members
+- **CONMEBOL** (South America) - 10 FIFA members
+- **OFC** (Oceania only) - 11 FIFA members
+- **UEFA** (Europe) - 55 FIFA members
+
 **URL**:
 ```
 https://aacjfdrctnmnenebzdxg.supabase.co/functions/v1/update-leagues
@@ -32,6 +40,8 @@ Authorization: Bearer N8N_BEARER_TOKEN
   "leaguesData": {
     "sport_key": "soccer_epl",
     "sport_title": "English Premier League",
+    "confederation": "UEFA",
+    "region": "Europe",
     "leagues": []
   }
 }
@@ -68,7 +78,7 @@ Authorization: Bearer N8N_BEARER_TOKEN
 **Database Impact**:
 - Table: `sports_leagues`
 - Action: UPSERT (based on `sport_key`)
-- Columns updated: `sport_title`, `leagues`, `updated_at`
+- Columns updated: `sport_title`, `confederation`, `region`, `leagues`, `updated_at`
 
 ---
 

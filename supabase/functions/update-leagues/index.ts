@@ -9,6 +9,8 @@ const corsHeaders = {
 interface LeaguesData {
   sport_key: string;
   sport_title: string;
+  confederation?: string; // AFC, CAF, CONCACAF, CONMEBOL, OFC, UEFA
+  region?: string;
   leagues: any[];
 }
 
@@ -62,6 +64,8 @@ serve(async (req) => {
       .upsert({
         sport_key: body.leaguesData.sport_key,
         sport_title: body.leaguesData.sport_title,
+        confederation: body.leaguesData.confederation,
+        region: body.leaguesData.region,
         leagues: body.leaguesData.leagues || [],
         updated_at: new Date().toISOString()
       }, {
