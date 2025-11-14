@@ -50,12 +50,15 @@ const Auth = () => {
     setLoading(true);
 
     try {
+      // Trim whitespace from email
+      const trimmedEmail = loginEmail.trim().toLowerCase();
+      
       // Validate inputs
-      emailSchema.parse(loginEmail);
+      emailSchema.parse(trimmedEmail);
       passwordSchema.parse(loginPassword);
 
       const { error } = await supabase.auth.signInWithPassword({
-        email: loginEmail,
+        email: trimmedEmail,
         password: loginPassword,
       });
 
