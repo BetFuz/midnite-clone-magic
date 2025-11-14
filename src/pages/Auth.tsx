@@ -28,17 +28,41 @@ const Auth = () => {
   const [signupConfirmPassword, setSignupConfirmPassword] = useState("");
 
   useEffect(() => {
+    const checkUserAndRedirect = async (session: any) => {
+      if (!session) return;
+      
+      try {
+        // Check if user has admin role
+        const { data: roleData } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", session.user.id)
+          .in("role", ["admin", "superadmin"])
+          .maybeSingle();
+
+        // Redirect based on role
+        if (roleData?.role === 'admin' || roleData?.role === 'superadmin') {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/");
+        }
+      } catch (error) {
+        console.error("Error checking user role:", error);
+        navigate("/"); // Fallback to home page
+      }
+    };
+
     // Check if user is already logged in
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        navigate("/");
+        checkUserAndRedirect(session);
       }
     });
 
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session) {
-        navigate("/");
+      if (session && event === 'SIGNED_IN') {
+        checkUserAndRedirect(session);
       }
     });
 
