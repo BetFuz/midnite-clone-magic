@@ -117,11 +117,33 @@ const DataManagement = () => {
                         )}
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-2">
+                    <CardContent className="space-y-3">
                       {result.error ? (
-                        <div className="text-sm text-destructive">
-                          <p className="font-medium">Error:</p>
-                          <p>{result.error}</p>
+                        <div className="text-sm space-y-3">
+                          <div className="text-destructive">
+                            <p className="font-medium">Error:</p>
+                            <p>{result.error}</p>
+                          </div>
+                          {result.attemptedApis && result.attemptedApis.length > 0 && (
+                            <div className="p-3 bg-muted rounded">
+                              <p className="text-xs font-medium mb-2">Attempted APIs:</p>
+                              <ul className="text-xs space-y-1">
+                                {result.attemptedApis.map((api: string, i: number) => (
+                                  <li key={i}>• {api}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          {result.errors && result.errors.length > 0 && (
+                            <div className="p-3 bg-destructive/10 border border-destructive/20 rounded">
+                              <p className="text-xs font-medium text-destructive mb-2">Errors:</p>
+                              <ul className="text-xs space-y-1 text-muted-foreground">
+                                {result.errors.map((err: string, i: number) => (
+                                  <li key={i}>• {err}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
                         </div>
                       ) : (
                         <>
@@ -139,10 +161,40 @@ const DataManagement = () => {
                               </p>
                             </div>
                           </div>
+                          
+                          <div className="p-3 bg-green-500/10 border border-green-500/20 rounded">
+                            <p className="text-sm font-medium text-green-500 mb-1">
+                              ✓ Data Source: {result.dataSource}
+                            </p>
+                            {result.hasOdds && (
+                              <p className="text-xs text-muted-foreground">
+                                Includes live betting odds
+                              </p>
+                            )}
+                            {!result.hasOdds && (
+                              <p className="text-xs text-yellow-500">
+                                Fixtures only (no odds available from this source)
+                              </p>
+                            )}
+                          </div>
+
+                          {result.attemptedApis && result.attemptedApis.length > 1 && (
+                            <div className="p-3 bg-muted rounded">
+                              <p className="text-xs font-medium mb-2">API Fallback Chain:</p>
+                              <ul className="text-xs space-y-1">
+                                {result.attemptedApis.map((api: string, i: number) => (
+                                  <li key={i} className={api === result.dataSource ? "text-green-500 font-medium" : "text-muted-foreground"}>
+                                    {i + 1}. {api} {api === result.dataSource && "✓"}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
                           {result.errors && result.errors.length > 0 && (
-                            <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded">
+                            <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded">
                               <p className="text-sm font-medium text-yellow-500 mb-2">
-                                Partial Errors:
+                                Partial Errors (non-critical):
                               </p>
                               <ul className="text-xs space-y-1">
                                 {result.errors.map((err: string, i: number) => (
@@ -151,7 +203,8 @@ const DataManagement = () => {
                               </ul>
                             </div>
                           )}
-                          <p className="text-xs text-muted-foreground mt-4">
+                          
+                          <p className="text-xs text-muted-foreground">
                             Updated at: {new Date(result.timestamp).toLocaleString()}
                           </p>
                         </>
