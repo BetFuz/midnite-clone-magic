@@ -137,8 +137,8 @@ const Index = () => {
     { name: "La Liga", url: "/football/la-liga", logo: laLigaLogo, matches: 10, country: "Spain" },
     { name: "Serie A", url: "/football/serie-a", logo: serieALogo, matches: 10, country: "Italy" },
     { name: "Bundesliga", url: "/football/bundesliga", logo: bundesligaLogo, matches: 9, country: "Germany" },
-    { name: "Ligue 1", url: "/football/la-liga", logo: ligue1Logo, matches: 10, country: "France" },
-    { name: "Eredivisie", url: "/football/bundesliga", logo: eredivisieLogo, matches: 9, country: "Netherlands" },
+    { name: "Ligue 1", url: "/football/ligue-1", logo: ligue1Logo, matches: 10, country: "France" },
+    { name: "Eredivisie", url: "/sports/football", logo: eredivisieLogo, matches: 9, country: "Netherlands" },
     { name: "MLS", url: "/sports/football", logo: mlsLogo, matches: 12, country: "USA" },
     { name: "NBA", url: "/basketball/nba", logo: nbaLogo, matches: 12, country: "USA" },
     { name: "WNBA", url: "/basketball/wnba", logo: wnbaLogo, matches: 10, country: "USA" },
@@ -163,8 +163,8 @@ const Index = () => {
     { name: "AC Milan", url: "/football/serie-a", logo: acMilanLogo },
     { name: "Inter Milan", url: "/football/serie-a", logo: interMilanLogo },
     { name: "Juventus", url: "/football/serie-a", logo: juventusLogo },
-    { name: "PSG", url: "/football/la-liga", logo: psgLogo },
-    { name: "Ajax", url: "/football/bundesliga", logo: ajaxLogo },
+    { name: "PSG", url: "/football/ligue-1", logo: psgLogo },
+    { name: "Ajax", url: "/sports/football", logo: ajaxLogo },
   ];
 
   const featuredMatches = [
