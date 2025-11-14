@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 export interface Match {
   id: string;
   match_id: string;
+  league_id?: number;
   sport_key: string;
   sport_title: string;
   league_name: string;
