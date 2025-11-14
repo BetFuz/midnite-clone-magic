@@ -490,6 +490,33 @@ export type Database = {
         }
         Relationships: []
       }
+      leagues: {
+        Row: {
+          created_at: string | null
+          id: number
+          name: string
+          provider_meta: Json | null
+          sport_key: string | null
+          sport_title: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          name: string
+          provider_meta?: Json | null
+          sport_key?: string | null
+          sport_title?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          name?: string
+          provider_meta?: Json | null
+          sport_key?: string | null
+          sport_title?: string | null
+        }
+        Relationships: []
+      }
       live_streams: {
         Row: {
           active_bets_count: number
@@ -647,6 +674,7 @@ export type Database = {
           home_odds: number | null
           home_team: string
           id: string
+          league_id: number | null
           league_name: string
           match_id: string
           sport_key: string
@@ -663,6 +691,7 @@ export type Database = {
           home_odds?: number | null
           home_team: string
           id?: string
+          league_id?: number | null
           league_name: string
           match_id: string
           sport_key: string
@@ -679,6 +708,7 @@ export type Database = {
           home_odds?: number | null
           home_team?: string
           id?: string
+          league_id?: number | null
           league_name?: string
           match_id?: string
           sport_key?: string
@@ -1347,7 +1377,57 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_matches: {
+        Row: {
+          away_odds: number | null
+          away_team: string | null
+          draw_odds: number | null
+          home_odds: number | null
+          home_team: string | null
+          id: string | null
+          kickoff_at: string | null
+          league_id: number | null
+          league_name: string | null
+          match_id: string | null
+          sport_key: string | null
+          sport_title: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          away_odds?: number | null
+          away_team?: string | null
+          draw_odds?: number | null
+          home_odds?: number | null
+          home_team?: string | null
+          id?: string | null
+          kickoff_at?: string | null
+          league_id?: number | null
+          league_name?: string | null
+          match_id?: string | null
+          sport_key?: string | null
+          sport_title?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          away_odds?: number | null
+          away_team?: string | null
+          draw_odds?: number | null
+          home_odds?: number | null
+          home_team?: string | null
+          id?: string | null
+          kickoff_at?: string | null
+          league_id?: number | null
+          league_name?: string | null
+          match_id?: string | null
+          sport_key?: string | null
+          sport_title?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {
