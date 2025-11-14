@@ -44,3 +44,6 @@ verify_jwt = false
 
 [functions.refresh-football-matches]
 verify_jwt = false
+
+[functions.public-matches]
+verify_jwt = false
