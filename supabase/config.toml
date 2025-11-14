@@ -32,3 +32,6 @@ verify_jwt = false
 
 [functions.user-registration-webhook]
 verify_jwt = false
+
+[functions.update-matches]
+verify_jwt = false

@@ -131,7 +131,65 @@ Authorization: Bearer N8N_BEARER_TOKEN
 
 ---
 
-### 3. n8n Webhook Receiver (Multi-Event)
+### 3. Update Matches Endpoint
+
+**Purpose**: Receive match schedules and odds data from n8n for upcoming matches
+
+**URL**:
+```
+https://aacjfdrctnmnenebzdxg.supabase.co/functions/v1/update-matches
+```
+
+**Method**: `POST`
+
+**Authentication**: 
+```http
+Authorization: Bearer N8N_BEARER_TOKEN
+```
+
+**Request Body**:
+```json
+{
+  "matches": [
+    {
+      "match_id": "match_123",
+      "sport_key": "soccer_epl",
+      "sport_title": "English Premier League",
+      "league_name": "Premier League",
+      "home_team": "Arsenal",
+      "away_team": "Chelsea",
+      "commence_time": "2025-01-15T19:00:00Z",
+      "home_odds": 2.10,
+      "draw_odds": 3.40,
+      "away_odds": 3.80,
+      "status": "upcoming"
+    }
+  ]
+}
+```
+
+**Response Success (200)**:
+```json
+{
+  "success": true,
+  "message": "Updated 10 matches"
+}
+```
+
+**What It Does**:
+1. Validates Bearer token
+2. Upserts match data into `matches` table
+3. Updates existing matches or creates new ones
+4. Returns success confirmation
+
+**Database Impact**:
+- Table: `matches`
+- Action: UPSERT (based on `match_id`)
+- Displays on league pages for betting
+
+---
+
+### 4. n8n Webhook Receiver (Multi-Event)
 
 **Purpose**: Central hub for receiving various event types from n8n (odds, settlements, alerts)
 

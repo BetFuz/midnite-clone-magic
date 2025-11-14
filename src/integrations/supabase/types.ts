@@ -541,6 +541,30 @@ export type Database = {
         }
         Relationships: []
       }
+      marketing_posts: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          posted_at: string | null
+          status: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          posted_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          posted_at?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
       match_statistics: {
         Row: {
           away_form: string | null
@@ -613,6 +637,84 @@ export type Database = {
         }
         Relationships: []
       }
+      matches: {
+        Row: {
+          away_odds: number | null
+          away_team: string
+          commence_time: string
+          created_at: string | null
+          draw_odds: number | null
+          home_odds: number | null
+          home_team: string
+          id: string
+          league_name: string
+          match_id: string
+          sport_key: string
+          sport_title: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          away_odds?: number | null
+          away_team: string
+          commence_time: string
+          created_at?: string | null
+          draw_odds?: number | null
+          home_odds?: number | null
+          home_team: string
+          id?: string
+          league_name: string
+          match_id: string
+          sport_key: string
+          sport_title: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          away_odds?: number | null
+          away_team?: string
+          commence_time?: string
+          created_at?: string | null
+          draw_odds?: number | null
+          home_odds?: number | null
+          home_team?: string
+          id?: string
+          league_name?: string
+          match_id?: string
+          sport_key?: string
+          sport_title?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      n8n_events_log: {
+        Row: {
+          created_at: string | null
+          event_data: Json
+          event_type: string
+          id: string
+          processed: boolean | null
+          source_workflow: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_data: Json
+          event_type: string
+          id?: string
+          processed?: boolean | null
+          source_workflow?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event_data?: Json
+          event_type?: string
+          id?: string
+          processed?: boolean | null
+          source_workflow?: string | null
+        }
+        Relationships: []
+      }
       nft_badges: {
         Row: {
           badge_name: string
@@ -643,6 +745,39 @@ export type Database = {
           rarity?: string | null
           token_id?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      pending_notifications: {
+        Row: {
+          created_at: string | null
+          data: Json | null
+          id: string
+          message: string
+          notification_type: string
+          read: boolean | null
+          title: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          data?: Json | null
+          id?: string
+          message: string
+          notification_type: string
+          read?: boolean | null
+          title: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          data?: Json | null
+          id?: string
+          message?: string
+          notification_type?: string
+          read?: boolean | null
+          title?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -768,6 +903,30 @@ export type Database = {
         }
         Relationships: []
       }
+      realtime_odds_cache: {
+        Row: {
+          id: string
+          last_updated: string | null
+          market: string
+          match_id: string
+          odds: Json
+        }
+        Insert: {
+          id?: string
+          last_updated?: string | null
+          market: string
+          match_id: string
+          odds: Json
+        }
+        Update: {
+          id?: string
+          last_updated?: string | null
+          market?: string
+          match_id?: string
+          odds?: Json
+        }
+        Relationships: []
+      }
       social_bets: {
         Row: {
           bet_slip_id: string
@@ -869,6 +1028,33 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
           win_rate?: number | null
+        }
+        Relationships: []
+      }
+      sports_leagues: {
+        Row: {
+          created_at: string | null
+          id: string
+          leagues: Json
+          sport_key: string
+          sport_title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          leagues?: Json
+          sport_key: string
+          sport_title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          leagues?: Json
+          sport_key?: string
+          sport_title?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
