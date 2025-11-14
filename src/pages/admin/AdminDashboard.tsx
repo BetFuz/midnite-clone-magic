@@ -3,49 +3,50 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import Sidebar from "@/components/Sidebar";
 import MobileNav from "@/components/MobileNav";
 import { AdminGuard } from "@/components/admin/AdminGuard";
 import { supabase } from "@/integrations/supabase/client";
 import { 
-  Shield, Activity, AlertTriangle, Users, Lock, 
-  TrendingUp, Clock, CheckCircle, XCircle, RefreshCw
+  Shield, Users, Database, TrendingUp, Activity, 
+  DollarSign, BarChart3, RefreshCw, Calendar, Trophy,
+  Clock, CheckCircle, XCircle, Eye
 } from "lucide-react";
 import { toast } from "sonner";
+import { formatCurrency } from "@/lib/currency";
 
-interface AuditLog {
-  id: string;
-  admin_id: string;
-  action: string;
-  resource_type: string;
-  resource_id?: string;
-  ip_address?: string;
-  user_agent?: string;
-  mfa_verified: boolean;
-  status: string;
-  error_message?: string;
-  created_at: string;
-  profiles?: {
-    full_name: string;
+interface SystemStats {
+  totalUsers: number;
+  totalBets: number;
+  totalMatches: number;
+  activeLeagues: number;
+  totalStaked: number;
+  recentUsers: Array<{
     email: string;
-  };
-}
-
-interface DashboardStats {
-  totalAuditLogs: number;
-  recentFailedAccess: number;
-  adminUsers: number;
-  criticalAlerts: number;
+    created_at: string;
+  }>;
+  recentBets: Array<{
+    user_email: string;
+    total_stake: number;
+    status: string;
+    created_at: string;
+  }>;
+  adminUsers: Array<{
+    email: string;
+    role: string;
+  }>;
 }
 
 const AdminDashboard = () => {
-  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
-  const [stats, setStats] = useState<DashboardStats>({
-    totalAuditLogs: 0,
-    recentFailedAccess: 0,
-    adminUsers: 0,
-    criticalAlerts: 0,
+  const [stats, setStats] = useState<SystemStats>({
+    totalUsers: 0,
+    totalBets: 0,
+    totalMatches: 0,
+    activeLeagues: 0,
+    totalStaked: 0,
+    recentUsers: [],
+    recentBets: [],
+    adminUsers: [],
   });
   const [loading, setLoading] = useState(true);
 
@@ -57,39 +58,84 @@ const AdminDashboard = () => {
     try {
       setLoading(true);
 
-      // Load audit logs
-      const { data: logs } = await supabase.functions.invoke('admin-audit-logs', {
-        method: 'GET',
-        body: { limit: 50 },
-      });
+      // Get total users
+      const { count: userCount } = await supabase
+        .from('profiles')
+        .select('*', { count: 'exact', head: true });
 
-      if (logs?.data) {
-        setAuditLogs(logs.data);
-      }
+      // Get total bets
+      const { count: betCount } = await supabase
+        .from('bet_slips')
+        .select('*', { count: 'exact', head: true });
 
-      // Load admin users count
-      const { count: adminCount } = await supabase
+      // Get total matches
+      const { count: matchCount } = await supabase
+        .from('matches')
+        .select('*', { count: 'exact', head: true });
+
+      // Get active leagues
+      const { count: leagueCount } = await supabase
+        .from('sports_leagues')
+        .select('*', { count: 'exact', head: true });
+
+      // Get total staked amount
+      const { data: betData } = await supabase
+        .from('bet_slips')
+        .select('total_stake');
+      
+      const totalStaked = betData?.reduce((sum, bet) => sum + Number(bet.total_stake), 0) || 0;
+
+      // Get recent users (last 10)
+      const { data: recentUsers } = await supabase
+        .from('profiles')
+        .select('email, created_at')
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      // Get recent bets (last 10)
+      const { data: recentBetsData } = await supabase
+        .from('bet_slips')
+        .select(`
+          total_stake,
+          status,
+          created_at,
+          user_id,
+          profiles(email)
+        `)
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      const recentBets = recentBetsData?.map(bet => ({
+        user_email: (bet.profiles as any)?.email || 'Unknown',
+        total_stake: bet.total_stake,
+        status: bet.status,
+        created_at: bet.created_at
+      })) || [];
+
+      // Get admin users
+      const { data: adminRoles } = await supabase
         .from('user_roles')
-        .select('*', { count: 'exact', head: true })
+        .select(`
+          role,
+          user_id,
+          profiles(email)
+        `)
         .in('role', ['admin', 'superadmin']);
 
-      // Count recent failed access attempts (last 24 hours)
-      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-      const failedLogs = logs?.data?.filter((log: AuditLog) => 
-        log.status === 'failed' && log.created_at > oneDayAgo
-      ) || [];
-
-      // Count critical alerts (failed admin actions)
-      const criticalLogs = logs?.data?.filter((log: AuditLog) => 
-        log.status === 'failed' && 
-        (log.action.includes('ACCESS_DENIED') || log.action.includes('FORBIDDEN'))
-      ) || [];
+      const adminUsers = adminRoles?.map(admin => ({
+        email: (admin.profiles as any)?.email || 'Unknown',
+        role: admin.role
+      })) || [];
 
       setStats({
-        totalAuditLogs: logs?.count || 0,
-        recentFailedAccess: failedLogs.length,
-        adminUsers: adminCount || 0,
-        criticalAlerts: criticalLogs.length,
+        totalUsers: userCount || 0,
+        totalBets: betCount || 0,
+        totalMatches: matchCount || 0,
+        activeLeagues: leagueCount || 0,
+        totalStaked,
+        recentUsers: recentUsers || [],
+        recentBets,
+        adminUsers,
       });
 
     } catch (error) {
@@ -100,15 +146,26 @@ const AdminDashboard = () => {
     }
   };
 
-  const getActionBadgeColor = (status: string) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
-      case 'success':
-        return 'bg-green-500/10 text-green-500 border-green-500/20';
-      case 'failed':
-        return 'bg-red-500/10 text-red-500 border-red-500/20';
+      case 'won':
+        return 'text-green-500';
+      case 'lost':
+        return 'text-red-500';
+      case 'pending':
+        return 'text-yellow-500';
       default:
-        return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
+        return 'text-muted-foreground';
     }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   return (
@@ -122,16 +179,16 @@ const AdminDashboard = () => {
             {/* Header */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="p-3 bg-primary/10 rounded-lg">
+                <div className="p-2 rounded-lg bg-primary/10">
                   <Shield className="w-6 h-6 text-primary" />
                 </div>
                 <div>
                   <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-                  <p className="text-muted-foreground">Secure monitoring & audit trail</p>
+                  <p className="text-muted-foreground">System overview and statistics</p>
                 </div>
               </div>
-              <Button onClick={loadDashboardData} variant="outline" size="sm">
-                <RefreshCw className="w-4 h-4 mr-2" />
+              <Button onClick={loadDashboardData} disabled={loading} variant="outline">
+                <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
                 Refresh
               </Button>
             </div>
@@ -139,216 +196,220 @@ const AdminDashboard = () => {
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    Total Audit Logs
-                  </CardTitle>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+                  <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center justify-between">
-                    <p className="text-3xl font-bold">{stats.totalAuditLogs}</p>
-                    <Activity className="w-8 h-8 text-primary/40" />
-                  </div>
+                  <div className="text-2xl font-bold">{stats.totalUsers.toLocaleString()}</div>
+                  <p className="text-xs text-muted-foreground">
+                    Registered accounts
+                  </p>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    Admin Users
-                  </CardTitle>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total Bets</CardTitle>
+                  <Trophy className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center justify-between">
-                    <p className="text-3xl font-bold">{stats.adminUsers}</p>
-                    <Users className="w-8 h-8 text-blue-500/40" />
-                  </div>
+                  <div className="text-2xl font-bold">{stats.totalBets.toLocaleString()}</div>
+                  <p className="text-xs text-muted-foreground">
+                    All time
+                  </p>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    Failed Access (24h)
-                  </CardTitle>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total Staked</CardTitle>
+                  <DollarSign className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center justify-between">
-                    <p className="text-3xl font-bold text-red-500">{stats.recentFailedAccess}</p>
-                    <XCircle className="w-8 h-8 text-red-500/40" />
-                  </div>
+                  <div className="text-2xl font-bold">{formatCurrency(stats.totalStaked)}</div>
+                  <p className="text-xs text-muted-foreground">
+                    Platform volume
+                  </p>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    Critical Alerts
-                  </CardTitle>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Active Matches</CardTitle>
+                  <Activity className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center justify-between">
-                    <p className="text-3xl font-bold text-orange-500">{stats.criticalAlerts}</p>
-                    <AlertTriangle className="w-8 h-8 text-orange-500/40" />
-                  </div>
+                  <div className="text-2xl font-bold">{stats.totalMatches.toLocaleString()}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {stats.activeLeagues} leagues
+                  </p>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Security Alerts */}
-            {stats.recentFailedAccess > 5 && (
-              <Alert variant="destructive">
-                <AlertTriangle className="h-4 w-4" />
-                <AlertDescription>
-                  <strong>Security Alert:</strong> {stats.recentFailedAccess} failed admin access 
-                  attempts detected in the last 24 hours. Review audit logs immediately.
-                </AlertDescription>
-              </Alert>
-            )}
+            {/* Tabs for detailed views */}
+            <Tabs defaultValue="overview" className="space-y-4">
+              <TabsList>
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="users">Recent Users</TabsTrigger>
+                <TabsTrigger value="bets">Recent Bets</TabsTrigger>
+                <TabsTrigger value="admins">Admin Users</TabsTrigger>
+              </TabsList>
 
-            {/* Audit Log Tabs */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Lock className="w-5 h-5 text-primary" />
-                  Real-Time Audit Trail
-                </CardTitle>
-                <CardDescription>
-                  Immutable log of all admin actions with full audit details
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Tabs defaultValue="all" className="w-full">
-                  <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="all">All Actions</TabsTrigger>
-                    <TabsTrigger value="failed">Failed</TabsTrigger>
-                    <TabsTrigger value="critical">Critical</TabsTrigger>
-                  </TabsList>
+              <TabsContent value="overview" className="space-y-4">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>System Health</CardTitle>
+                      <CardDescription>Current platform status</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="w-4 h-4 text-green-500" />
+                          <span className="text-sm">Database</span>
+                        </div>
+                        <Badge variant="outline" className="bg-green-500/10 text-green-500">Online</Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="w-4 h-4 text-green-500" />
+                          <span className="text-sm">Authentication</span>
+                        </div>
+                        <Badge variant="outline" className="bg-green-500/10 text-green-500">Active</Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="w-4 h-4 text-green-500" />
+                          <span className="text-sm">Edge Functions</span>
+                        </div>
+                        <Badge variant="outline" className="bg-green-500/10 text-green-500">Running</Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
 
-                  <TabsContent value="all" className="space-y-4">
-                    {loading ? (
-                      <div className="text-center py-8 text-muted-foreground">
-                        Loading audit logs...
-                      </div>
-                    ) : auditLogs.length === 0 ? (
-                      <div className="text-center py-8 text-muted-foreground">
-                        No audit logs found
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        {auditLogs.map((log) => (
-                          <div 
-                            key={log.id} 
-                            className="flex items-start gap-4 p-4 border border-border rounded-lg bg-card"
-                          >
-                            <div className="flex-shrink-0 mt-1">
-                              {log.status === 'success' ? (
-                                <CheckCircle className="w-5 h-5 text-green-500" />
-                              ) : (
-                                <XCircle className="w-5 h-5 text-red-500" />
-                              )}
-                            </div>
-                            
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 mb-1">
-                                <Badge variant="outline" className={getActionBadgeColor(log.status)}>
-                                  {log.action}
-                                </Badge>
-                                <span className="text-sm text-muted-foreground">
-                                  {log.resource_type}
-                                </span>
-                                {log.mfa_verified && (
-                                  <Badge variant="secondary" className="text-xs">
-                                    MFA ✓
-                                  </Badge>
-                                )}
-                              </div>
-                              
-                              <p className="text-sm text-muted-foreground mb-1">
-                                Admin: {log.profiles?.email || 'Unknown'}
-                              </p>
-                              
-                              <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                                <span className="flex items-center gap-1">
-                                  <Clock className="w-3 h-3" />
-                                  {new Date(log.created_at).toLocaleString()}
-                                </span>
-                                <span>IP: {log.ip_address || 'unknown'}</span>
-                              </div>
-                              
-                              {log.error_message && (
-                                <p className="mt-2 text-xs text-red-500">
-                                  Error: {log.error_message}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </TabsContent>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Quick Actions</CardTitle>
+                      <CardDescription>Common admin tasks</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      <Button className="w-full justify-start" variant="outline" onClick={() => window.location.href = '/admin/seed'}>
+                        <Database className="w-4 h-4 mr-2" />
+                        Update Match Data
+                      </Button>
+                      <Button className="w-full justify-start" variant="outline" onClick={() => window.location.href = '/admin/setup'}>
+                        <Users className="w-4 h-4 mr-2" />
+                        Manage User Roles
+                      </Button>
+                      <Button className="w-full justify-start" variant="outline" onClick={() => window.location.href = '/admin/webhooks'}>
+                        <Activity className="w-4 h-4 mr-2" />
+                        Configure Webhooks
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
 
-                  <TabsContent value="failed" className="space-y-4">
+              <TabsContent value="users">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Recent User Registrations</CardTitle>
+                    <CardDescription>Last 10 users who joined the platform</CardDescription>
+                  </CardHeader>
+                  <CardContent>
                     <div className="space-y-3">
-                      {auditLogs
-                        .filter(log => log.status === 'failed')
-                        .map((log) => (
-                          <div 
-                            key={log.id} 
-                            className="flex items-start gap-4 p-4 border border-red-500/20 rounded-lg bg-red-500/5"
-                          >
-                            <XCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-1" />
-                            <div className="flex-1">
-                              <Badge variant="outline" className="bg-red-500/10 text-red-500 mb-2">
-                                {log.action}
-                              </Badge>
-                              <p className="text-sm mb-1">{log.profiles?.email || 'Unknown'}</p>
-                              <p className="text-xs text-red-500">{log.error_message}</p>
-                              <p className="text-xs text-muted-foreground mt-1">
-                                {new Date(log.created_at).toLocaleString()} • IP: {log.ip_address}
-                              </p>
+                      {stats.recentUsers.length === 0 ? (
+                        <p className="text-sm text-muted-foreground text-center py-4">No users yet</p>
+                      ) : (
+                        stats.recentUsers.map((user, index) => (
+                          <div key={index} className="flex items-center justify-between p-3 rounded-lg border">
+                            <div className="flex items-center gap-3">
+                              <div className="p-2 rounded-full bg-primary/10">
+                                <Users className="w-4 h-4 text-primary" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium">{user.email}</p>
+                                <p className="text-xs text-muted-foreground">{formatDate(user.created_at)}</p>
+                              </div>
                             </div>
+                            <Badge variant="outline">New</Badge>
                           </div>
-                        ))}
+                        ))
+                      )}
                     </div>
-                  </TabsContent>
+                  </CardContent>
+                </Card>
+              </TabsContent>
 
-                  <TabsContent value="critical" className="space-y-4">
-                    <Alert variant="destructive" className="mb-4">
-                      <AlertTriangle className="h-4 w-4" />
-                      <AlertDescription>
-                        Critical security events require immediate investigation
-                      </AlertDescription>
-                    </Alert>
+              <TabsContent value="bets">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Recent Bets</CardTitle>
+                    <CardDescription>Last 10 bets placed on the platform</CardDescription>
+                  </CardHeader>
+                  <CardContent>
                     <div className="space-y-3">
-                      {auditLogs
-                        .filter(log => 
-                          log.status === 'failed' && 
-                          (log.action.includes('ACCESS_DENIED') || log.action.includes('FORBIDDEN'))
-                        )
-                        .map((log) => (
-                          <div 
-                            key={log.id} 
-                            className="flex items-start gap-4 p-4 border border-orange-500/20 rounded-lg bg-orange-500/5"
-                          >
-                            <AlertTriangle className="w-5 h-5 text-orange-500 flex-shrink-0 mt-1" />
-                            <div className="flex-1">
-                              <Badge variant="outline" className="bg-orange-500/10 text-orange-500 mb-2">
-                                CRITICAL: {log.action}
-                              </Badge>
-                              <p className="text-sm mb-1">{log.profiles?.email || 'Unknown user'}</p>
-                              <p className="text-xs text-orange-500">{log.error_message}</p>
-                              <p className="text-xs text-muted-foreground mt-1">
-                                {new Date(log.created_at).toLocaleString()} • IP: {log.ip_address}
-                              </p>
+                      {stats.recentBets.length === 0 ? (
+                        <p className="text-sm text-muted-foreground text-center py-4">No bets yet</p>
+                      ) : (
+                        stats.recentBets.map((bet, index) => (
+                          <div key={index} className="flex items-center justify-between p-3 rounded-lg border">
+                            <div className="flex items-center gap-3">
+                              <div className="p-2 rounded-full bg-primary/10">
+                                <Trophy className="w-4 h-4 text-primary" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium">{bet.user_email}</p>
+                                <p className="text-xs text-muted-foreground">{formatDate(bet.created_at)}</p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm font-medium">{formatCurrency(bet.total_stake)}</p>
+                              <p className={`text-xs capitalize ${getStatusColor(bet.status)}`}>{bet.status}</p>
                             </div>
                           </div>
-                        ))}
+                        ))
+                      )}
                     </div>
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="admins">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Admin Users</CardTitle>
+                    <CardDescription>Users with admin or superadmin privileges</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {stats.adminUsers.length === 0 ? (
+                        <p className="text-sm text-muted-foreground text-center py-4">No admin users</p>
+                      ) : (
+                        stats.adminUsers.map((admin, index) => (
+                          <div key={index} className="flex items-center justify-between p-3 rounded-lg border">
+                            <div className="flex items-center gap-3">
+                              <div className="p-2 rounded-full bg-red-500/10">
+                                <Shield className="w-4 h-4 text-red-500" />
+                              </div>
+                              <p className="text-sm font-medium">{admin.email}</p>
+                            </div>
+                            <Badge 
+                              variant="outline" 
+                              className={admin.role === 'superadmin' ? 'bg-red-500/10 text-red-500' : 'bg-blue-500/10 text-blue-500'}
+                            >
+                              {admin.role === 'superadmin' ? 'Super Admin' : 'Admin'}
+                            </Badge>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
           </div>
         </main>
       </div>
