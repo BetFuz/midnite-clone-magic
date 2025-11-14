@@ -35,3 +35,6 @@ verify_jwt = false
 
 [functions.update-matches]
 verify_jwt = false
+
+[functions.seed-matches]
+verify_jwt = false
