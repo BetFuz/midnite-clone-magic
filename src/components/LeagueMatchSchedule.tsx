@@ -13,7 +13,7 @@ interface LeagueMatchScheduleProps {
 }
 
 export const LeagueMatchSchedule = ({ leagueName, daysAhead = 7 }: LeagueMatchScheduleProps) => {
-  const { data: matches, isLoading } = useLeagueMatches(leagueName, daysAhead);
+  const { data: matches, isLoading, isError, error, refetch } = useLeagueMatches(leagueName, daysAhead);
   const { addSelection } = useBetSlip();
 
   const handleAddBet = (match: Match, selectionType: "home" | "away" | "draw", odds: number, selectionValue: string) => {
@@ -38,6 +38,21 @@ export const LeagueMatchSchedule = ({ leagueName, daysAhead = 7 }: LeagueMatchSc
         <Skeleton className="h-32 w-full" />
         <Skeleton className="h-32 w-full" />
       </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Card>
+        <CardContent className="pt-6">
+          <p className="text-center text-destructive">
+            Failed to load matches. {error instanceof Error ? error.message : "Please try again."}
+          </p>
+          <div className="flex justify-center mt-3">
+            <Button variant="outline" size="sm" onClick={() => refetch()}>Retry</Button>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
