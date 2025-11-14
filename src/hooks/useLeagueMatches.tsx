@@ -1,0 +1,63 @@
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+
+export interface Match {
+  id: string;
+  match_id: string;
+  sport_key: string;
+  sport_title: string;
+  league_name: string;
+  home_team: string;
+  away_team: string;
+  commence_time: string;
+  home_odds?: number;
+  draw_odds?: number;
+  away_odds?: number;
+  status: string;
+}
+
+export const useLeagueMatches = (leagueName: string, daysAhead: number = 7) => {
+  return useQuery({
+    queryKey: ['league-matches', leagueName, daysAhead],
+    queryFn: async () => {
+      const now = new Date();
+      const futureDate = new Date();
+      futureDate.setDate(futureDate.getDate() + daysAhead);
+
+      const { data, error } = await supabase
+        .from('matches')
+        .select('*')
+        .eq('league_name', leagueName)
+        .gte('commence_time', now.toISOString())
+        .lte('commence_time', futureDate.toISOString())
+        .order('commence_time', { ascending: true });
+
+      if (error) throw error;
+      return data as Match[];
+    },
+    refetchInterval: 60000, // Refresh every minute
+  });
+};
+
+export const useSportMatches = (sportKey: string, daysAhead: number = 7) => {
+  return useQuery({
+    queryKey: ['sport-matches', sportKey, daysAhead],
+    queryFn: async () => {
+      const now = new Date();
+      const futureDate = new Date();
+      futureDate.setDate(futureDate.getDate() + daysAhead);
+
+      const { data, error } = await supabase
+        .from('matches')
+        .select('*')
+        .eq('sport_key', sportKey)
+        .gte('commence_time', now.toISOString())
+        .lte('commence_time', futureDate.toISOString())
+        .order('commence_time', { ascending: true });
+
+      if (error) throw error;
+      return data as Match[];
+    },
+    refetchInterval: 60000,
+  });
+};
