@@ -138,12 +138,20 @@ const Auth = () => {
       } else {
         toast({
           title: "Welcome to Betfuz!",
-          description: "Your account has been created successfully.",
+          description: "Your account has been created successfully. The first user automatically gets superadmin access!",
         });
         // Clear form
         setSignupEmail("");
         setSignupPassword("");
         setSignupConfirmPassword("");
+        
+        // Show admin setup info
+        setTimeout(() => {
+          toast({
+            title: "Admin Access",
+            description: "Visit /admin/setup to verify your admin permissions.",
+          });
+        }, 2000);
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -297,10 +305,26 @@ const Auth = () => {
           </Tabs>
         </Card>
 
-        <div className="mt-6 text-center">
+        <div className="mt-6 text-center space-y-4">
           <Button variant="ghost" onClick={() => navigate("/")} className="text-muted-foreground">
             Back to Home
           </Button>
+          
+          <div className="pt-4 border-t border-border max-w-md mx-auto">
+            <p className="text-xs text-muted-foreground mb-2">
+              <strong className="text-foreground">Admin Access:</strong> The first user to sign up becomes a superadmin automatically.
+            </p>
+            <p className="text-xs text-muted-foreground">
+              After logging in, visit{" "}
+              <button 
+                onClick={() => navigate("/admin/setup")} 
+                className="text-primary hover:underline font-medium"
+              >
+                Admin Setup
+              </button>
+              {" "}to verify your permissions or grant access to other users.
+            </p>
+          </div>
         </div>
       </div>
     </div>
