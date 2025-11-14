@@ -23,3 +23,12 @@ verify_jwt = true
 
 [functions.n8n-webhook-receiver]
 verify_jwt = false
+
+[functions.update-leagues]
+verify_jwt = false
+
+[functions.marketing-post]
+verify_jwt = false
+
+[functions.user-registration-webhook]
+verify_jwt = false

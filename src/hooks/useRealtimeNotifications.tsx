@@ -34,7 +34,6 @@ export const useRealtimeNotifications = (userId?: string) => {
           setNotifications(prev => [...prev, notification]);
           setUnreadCount(prev => prev + 1);
           
-          // Show toast notification
           toast({
             title: notification.title,
             description: notification.message,
@@ -129,47 +128,19 @@ export const useRealtimeNotifications = (userId?: string) => {
           });
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('System alerts channel status:', status);
+      });
 
     return () => {
+      console.log('Cleaning up system alerts channel');
       supabase.removeChannel(channel);
     };
   }, [toast]);
 
-  const markAsRead = async (notificationId: string) => {
-    if (!userId) return;
-    
-    const { error } = await supabase
-      .from('pending_notifications')
-      .update({ read: true })
-      .eq('id', notificationId)
-      .eq('user_id', userId);
-
-    if (!error) {
-      setUnreadCount(prev => Math.max(0, prev - 1));
-    }
-  };
-
-  const markAllAsRead = async () => {
-    if (!userId) return;
-    
-    const { error } = await supabase
-      .from('pending_notifications')
-      .update({ read: true })
-      .eq('user_id', userId)
-      .eq('read', false);
-
-    if (!error) {
-      setUnreadCount(0);
-    }
-  };
-
   return {
     notifications,
     unreadCount,
-    isConnected,
-    markAsRead,
-    markAllAsRead,
-    clearNotifications: () => setNotifications([])
+    isConnected
   };
 };

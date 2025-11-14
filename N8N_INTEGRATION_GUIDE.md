@@ -42,6 +42,62 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFhY2pmZHJ
 **Service Role Key (Private - Store as n8n credential):**
 Ask your admin to provide this securely.
 
+### 3. Incoming Lovable API Endpoints (n8n Calls These)
+
+n8n workflows need to send data TO these endpoints hourly:
+
+#### Update Leagues Endpoint
+- **URL**: `https://aacjfdrctnmnenebzdxg.supabase.co/functions/v1/update-leagues`
+- **Method**: POST
+- **Authentication**: Bearer `N8N_BEARER_TOKEN` (configured on Lovable side)
+- **Purpose**: Hourly sports/leagues data sync from The Odds API
+
+**Request Body**:
+```json
+{
+  "leaguesData": {
+    "sport_key": "soccer_epl",
+    "sport_title": "English Premier League",
+    "leagues": []
+  }
+}
+```
+
+**n8n Configuration**:
+```
+HTTP Request Node:
+- Method: POST
+- URL: https://aacjfdrctnmnenebzdxg.supabase.co/functions/v1/update-leagues
+- Authentication: Header Auth
+  - Header Name: Authorization
+  - Header Value: Bearer [YOUR_N8N_BEARER_TOKEN]
+- Body: JSON
+```
+
+#### Marketing Post Endpoint
+- **URL**: `https://aacjfdrctnmnenebzdxg.supabase.co/functions/v1/marketing-post`
+- **Method**: POST
+- **Authentication**: Bearer `N8N_BEARER_TOKEN`
+- **Purpose**: Hourly AI-generated marketing content delivery
+
+**Request Body**:
+```json
+{
+  "content": "📊 Breaking: Bitcoin reaches new high! Place your crypto prediction bets now and get 20% bonus on wins!"
+}
+```
+
+**n8n Configuration**:
+```
+HTTP Request Node:
+- Method: POST
+- URL: https://aacjfdrctnmnenebzdxg.supabase.co/functions/v1/marketing-post
+- Authentication: Header Auth
+  - Header Name: Authorization
+  - Header Value: Bearer [YOUR_N8N_BEARER_TOKEN]
+- Body: JSON
+```
+
 ---
 
 ## 📨 What You Need From n8n
@@ -52,6 +108,34 @@ Point your n8n workflows to send POST requests to:
 ```
 https://aacjfdrctnmnenebzdxg.supabase.co/functions/v1/n8n-webhook-receiver
 ```
+
+### n8n Webhook Endpoints (Receive Data FROM Lovable)
+
+n8n must provide these webhook URLs to receive events from Lovable:
+
+#### User Registration Webhook
+Default n8n URL (can be changed in admin webhook settings):
+```
+https://pannaafric.app.n8n.cloud/webhook/user-registration
+```
+
+**Data Received from Lovable**:
+```json
+{
+  "id": "user_uuid",
+  "username": "John Doe",
+  "email": "john@example.com",
+  "registered_at": "2025-01-14T12:00:00Z"
+}
+```
+
+**n8n Workflow Setup**:
+1. Add a Webhook trigger node
+2. Set Method: POST
+3. Set Path: `/user-registration`
+4. Connect to your Postgres storage node
+
+---
 
 ### Authentication Header
 Include in all n8n → Site requests:
