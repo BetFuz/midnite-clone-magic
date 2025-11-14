@@ -105,6 +105,12 @@ function generateSampleMatches() {
       ['Rybakina', 'Gauff'], ['Pegula', 'Rybakina'], ['Vondrousova', 'Jabeur'],
       ['Coco Gauff', 'Ons Jabeur'], ['Aryna Sabalenka', 'Jessica Pegula'],
       ['Marketa Vondrousova', 'Elena Rybakina']
+    ],
+    'Champions League': [
+      ['Real Madrid', 'Bayern Munich'], ['PSG', 'Barcelona'], ['Man City', 'Inter Milan'],
+      ['Atletico Madrid', 'Borussia Dortmund'], ['Arsenal', 'Porto'], ['Napoli', 'Leipzig'],
+      ['Benfica', 'Ajax'], ['AC Milan', 'PSV'], ['Manchester United', 'Copenhagen'],
+      ['Galatasaray', 'Young Boys']
     ]
   };
 
