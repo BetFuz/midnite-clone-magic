@@ -30,25 +30,23 @@ export const useAdminAuth = () => {
         .select("role")
         .eq("user_id", userId)
         .in("role", ["admin", "superadmin"])
-        .single();
+        .maybeSingle(); // Use maybeSingle instead of single to avoid errors
 
       if (error) {
-        // User might not have admin role, which is not an error
-        if (error.code === 'PGRST116') {
-          return 'user';
-        }
         console.error("Error checking user role:", error);
-        return null;
+        return 'user';
       }
 
       return data?.role as AdminRole || 'user';
     } catch (error) {
       console.error("Error in checkUserRole:", error);
-      return null;
+      return 'user';
     }
   };
 
   useEffect(() => {
+    let isMounted = true;
+    
     const initializeAuth = async () => {
       try {
         // Get current session
@@ -58,68 +56,93 @@ export const useAdminAuth = () => {
           throw sessionError;
         }
 
+        if (!isMounted) return;
+
         if (session?.user) {
           const role = await checkUserRole(session.user.id);
-          setAuthState({
-            user: session.user,
-            role,
-            isAdmin: role === 'admin' || role === 'superadmin',
-            isSuperAdmin: role === 'superadmin',
-            loading: false,
-            error: null,
-          });
+          if (isMounted) {
+            setAuthState({
+              user: session.user,
+              role,
+              isAdmin: role === 'admin' || role === 'superadmin',
+              isSuperAdmin: role === 'superadmin',
+              loading: false,
+              error: null,
+            });
+          }
         } else {
+          if (isMounted) {
+            setAuthState({
+              user: null,
+              role: null,
+              isAdmin: false,
+              isSuperAdmin: false,
+              loading: false,
+              error: null,
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error initializing auth:", error);
+        if (isMounted) {
           setAuthState({
             user: null,
             role: null,
             isAdmin: false,
             isSuperAdmin: false,
             loading: false,
-            error: null,
+            error: error instanceof Error ? error.message : 'Authentication error',
           });
         }
-      } catch (error) {
-        console.error("Error initializing auth:", error);
-        setAuthState({
-          user: null,
-          role: null,
-          isAdmin: false,
-          isSuperAdmin: false,
-          loading: false,
-          error: error instanceof Error ? error.message : 'Authentication error',
-        });
       }
     };
+
+    // Set a timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      if (isMounted) {
+        setAuthState(prev => ({ ...prev, loading: false }));
+      }
+    }, 5000); // 5 second timeout
 
     initializeAuth();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
+        if (!isMounted) return;
+        
         if (session?.user) {
           const role = await checkUserRole(session.user.id);
-          setAuthState({
-            user: session.user,
-            role,
-            isAdmin: role === 'admin' || role === 'superadmin',
-            isSuperAdmin: role === 'superadmin',
-            loading: false,
-            error: null,
-          });
+          if (isMounted) {
+            setAuthState({
+              user: session.user,
+              role,
+              isAdmin: role === 'admin' || role === 'superadmin',
+              isSuperAdmin: role === 'superadmin',
+              loading: false,
+              error: null,
+            });
+          }
         } else {
-          setAuthState({
-            user: null,
-            role: null,
-            isAdmin: false,
-            isSuperAdmin: false,
-            loading: false,
-            error: null,
-          });
+          if (isMounted) {
+            setAuthState({
+              user: null,
+              role: null,
+              isAdmin: false,
+              isSuperAdmin: false,
+              loading: false,
+              error: null,
+            });
+          }
         }
       }
     );
 
-    return () => subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      clearTimeout(timeoutId);
+      subscription.unsubscribe();
+    };
   }, []);
 
   return authState;
