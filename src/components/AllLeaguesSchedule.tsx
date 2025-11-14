@@ -53,7 +53,7 @@ export const AllLeaguesSchedule = () => {
       <TabsList className="w-full flex-wrap h-auto">
         {leagues.map((league) => (
           <TabsTrigger key={league.sport_key} value={league.sport_key}>
-            {league.sport_title}
+            {league.confederation ? `[${league.confederation}] ` : ''}{league.sport_title}
           </TabsTrigger>
         ))}
       </TabsList>
