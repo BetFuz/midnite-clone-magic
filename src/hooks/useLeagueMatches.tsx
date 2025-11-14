@@ -32,8 +32,12 @@ export const useLeagueMatches = (leagueName: string, daysAhead: number = 7) => {
         .lte('commence_time', futureDate.toISOString())
         .order('commence_time', { ascending: true });
 
-      if (error) throw error;
-      return data as Match[];
+      if (error) {
+        console.error('useLeagueMatches error', { leagueName, daysAhead, now: now.toISOString(), future: futureDate.toISOString(), error });
+        throw error;
+      }
+      console.info('useLeagueMatches result', { leagueName, count: data?.length ?? 0, range: [now.toISOString(), futureDate.toISOString()] });
+      return (data ?? []) as Match[];
     },
     refetchInterval: 60000, // Refresh every minute
   });
@@ -55,8 +59,12 @@ export const useSportMatches = (sportKey: string, daysAhead: number = 7) => {
         .lte('commence_time', futureDate.toISOString())
         .order('commence_time', { ascending: true });
 
-      if (error) throw error;
-      return data as Match[];
+      if (error) {
+        console.error('useSportMatches error', { sportKey, daysAhead, now: now.toISOString(), future: futureDate.toISOString(), error });
+        throw error;
+      }
+      console.info('useSportMatches result', { sportKey, count: data?.length ?? 0, range: [now.toISOString(), futureDate.toISOString()] });
+      return (data ?? []) as Match[];
     },
     refetchInterval: 60000,
   });
