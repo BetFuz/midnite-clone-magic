@@ -3,9 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import Sidebar from "@/components/Sidebar";
-import MobileNav from "@/components/MobileNav";
 import { AdminGuard } from "@/components/admin/AdminGuard";
+import { AdminLayout } from "@/components/admin/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { 
   Shield, Users, Database, TrendingUp, Activity, 
@@ -170,12 +169,8 @@ const AdminDashboard = () => {
 
   return (
     <AdminGuard requireSuperAdmin={false}>
-      <div className="flex min-h-screen bg-background">
-        <Sidebar />
-        <MobileNav />
-        
-        <main className="flex-1 p-6 lg:ml-64 pb-20 md:pb-6">
-          <div className="max-w-7xl mx-auto space-y-6">
+      <AdminLayout>
+        <div className="space-y-6">
             {/* Header */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -411,9 +406,8 @@ const AdminDashboard = () => {
               </TabsContent>
             </Tabs>
           </div>
-        </main>
-      </div>
-    </AdminGuard>
+        </AdminLayout>
+      </AdminGuard>
   );
 };
 
