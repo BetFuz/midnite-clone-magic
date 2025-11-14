@@ -47,3 +47,6 @@ verify_jwt = false
 
 [functions.public-matches]
 verify_jwt = false
+
+[functions.diagnostic]
+verify_jwt = false
