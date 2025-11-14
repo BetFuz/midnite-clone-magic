@@ -68,6 +68,19 @@ export const useLeagueMatches = (leagueName: string, daysAhead: number = 7) => {
       }
 
       // Attempt 2: direct table query by league_name
+      const { data: tableData, error: tableErr } = await supabase
+        .from('matches')
+        .select('*')
+        .eq('league_name', leagueName)
+        .gte('commence_time', now.toISOString())
+        .lte('commence_time', futureDate.toISOString())
+        .order('commence_time', { ascending: true });
+      if (tableErr) {
+        console.warn('useLeagueMatches: table query error (will fallback)', tableErr);
+      } else if (tableData && tableData.length > 0) {
+        console.info('useLeagueMatches: table result', { leagueName, count: tableData.length });
+        return tableData as Match[];
+      }
 
       // Fallback: call public-matches edge function (supports both league_name and days)
       console.info('useLeagueMatches: fallback to function', { leagueName, daysAhead });
