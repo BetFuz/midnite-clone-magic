@@ -15,7 +15,7 @@ export const AdminGuard = ({ children, requireSuperAdmin = false }: AdminGuardPr
 
   useEffect(() => {
     if (!loading && !user) {
-      navigate("/auth", { replace: true });
+      navigate("/admin/auth", { replace: true });
     }
   }, [loading, user, navigate]);
 
