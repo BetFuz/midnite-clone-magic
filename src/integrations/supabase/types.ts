@@ -1033,25 +1033,31 @@ export type Database = {
       }
       sports_leagues: {
         Row: {
+          confederation: string | null
           created_at: string | null
           id: string
           leagues: Json
+          region: string | null
           sport_key: string
           sport_title: string
           updated_at: string | null
         }
         Insert: {
+          confederation?: string | null
           created_at?: string | null
           id?: string
           leagues?: Json
+          region?: string | null
           sport_key: string
           sport_title: string
           updated_at?: string | null
         }
         Update: {
+          confederation?: string | null
           created_at?: string | null
           id?: string
           leagues?: Json
+          region?: string | null
           sport_key?: string
           sport_title?: string
           updated_at?: string | null
