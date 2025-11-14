@@ -1,11 +1,11 @@
+import { AdminLayout } from "@/components/admin/AdminLayout";
+import { AdminGuard } from "@/components/admin/AdminGuard";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { RefreshCw, Database, AlertCircle, CheckCircle2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import Header from "@/components/Header";
-import Sidebar from "@/components/Sidebar";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const DataManagement = () => {
@@ -48,57 +48,54 @@ const DataManagement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <div className="flex">
-        <Sidebar />
-        <main className="flex-1 p-6 overflow-y-auto h-[calc(100vh-4rem)]">
-          <div className="max-w-4xl mx-auto space-y-6">
-            <div>
-              <h1 className="text-3xl font-bold mb-2">Data Management</h1>
-              <p className="text-muted-foreground">
-                Update live match data and odds from external APIs
-              </p>
-            </div>
+    <AdminGuard>
+      <AdminLayout>
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Data Management</h1>
+            <p className="text-muted-foreground">
+              Update live match data and odds from external APIs
+            </p>
+          </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Database className="h-5 w-5" />
-                  Football Matches & Odds
-                </CardTitle>
-                <CardDescription>
-                  Fetch latest fixtures and odds for Premier League, La Liga, Bundesliga, 
-                  Serie A, Ligue 1, and Champions League from The Odds API
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Alert>
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>
-                    Each refresh uses API credits. The Odds API provides 500 free requests per month.
-                    This operation fetches 6 major leagues.
-                  </AlertDescription>
-                </Alert>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Database className="h-5 w-5" />
+                Football Matches & Odds
+              </CardTitle>
+              <CardDescription>
+                Fetch latest fixtures and odds for Premier League, La Liga, Bundesliga, 
+                Serie A, Ligue 1, and Champions League from The Odds API
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  Each refresh uses API credits. The Odds API provides 500 free requests per month.
+                  This operation fetches 6 major leagues.
+                </AlertDescription>
+              </Alert>
 
-                <Button 
-                  onClick={refreshFootballMatches} 
-                  disabled={loading}
-                  className="w-full"
-                  size="lg"
-                >
-                  {loading ? (
-                    <>
-                      <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                      Fetching Live Data...
-                    </>
-                  ) : (
-                    <>
-                      <RefreshCw className="mr-2 h-4 w-4" />
-                      Refresh Football Matches
-                    </>
-                  )}
-                </Button>
+              <Button 
+                onClick={refreshFootballMatches} 
+                disabled={loading}
+                className="w-full"
+                size="lg"
+              >
+                {loading ? (
+                  <>
+                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                    Fetching Live Data...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    Refresh Football Matches
+                  </>
+                )}
+              </Button>
 
                 {result && (
                   <Card className={result.error ? "border-destructive" : "border-green-500"}>
@@ -225,11 +222,10 @@ const DataManagement = () => {
                 <p>• The Odds API provides high-quality, reliable sports data</p>
                 <p>• Set up automated refreshes using cron jobs or scheduled functions</p>
               </CardContent>
-            </Card>
-          </div>
-        </main>
-      </div>
-    </div>
+          </Card>
+        </div>
+      </AdminLayout>
+    </AdminGuard>
   );
 };
 

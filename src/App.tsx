@@ -119,6 +119,9 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminSetup from "./pages/admin/AdminSetup";
 import SeedData from "./pages/admin/SeedData";
 import DataManagement from "./pages/admin/DataManagement";
+import Users from "./pages/admin/Users";
+import Bets from "./pages/admin/Bets";
+import Finances from "./pages/admin/Finances";
 
 import MobileBetSlip from "./components/MobileBetSlip";
 import { BottomNav } from "./components/mobile/BottomNav";
@@ -296,9 +299,12 @@ const App = () => (
           {/* Admin */}
           <Route path="/admin/setup" element={<AdminSetup />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/users" element={<Users />} />
+          <Route path="/admin/bets" element={<Bets />} />
+          <Route path="/admin/finances" element={<Finances />} />
+          <Route path="/admin/data" element={<DataManagement />} />
           <Route path="/admin/webhooks" element={<WebhookSettings />} />
           <Route path="/admin/seed" element={<SeedData />} />
-          <Route path="/admin/data" element={<DataManagement />} />
           
           {/* Match & Live Tables */}
           <Route path="/match/:id" element={<MatchDetail />} />
