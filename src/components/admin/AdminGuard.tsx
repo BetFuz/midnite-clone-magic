@@ -15,18 +15,15 @@ export const AdminGuard = ({ children, requireSuperAdmin = false }: AdminGuardPr
 
   useEffect(() => {
     if (!loading && !user) {
-      // Redirect to auth page if not logged in
       navigate("/auth", { replace: true });
     }
   }, [loading, user, navigate]);
 
+  // Show minimal loading without blocking
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
-        <div className="text-center space-y-4">
-          <Shield className="w-16 h-16 mx-auto animate-pulse text-primary" />
-          <p className="text-muted-foreground">Verifying admin credentials...</p>
-        </div>
+        <Shield className="w-8 h-8 animate-pulse text-primary" />
       </div>
     );
   }
