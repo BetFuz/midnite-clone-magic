@@ -117,6 +117,7 @@ import FAQ from "./pages/info/FAQ";
 import WebhookSettings from "./pages/admin/WebhookSettings";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminSetup from "./pages/admin/AdminSetup";
+import SeedData from "./pages/admin/SeedData";
 
 import MobileBetSlip from "./components/MobileBetSlip";
 import { BottomNav } from "./components/mobile/BottomNav";
@@ -295,6 +296,7 @@ const App = () => (
           <Route path="/admin/setup" element={<AdminSetup />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/webhooks" element={<WebhookSettings />} />
+          <Route path="/admin/seed" element={<SeedData />} />
           
           {/* Match & Live Tables */}
           <Route path="/match/:id" element={<MatchDetail />} />
