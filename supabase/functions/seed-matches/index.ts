@@ -31,7 +31,7 @@ const leagues = [
   { sport_key: 'tennis_wimbledon', sport_title: 'Wimbledon', confederation: null, region: 'England', leagues: [{ name: 'Wimbledon', country: 'England' }] },
 ];
 
-// Generate sample matches for the next 14 days
+// Generate sample matches for the next 20 days
 function generateSampleMatches() {
   interface Match {
     match_id: string;
@@ -50,43 +50,58 @@ function generateSampleMatches() {
   const matches: Match[] = [];
   const now = new Date();
   
-  // Football teams by league
+  // Football teams by league - expanded for more matches
   const teams: Record<string, string[][]> = {
     'Premier League': [
       ['Manchester City', 'Liverpool'], ['Arsenal', 'Chelsea'], ['Manchester United', 'Tottenham'],
-      ['Newcastle', 'Brighton'], ['Aston Villa', 'West Ham'], ['Brentford', 'Fulham']
+      ['Newcastle', 'Brighton'], ['Aston Villa', 'West Ham'], ['Brentford', 'Fulham'],
+      ['Crystal Palace', 'Wolves'], ['Nottingham Forest', 'Everton'], ['Bournemouth', 'Luton Town'],
+      ['Sheffield United', 'Burnley']
     ],
     'La Liga': [
       ['Real Madrid', 'Barcelona'], ['Atletico Madrid', 'Sevilla'], ['Real Sociedad', 'Athletic Bilbao'],
-      ['Valencia', 'Villarreal'], ['Real Betis', 'Girona'], ['Osasuna', 'Rayo Vallecano']
+      ['Valencia', 'Villarreal'], ['Real Betis', 'Girona'], ['Osasuna', 'Rayo Vallecano'],
+      ['Getafe', 'Alaves'], ['Celta Vigo', 'Las Palmas'], ['Cadiz', 'Granada'],
+      ['Mallorca', 'Almeria']
     ],
     'Bundesliga': [
       ['Bayern Munich', 'Borussia Dortmund'], ['RB Leipzig', 'Bayer Leverkusen'], ['Union Berlin', 'Freiburg'],
-      ['Eintracht Frankfurt', 'Wolfsburg'], ['Hoffenheim', 'Borussia M\'gladbach'], ['Stuttgart', 'Mainz']
+      ['Eintracht Frankfurt', 'Wolfsburg'], ['Hoffenheim', 'Borussia M\'gladbach'], ['Stuttgart', 'Mainz'],
+      ['Augsburg', 'Werder Bremen'], ['Bochum', 'Heidenheim'], ['Cologne', 'Darmstadt'],
+      ['Bayer Leverkusen', 'Union Berlin']
     ],
     'Serie A': [
       ['Inter Milan', 'AC Milan'], ['Juventus', 'Napoli'], ['Roma', 'Lazio'],
-      ['Atalanta', 'Fiorentina'], ['Bologna', 'Torino'], ['Sassuolo', 'Udinese']
+      ['Atalanta', 'Fiorentina'], ['Bologna', 'Torino'], ['Sassuolo', 'Udinese'],
+      ['Monza', 'Verona'], ['Empoli', 'Lecce'], ['Cagliari', 'Frosinone'],
+      ['Genoa', 'Salernitana']
     ],
     'Ligue 1': [
       ['PSG', 'Marseille'], ['Monaco', 'Lyon'], ['Lille', 'Nice'],
-      ['Rennes', 'Lens'], ['Toulouse', 'Montpellier'], ['Strasbourg', 'Nantes']
+      ['Rennes', 'Lens'], ['Toulouse', 'Montpellier'], ['Strasbourg', 'Nantes'],
+      ['Reims', 'Brest'], ['Le Havre', 'Lorient'], ['Metz', 'Clermont'],
+      ['Monaco', 'Lille']
     ],
     'NBA': [
       ['Lakers', 'Warriors'], ['Celtics', 'Heat'], ['Bucks', '76ers'],
-      ['Nuggets', 'Suns'], ['Mavericks', 'Clippers'], ['Nets', 'Knicks']
+      ['Nuggets', 'Suns'], ['Mavericks', 'Clippers'], ['Nets', 'Knicks'],
+      ['Grizzlies', 'Pelicans'], ['Kings', 'Timberwolves'], ['Hawks', 'Cavaliers'],
+      ['Raptors', 'Bulls']
     ],
     'EuroLeague': [
       ['Real Madrid', 'Barcelona'], ['Olympiacos', 'Panathinaikos'], ['Bayern Munich', 'Fenerbahce'],
-      ['Maccabi Tel Aviv', 'Zalgiris Kaunas'], ['CSKA Moscow', 'Anadolu Efes']
+      ['Maccabi Tel Aviv', 'Zalgiris Kaunas'], ['CSKA Moscow', 'Anadolu Efes'],
+      ['Partizan', 'Virtus Bologna'], ['Monaco', 'Baskonia'], ['Alba Berlin', 'Red Star']
     ],
     'ATP Masters 1000': [
       ['Djokovic', 'Alcaraz'], ['Sinner', 'Medvedev'], ['Rune', 'Tsitsipas'],
-      ['Zverev', 'Rublev'], ['Fritz', 'Ruud'], ['Hurkacz', 'Dimitrov']
+      ['Zverev', 'Rublev'], ['Fritz', 'Ruud'], ['Hurkacz', 'Dimitrov'],
+      ['De Minaur', 'Paul'], ['Shelton', 'Tiafoe']
     ],
     'Wimbledon': [
       ['Djokovic', 'Sinner'], ['Alcaraz', 'Medvedev'], ['Swiatek', 'Sabalenka'],
-      ['Rybakina', 'Gauff'], ['Pegula', 'Rybakina']
+      ['Rybakina', 'Gauff'], ['Pegula', 'Rybakina'], ['Vondrousova', 'Jabeur'],
+      ['Coco Gauff', 'Ons Jabeur']
     ]
   };
 
@@ -94,9 +109,9 @@ function generateSampleMatches() {
     const leagueName = league.leagues[0].name;
     const leagueTeams = teams[leagueName] || [];
     
-    // Generate 6-8 matches per league over 14 days
+    // Generate 10+ matches per league over 20 days to ensure 15+ days coverage
     leagueTeams.forEach((teamPair: string[], idx: number) => {
-      const daysOffset = Math.floor(idx * 2.5); // Spread matches across 14 days
+      const daysOffset = Math.floor(idx * 2); // Spread matches across 20 days
       const matchDate = new Date(now);
       matchDate.setDate(matchDate.getDate() + daysOffset);
       matchDate.setHours(15 + (idx % 6), 0, 0, 0); // Stagger times
