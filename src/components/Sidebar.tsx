@@ -1,6 +1,7 @@
 import { Home, Trophy, CircleDot, Flame, Hammer, Target, TrendingUp, Dumbbell, Volleyball, Table2, TicketCheck, BarChart3, History, CreditCard, Vote, LayoutGrid, DollarSign, Users, Sparkles, Globe, Bot, ShoppingCart, Brain, Wallet, Glasses, Play, Film, Gamepad2, Shield, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NavLink } from "@/components/NavLink";
+import { useAdminAuth } from "@/hooks/useAdminAuth";
 
 interface SidebarProps {
   className?: string;
@@ -8,6 +9,8 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ className, showOnMobile = false }: SidebarProps) => {
+  const { isAdmin, isSuperAdmin } = useAdminAuth();
+  
   const menuItems = [
     { icon: Home, label: "Home", url: "/" },
     { icon: LayoutGrid, label: "Betting Hub", url: "/betting-hub", badge: "NEW" },
@@ -168,35 +171,46 @@ const Sidebar = ({ className, showOnMobile = false }: SidebarProps) => {
           </div>
         </div>
 
-        <div>
-          <h3 className="px-4 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-            Admin Area
-          </h3>
-          <div className="space-y-1">
-            {adminFeatures.map((item) => (
-              <NavLink
-                key={item.label}
-                to={item.url}
-                className="w-full"
-                activeClassName="bg-sidebar-accent text-sidebar-accent-foreground"
-              >
-                <div
-                  className={cn(
-                    "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-sidebar-foreground hover:bg-sidebar-accent/50"
-                  )}
-                >
-                  <item.icon className="h-5 w-5 text-red-500" />
-                  <span className="flex-1 text-left">{item.label}</span>
-                  {item.badge && (
-                    <span className="px-2 py-0.5 text-xs font-bold bg-red-500 text-white rounded">
-                      {item.badge}
-                    </span>
-                  )}
-                </div>
-              </NavLink>
-            ))}
+        {/* Admin Area - Only show for admins and superadmins */}
+        {isAdmin && (
+          <div>
+            <h3 className="px-4 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Admin Area
+            </h3>
+            <div className="space-y-1">
+              {adminFeatures
+                .filter(item => {
+                  // Show webhook settings only to superadmins
+                  if (item.url === "/admin/webhooks") {
+                    return isSuperAdmin;
+                  }
+                  return true;
+                })
+                .map((item) => (
+                  <NavLink
+                    key={item.label}
+                    to={item.url}
+                    className="w-full"
+                    activeClassName="bg-sidebar-accent text-sidebar-accent-foreground"
+                  >
+                    <div
+                      className={cn(
+                        "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-sidebar-foreground hover:bg-sidebar-accent/50"
+                      )}
+                    >
+                      <item.icon className="h-5 w-5 text-red-500" />
+                      <span className="flex-1 text-left">{item.label}</span>
+                      {item.badge && (
+                        <span className="px-2 py-0.5 text-xs font-bold bg-red-500 text-white rounded">
+                          {item.badge}
+                        </span>
+                      )}
+                    </div>
+                  </NavLink>
+                ))}
+            </div>
           </div>
-        </div>
+        )}
 
         <div>
           <h3 className="px-4 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
