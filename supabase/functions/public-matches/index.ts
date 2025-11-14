@@ -32,7 +32,8 @@ export const handler = async (req: Request): Promise<Response> => {
     const body = req.method === 'POST' ? await req.json().catch(() => ({})) : {};
     const qp = (key: string) => url.searchParams.get(key) ?? body[key];
 
-    const leagueName = qp('league_name') || qp('league') || qp('league_id');
+    const leagueId = qp('league_id') ? parseInt(qp('league_id'), 10) : undefined;
+    const leagueName = qp('league_name') || qp('league');
     const sportKey = qp('sport_key') || undefined;
     const date = qp('date'); // YYYY-MM-DD
     const days = parseInt(qp('days') ?? '14', 10);
@@ -53,15 +54,17 @@ export const handler = async (req: Request): Promise<Response> => {
       end = range.end;
     }
 
-    // Build query
+    // Build query - support both league_id and league_name
     let query = supabase
       .from('matches')
-      .select('id, match_id, league_name, sport_key, sport_title, home_team, away_team, commence_time, status, home_odds, draw_odds, away_odds')
+      .select('id, match_id, league_id, league_name, sport_key, sport_title, home_team, away_team, commence_time, status, home_odds, draw_odds, away_odds')
       .gte('commence_time', start.toISOString())
       .lte('commence_time', end.toISOString())
       .order('commence_time', { ascending: true });
 
-    if (leagueName) {
+    if (leagueId) {
+      query = query.eq('league_id', leagueId);
+    } else if (leagueName) {
       query = query.eq('league_name', leagueName);
     }
     if (sportKey) {
@@ -70,13 +73,14 @@ export const handler = async (req: Request): Promise<Response> => {
 
     const { data, error } = await query;
     if (error) {
-      console.error('public-matches: query error', { error, leagueName, sportKey, start: start.toISOString(), end: end.toISOString() });
+      console.error('public-matches: query error', { error, leagueId, leagueName, sportKey, start: start.toISOString(), end: end.toISOString() });
       return json({ error: error.message }, { status: 500 });
     }
 
     const matches = (data ?? []).map((m) => ({
       id: m.id,
       match_id: m.match_id,
+      league_id: m.league_id,
       league: m.league_name,
       sport_key: m.sport_key,
       home: m.home_team,
