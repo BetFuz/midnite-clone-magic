@@ -41,3 +41,6 @@ verify_jwt = false
 
 [functions.update-all-matches]
 verify_jwt = false
+
+[functions.refresh-football-matches]
+verify_jwt = false
