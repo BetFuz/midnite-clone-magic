@@ -117,14 +117,22 @@ import Contact from "./pages/info/Contact";
 import FAQ from "./pages/info/FAQ";
 
 // Admin
+import AdminAuth from "./pages/admin/AdminAuth";
 import WebhookSettings from "./pages/admin/WebhookSettings";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminSetup from "./pages/admin/AdminSetup";
 import SeedData from "./pages/admin/SeedData";
 import DataManagement from "./pages/admin/DataManagement";
-import Users from "./pages/admin/Users";
-import Bets from "./pages/admin/Bets";
-import Finances from "./pages/admin/Finances";
+import AdminUsers from "./pages/admin/Users";
+import AdminBets from "./pages/admin/Bets";
+import AdminFinances from "./pages/admin/Finances";
+import AdminEvents from "./pages/admin/Events";
+import AdminOdds from "./pages/admin/Odds";
+import AdminKYC from "./pages/admin/KYC";
+import AdminWithdrawals from "./pages/admin/Withdrawals";
+import AdminReports from "./pages/admin/Reports";
+import AdminAuditLog from "./pages/admin/AuditLog";
+import AdminSettings from "./pages/admin/Settings";
 
 import MobileBetSlip from "./components/MobileBetSlip";
 import { BottomNav } from "./components/mobile/BottomNav";
@@ -303,13 +311,23 @@ const App = () => (
           <Route path="/info/faq" element={<FAQ />} />
 
           {/* Admin */}
+          <Route path="/admin/auth" element={<AdminAuth />} />
+          <Route path="/admin/login" element={<AdminAuth />} />
           <Route path="/admin/setup" element={<AdminSetup />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/admin/users" element={<Users />} />
-          <Route path="/admin/bets" element={<Bets />} />
-          <Route path="/admin/finances" element={<Finances />} />
+          <Route path="/admin/events" element={<AdminEvents />} />
+          <Route path="/admin/odds" element={<AdminOdds />} />
+          <Route path="/admin/users" element={<AdminUsers />} />
+          <Route path="/admin/bets" element={<AdminBets />} />
+          <Route path="/admin/finances" element={<AdminFinances />} />
+          <Route path="/admin/kyc" element={<AdminKYC />} />
+          <Route path="/admin/withdrawals" element={<AdminWithdrawals />} />
+          <Route path="/admin/reports" element={<AdminReports />} />
           <Route path="/admin/data" element={<DataManagement />} />
           <Route path="/admin/webhooks" element={<WebhookSettings />} />
+          <Route path="/admin/audit" element={<AdminAuditLog />} />
+          <Route path="/admin/audit-log" element={<AdminAuditLog />} />
+          <Route path="/admin/settings" element={<AdminSettings />} />
           <Route path="/admin/seed" element={<SeedData />} />
           
           {/* Match & Live Tables */}
