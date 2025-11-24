@@ -50,3 +50,9 @@ verify_jwt = false
 
 [functions.diagnostic]
 verify_jwt = false
+
+[functions.settlement]
+verify_jwt = false
+
+[functions.payment-webhook]
+verify_jwt = false
