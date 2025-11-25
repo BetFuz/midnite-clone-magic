@@ -3,11 +3,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 export interface RealtimeNotification {
+  id?: string;
   type: string;
   title: string;
   message: string;
   extra?: any;
   timestamp: string;
+  read?: boolean;
 }
 
 export const useRealtimeNotifications = (userId?: string) => {
@@ -81,11 +83,13 @@ export const useRealtimeNotifications = (userId?: string) => {
           if (payload.new) {
             const dbNotification = payload.new as any;
             setNotifications(prev => [...prev, {
+              id: dbNotification.id,
               type: dbNotification.notification_type,
               title: dbNotification.title,
               message: dbNotification.message,
               extra: dbNotification.data,
-              timestamp: dbNotification.created_at
+              timestamp: dbNotification.created_at,
+              read: dbNotification.read
             }]);
             if (!dbNotification.read) {
               setUnreadCount(prev => prev + 1);
@@ -138,9 +142,37 @@ export const useRealtimeNotifications = (userId?: string) => {
     };
   }, [toast]);
 
+  const markAsRead = async (notificationIds: string[]) => {
+    try {
+      const { error } = await supabase.functions.invoke('mark-notifications-read', {
+        body: { notificationIds }
+      });
+
+      if (error) throw error;
+
+      // Update local state
+      setNotifications(prev => 
+        prev.map(notif => 
+          notif.id && notificationIds.includes(notif.id) 
+            ? { ...notif, read: true } 
+            : notif
+        )
+      );
+
+      // Update unread count
+      setUnreadCount(prev => Math.max(0, prev - notificationIds.length));
+
+      return { error: null };
+    } catch (error: any) {
+      console.error('Error marking notifications as read:', error);
+      return { error };
+    }
+  };
+
   return {
     notifications,
     unreadCount,
-    isConnected
+    isConnected,
+    markAsRead
   };
 };
