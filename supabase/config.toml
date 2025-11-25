@@ -56,3 +56,18 @@ verify_jwt = false
 
 [functions.payment-webhook]
 verify_jwt = false
+
+[functions.create-bet]
+verify_jwt = true
+
+[functions.list-bets]
+verify_jwt = true
+
+[functions.deposit]
+verify_jwt = true
+
+[functions.withdraw]
+verify_jwt = true
+
+[functions.mark-notifications-read]
+verify_jwt = true
