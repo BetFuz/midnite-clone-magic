@@ -1,7 +1,25 @@
 project_id = "aacjfdrctnmnenebzdxg"
 
-[functions.bet-recommendations]
-verify_jwt = false
+[functions.admin-api-gateway]
+verify_jwt = true
+
+[functions.admin-audit-logs]
+verify_jwt = true
+
+[functions.admin-bet-settlement]
+verify_jwt = true
+
+[functions.admin-financial-reports]
+verify_jwt = true
+
+[functions.admin-realtime-analytics]
+verify_jwt = true
+
+[functions.admin-user-management]
+verify_jwt = true
+
+[functions.admin-webhook-settings]
+verify_jwt = true
 
 [functions.ai-betting-chat]
 verify_jwt = true
@@ -9,65 +27,59 @@ verify_jwt = true
 [functions.ai-predictions]
 verify_jwt = false
 
-[functions.voice-betting-token]
-verify_jwt = true
-
-[functions.admin-webhook-settings]
-verify_jwt = true
-
-[functions.admin-audit-logs]
-verify_jwt = true
-
-[functions.admin-api-gateway]
-verify_jwt = true
-
-[functions.n8n-webhook-receiver]
-verify_jwt = false
-
-[functions.update-leagues]
-verify_jwt = false
-
-[functions.marketing-post]
-verify_jwt = false
-
-[functions.user-registration-webhook]
-verify_jwt = false
-
-[functions.update-matches]
-verify_jwt = false
-
-[functions.seed-matches]
-verify_jwt = false
-
-[functions.update-all-matches]
-verify_jwt = false
-
-[functions.refresh-football-matches]
-verify_jwt = false
-
-[functions.public-matches]
-verify_jwt = false
-
-[functions.diagnostic]
-verify_jwt = false
-
-[functions.settlement]
-verify_jwt = false
-
-[functions.payment-webhook]
+[functions.bet-recommendations]
 verify_jwt = false
 
 [functions.create-bet]
 verify_jwt = true
 
-[functions.list-bets]
-verify_jwt = true
-
 [functions.deposit]
 verify_jwt = true
 
-[functions.withdraw]
+[functions.diagnostic]
+verify_jwt = false
+
+[functions.list-bets]
 verify_jwt = true
 
 [functions.mark-notifications-read]
+verify_jwt = true
+
+[functions.marketing-post]
+verify_jwt = false
+
+[functions.n8n-webhook-receiver]
+verify_jwt = false
+
+[functions.payment-webhook]
+verify_jwt = false
+
+[functions.public-matches]
+verify_jwt = false
+
+[functions.refresh-football-matches]
+verify_jwt = false
+
+[functions.seed-matches]
+verify_jwt = false
+
+[functions.settlement]
+verify_jwt = false
+
+[functions.update-all-matches]
+verify_jwt = false
+
+[functions.update-leagues]
+verify_jwt = false
+
+[functions.update-matches]
+verify_jwt = false
+
+[functions.user-registration-webhook]
+verify_jwt = false
+
+[functions.voice-betting-token]
+verify_jwt = true
+
+[functions.withdraw]
 verify_jwt = true
