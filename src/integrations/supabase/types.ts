@@ -122,6 +122,39 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_opponents: {
+        Row: {
+          created_at: string | null
+          difficulty: string
+          game_type: string
+          id: string
+          name: string
+          strategy_profile: Json
+          total_games: number | null
+          win_rate: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          difficulty: string
+          game_type: string
+          id?: string
+          name: string
+          strategy_profile?: Json
+          total_games?: number | null
+          win_rate?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          difficulty?: string
+          game_type?: string
+          id?: string
+          name?: string
+          strategy_profile?: Json
+          total_games?: number | null
+          win_rate?: number | null
+        }
+        Relationships: []
+      }
       ai_predictions: {
         Row: {
           away_team: string
@@ -441,6 +474,154 @@ export type Database = {
             columns: ["league_id"]
             isOneToOne: false
             referencedRelation: "fantasy_leagues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      game_bets: {
+        Row: {
+          bet_type: string
+          bet_value: string
+          created_at: string | null
+          id: string
+          odds: number
+          potential_win: number
+          session_id: string
+          settled_at: string | null
+          stake_amount: number
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          bet_type: string
+          bet_value: string
+          created_at?: string | null
+          id?: string
+          odds: number
+          potential_win: number
+          session_id: string
+          settled_at?: string | null
+          stake_amount: number
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          bet_type?: string
+          bet_value?: string
+          created_at?: string | null
+          id?: string
+          odds?: number
+          potential_win?: number
+          session_id?: string
+          settled_at?: string | null
+          stake_amount?: number
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_bets_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "game_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_bets_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      game_moves: {
+        Row: {
+          id: string
+          move_data: Json
+          move_number: number
+          player: string
+          session_id: string
+          timestamp: string | null
+        }
+        Insert: {
+          id?: string
+          move_data: Json
+          move_number: number
+          player: string
+          session_id: string
+          timestamp?: string | null
+        }
+        Update: {
+          id?: string
+          move_data?: Json
+          move_number?: number
+          player?: string
+          session_id?: string
+          timestamp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_moves_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "game_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      game_sessions: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          current_player: string | null
+          game_state: Json
+          game_type: string
+          id: string
+          mode: string
+          player1_id: string | null
+          player2_id: string | null
+          stake_amount: number | null
+          started_at: string | null
+          status: string | null
+          winner: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          current_player?: string | null
+          game_state?: Json
+          game_type: string
+          id?: string
+          mode: string
+          player1_id?: string | null
+          player2_id?: string | null
+          stake_amount?: number | null
+          started_at?: string | null
+          status?: string | null
+          winner?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          current_player?: string | null
+          game_state?: Json
+          game_type?: string
+          id?: string
+          mode?: string
+          player1_id?: string | null
+          player2_id?: string | null
+          stake_amount?: number | null
+          started_at?: string | null
+          status?: string | null
+          winner?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_sessions_player1_id_fkey"
+            columns: ["player1_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1451,6 +1632,39 @@ export type Database = {
           _user_agent?: string
         }
         Returns: string
+      }
+      settle_game_bets: {
+        Args: { p_session_id: string; p_winner: string }
+        Returns: undefined
+      }
+      update_game_state: {
+        Args: {
+          p_current_player: string
+          p_game_state: Json
+          p_session_id: string
+          p_winner?: string
+        }
+        Returns: {
+          completed_at: string | null
+          created_at: string | null
+          current_player: string | null
+          game_state: Json
+          game_type: string
+          id: string
+          mode: string
+          player1_id: string | null
+          player2_id: string | null
+          stake_amount: number | null
+          started_at: string | null
+          status: string | null
+          winner: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "game_sessions"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
     }
     Enums: {
