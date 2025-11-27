@@ -1,5 +1,5 @@
-// Universal Racing Simulation Engine
-// Handles all racing types with realistic competition dynamics
+// Universal Racing Simulation Engine (Enhanced)
+// Handles all racing types with realistic competition dynamics, overtaking, crashes, and AI strategy
 
 export interface RacerState {
   id: string;
