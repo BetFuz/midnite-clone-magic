@@ -33,6 +33,7 @@ const Sidebar = ({ className, showOnMobile = false }: SidebarProps) => {
     { icon: CircleDot, label: "Games", url: "/games" },
     { icon: Gamepad2, label: "Casino Lobby", url: "/casino-lobby" },
     { icon: Gamepad2, label: "Slots", url: "/casino/slots", badge: "AI" },
+    { icon: Gamepad2, label: "AI Poker", url: "/live-table/poker", badge: "AI" },
     { icon: Target, label: "Live Casino", url: "/live-casino" },
     { icon: Dumbbell, label: "Virtuals", url: "/virtuals" },
     { icon: BarChart3, label: "Analytics", url: "/analytics", badge: "NEW" },
