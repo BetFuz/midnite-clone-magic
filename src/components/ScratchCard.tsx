@@ -114,16 +114,17 @@ export const ScratchCard = ({
   };
 
   return (
-    <div className="relative">
+    <div className="relative animate-fade-in">
       {/* Prize Grid Background */}
       <div className="absolute inset-0 rounded-lg overflow-hidden">
         <div className="grid grid-cols-3 gap-4 p-8 h-full">
           {symbols.map((symbol, idx) => (
             <div
               key={idx}
-              className={`flex items-center justify-center text-6xl bg-gradient-to-br ${color} rounded-lg shadow-lg`}
+              className={`flex items-center justify-center text-6xl bg-gradient-to-br ${color} rounded-lg shadow-2xl hover:scale-105 transition-transform duration-300 animate-scale-in`}
+              style={{ animationDelay: `${idx * 0.1}s` }}
             >
-              {symbol}
+              <span className="drop-shadow-[0_0_10px_rgba(0,0,0,0.5)]">{symbol}</span>
             </div>
           ))}
         </div>
@@ -158,25 +159,25 @@ export const ScratchCard = ({
 
       {/* Result */}
       {isRevealed && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <Card className="bg-background/95 backdrop-blur m-8">
+        <div className="absolute inset-0 flex items-center justify-center animate-bounce-in">
+          <Card className="bg-background/95 backdrop-blur m-8 shadow-2xl border-2 border-primary/50">
             <CardContent className="p-6 text-center space-y-4">
               {prize > 0 ? (
                 <>
-                  <div className="text-6xl">🎉</div>
-                  <h3 className="text-2xl font-bold text-green-500">Winner!</h3>
-                  <p className="text-4xl font-bold text-primary">
+                  <div className="text-6xl animate-bounce">🎉</div>
+                  <h3 className="text-2xl font-bold text-green-500 drop-shadow-lg">Winner!</h3>
+                  <p className="text-4xl font-bold text-primary animate-pulse drop-shadow-[0_0_15px_rgba(139,92,246,0.8)]">
                     ₦{prize.toLocaleString()}
                   </p>
                 </>
               ) : (
                 <>
-                  <div className="text-6xl">😔</div>
+                  <div className="text-6xl animate-scale-in">😔</div>
                   <h3 className="text-2xl font-bold text-muted-foreground">No Prize</h3>
                   <p className="text-sm text-muted-foreground">Better luck next time!</p>
                 </>
               )}
-              <Button onClick={onReset} className="w-full">
+              <Button onClick={onReset} className="w-full hover:scale-105 transition-transform">
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Try Another Card
               </Button>

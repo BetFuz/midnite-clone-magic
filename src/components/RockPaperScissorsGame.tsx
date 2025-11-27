@@ -35,18 +35,18 @@ export const RockPaperScissorsGame = () => {
   const stats = getStats();
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
+    <div className="min-h-screen bg-background p-4 md:p-8 animate-fade-in">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
+        <div className="text-center space-y-2 animate-scale-in">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent drop-shadow-lg">
             AI Rock Paper Scissors
           </h1>
           <p className="text-muted-foreground">Beat the AI's pattern recognition!</p>
         </div>
 
         {/* Balance & Stake */}
-        <Card className="bg-card/50 backdrop-blur">
+        <Card className="bg-card/50 backdrop-blur hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-500">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -78,7 +78,7 @@ export const RockPaperScissorsGame = () => {
           <div className="md:col-span-2 space-y-4">
             {/* AI Profile */}
             {aiProfile && (
-              <Card className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 border-2 border-purple-500/50">
+              <Card className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 border-2 border-purple-500/50 animate-scale-in hover:shadow-2xl hover:shadow-purple-500/30 transition-all duration-500">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Brain className="h-5 w-5 text-purple-500" />
@@ -105,15 +105,15 @@ export const RockPaperScissorsGame = () => {
                 {currentRound ? (
                   <div className="space-y-6">
                     {/* Result Display */}
-                    <div className="grid grid-cols-3 gap-4 items-center">
+                    <div className="grid grid-cols-3 gap-4 items-center animate-scale-in">
                       <div className="text-center space-y-2">
                         <p className="text-sm font-semibold text-muted-foreground">You</p>
-                        <div className="text-8xl">{moves.find(m => m.value === currentRound.playerMove)?.emoji}</div>
+                        <div className="text-8xl animate-bounce-in">{moves.find(m => m.value === currentRound.playerMove)?.emoji}</div>
                         <p className="font-bold">{currentRound.playerMove.toUpperCase()}</p>
                       </div>
 
                       <div className="text-center space-y-2">
-                        <div className={`text-4xl font-bold ${
+                        <div className={`text-4xl font-bold animate-pulse drop-shadow-lg ${
                           currentRound.result === 'win' ? 'text-green-500' :
                           currentRound.result === 'lose' ? 'text-red-500' :
                           'text-yellow-500'
@@ -123,7 +123,7 @@ export const RockPaperScissorsGame = () => {
                            'TIE! 🤝'}
                         </div>
                         {currentRound.winnings > 0 && (
-                          <Badge variant="outline" className="text-lg">
+                          <Badge variant="outline" className="text-lg animate-bounce shadow-lg shadow-green-500/50">
                             +₦{currentRound.winnings.toLocaleString()}
                           </Badge>
                         )}
@@ -131,7 +131,7 @@ export const RockPaperScissorsGame = () => {
 
                       <div className="text-center space-y-2">
                         <p className="text-sm font-semibold text-muted-foreground">AI</p>
-                        <div className="text-8xl">{moves.find(m => m.value === currentRound.aiMove)?.emoji}</div>
+                        <div className="text-8xl animate-bounce-in" style={{ animationDelay: '0.2s' }}>{moves.find(m => m.value === currentRound.aiMove)?.emoji}</div>
                         <p className="font-bold">{currentRound.aiMove.toUpperCase()}</p>
                       </div>
                     </div>
@@ -161,11 +161,12 @@ export const RockPaperScissorsGame = () => {
                     </div>
 
                     <div className="grid grid-cols-3 gap-4">
-                      {moves.map((move) => (
+                      {moves.map((move, idx) => (
                         <Button
                           key={move.value}
                           variant="outline"
-                          className="h-32 flex-col gap-2 hover:scale-105 transition-transform"
+                          className="h-32 flex-col gap-2 hover:scale-110 hover:shadow-2xl hover:shadow-primary/50 transition-all duration-300 animate-scale-in"
+                          style={{ animationDelay: `${idx * 0.1}s` }}
                           onClick={() => playRound(move.value)}
                           disabled={isPlaying || isLoadingAI}
                         >

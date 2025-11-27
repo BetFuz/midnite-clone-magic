@@ -91,38 +91,38 @@ export const CoinFlipGame = () => {
   const winRate = totalFlips > 0 ? ((wins / totalFlips) * 100).toFixed(1) : '0.0';
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
+    <div className="space-y-6 animate-fade-in">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 animate-scale-in">
+        <Card className="hover:shadow-xl hover:shadow-primary/20 transition-all duration-300">
           <CardHeader>
             <CardTitle className="text-sm">Balance</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">₦{balance.toLocaleString()}</p>
+            <p className="text-2xl font-bold text-primary">₦{balance.toLocaleString()}</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="hover:shadow-xl hover:shadow-emerald-500/20 transition-all duration-300">
           <CardHeader>
             <CardTitle className="text-sm">Win Rate</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">{winRate}%</p>
+            <p className="text-2xl font-bold text-emerald-500">{winRate}%</p>
             <p className="text-sm text-muted-foreground">{wins}W / {losses}L</p>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="hover:shadow-xl hover:shadow-yellow-500/20 transition-all duration-300">
           <CardHeader>
             <CardTitle className="text-sm">Total Flips</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">{totalFlips}</p>
+            <p className="text-2xl font-bold text-yellow-500">{totalFlips}</p>
           </CardContent>
         </Card>
       </div>
 
-      <Card>
+      <Card className="hover:shadow-2xl hover:shadow-orange-500/20 transition-all duration-500">
         <CardHeader>
           <CardTitle>Coin Flip</CardTitle>
         </CardHeader>
@@ -132,11 +132,11 @@ export const CoinFlipGame = () => {
               ref={canvasRef}
               width={300}
               height={200}
-              className="border-2 border-border rounded-lg"
+              className="border-2 border-border rounded-lg shadow-2xl hover:shadow-primary/50 transition-all duration-300"
             />
           </div>
 
-          <div className="p-4 bg-muted rounded-lg">
+          <div className="p-4 bg-muted rounded-lg animate-fade-in border border-border/50">
             <p className="text-center text-sm italic">{narrative}</p>
           </div>
 
@@ -158,7 +158,7 @@ export const CoinFlipGame = () => {
                 variant={prediction === 'heads' ? 'default' : 'outline'}
                 onClick={() => setPrediction('heads')}
                 disabled={isFlipping}
-                className="flex-1"
+                className="flex-1 hover:scale-105 hover:shadow-xl hover:shadow-primary/50 transition-all duration-300"
               >
                 🪙 Heads
               </Button>
@@ -166,7 +166,7 @@ export const CoinFlipGame = () => {
                 variant={prediction === 'tails' ? 'default' : 'outline'}
                 onClick={() => setPrediction('tails')}
                 disabled={isFlipping}
-                className="flex-1"
+                className="flex-1 hover:scale-105 hover:shadow-xl hover:shadow-primary/50 transition-all duration-300"
               >
                 🪙 Tails
               </Button>
@@ -176,7 +176,7 @@ export const CoinFlipGame = () => {
               <Button
                 onClick={flipCoin}
                 disabled={isFlipping || !prediction}
-                className="flex-1"
+                className="flex-1 hover:scale-105 hover:shadow-2xl hover:shadow-emerald-500/50 transition-all duration-300"
               >
                 {isFlipping ? 'Flipping...' : 'Flip Coin'}
               </Button>
@@ -184,6 +184,7 @@ export const CoinFlipGame = () => {
                 variant="outline"
                 onClick={reset}
                 disabled={isFlipping}
+                className="hover:scale-105 transition-transform"
               >
                 Reset
               </Button>

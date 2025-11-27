@@ -21,16 +21,16 @@ export const SlotMachine = () => {
   } = useSlotMachine();
 
   return (
-    <Card className={`w-full max-w-4xl mx-auto bg-gradient-to-br ${theme.backgroundColor} p-8 shadow-2xl`}>
+    <Card className={`w-full max-w-4xl mx-auto bg-gradient-to-br ${theme.backgroundColor} p-8 shadow-2xl hover:shadow-purple-500/30 transition-all duration-500 animate-fade-in`}>
       {/* Header */}
-      <div className="text-center mb-6">
-        <h2 className={`text-4xl font-bold ${theme.accentColor} mb-2`}>{theme.name}</h2>
+      <div className="text-center mb-6 animate-scale-in">
+        <h2 className={`text-4xl font-bold ${theme.accentColor} mb-2 drop-shadow-lg`}>{theme.name}</h2>
         <div className="flex justify-center gap-4 text-white">
-          <Badge variant="secondary" className="text-lg px-4 py-2">
+          <Badge variant="secondary" className="text-lg px-4 py-2 hover:scale-105 transition-transform">
             Balance: ₦{balance.toFixed(2)}
           </Badge>
           {totalWin > 0 && (
-            <Badge variant="default" className="text-lg px-4 py-2 bg-green-600 animate-pulse">
+            <Badge variant="default" className="text-lg px-4 py-2 bg-green-600 animate-bounce-in shadow-lg shadow-green-500/50">
               WIN: ₦{totalWin.toFixed(2)}
             </Badge>
           )}
@@ -38,7 +38,7 @@ export const SlotMachine = () => {
       </div>
 
       {/* Slot Reels */}
-      <div className="mb-8 bg-black/30 rounded-xl p-6 backdrop-blur-sm">
+      <div className="mb-8 bg-black/40 rounded-xl p-6 backdrop-blur-sm border border-white/10 shadow-inner">
         <div className="grid grid-cols-3 gap-4">
           {reels.map((reel, reelIndex) => (
             <div key={reelIndex} className="flex flex-col gap-2">
@@ -52,12 +52,14 @@ export const SlotMachine = () => {
                     key={symbolIndex}
                     className={`
                       bg-white rounded-lg p-6 text-6xl flex items-center justify-center
-                      transition-all duration-300 transform
-                      ${isSpinning ? 'animate-pulse scale-95' : 'scale-100'}
-                      ${isWinning ? 'ring-4 ring-yellow-400 shadow-lg shadow-yellow-400/50 animate-bounce' : ''}
+                      transition-all duration-300 transform shadow-lg
+                      ${isSpinning ? 'animate-spin-slow scale-95 opacity-80' : 'scale-100 hover:scale-105'}
+                      ${isWinning ? 'ring-4 ring-yellow-400 shadow-2xl shadow-yellow-400/70 animate-pulse-glow' : ''}
                     `}
                   >
-                    {symbol}
+                    <span className={isWinning ? 'drop-shadow-[0_0_15px_rgba(250,204,21,0.8)]' : ''}>
+                      {symbol}
+                    </span>
                   </div>
                 );
               })}
@@ -67,8 +69,8 @@ export const SlotMachine = () => {
 
         {/* Winning Lines Indicator */}
         {winningLines.length > 0 && !isSpinning && (
-          <div className="mt-4 text-center">
-            <p className="text-yellow-400 font-bold text-xl">
+          <div className="mt-4 text-center animate-bounce-in">
+            <p className="text-yellow-400 font-bold text-2xl drop-shadow-[0_0_10px_rgba(250,204,21,0.8)]">
               🎊 {winningLines.length} Winning Line{winningLines.length > 1 ? 's' : ''} 🎊
             </p>
           </div>
@@ -100,7 +102,7 @@ export const SlotMachine = () => {
             onClick={spin}
             disabled={isSpinning || balance < betAmount}
             size="lg"
-            className="w-full text-xl font-bold bg-green-600 hover:bg-green-700 h-16"
+            className="w-full text-xl font-bold bg-green-600 hover:bg-green-700 hover:shadow-2xl hover:shadow-green-500/50 h-16 transition-all duration-300 hover:scale-105"
           >
             {isSpinning ? (
               <RefreshCw className="h-6 w-6 animate-spin mr-2" />
@@ -115,9 +117,9 @@ export const SlotMachine = () => {
             disabled={isLoadingTheme || isSpinning}
             size="lg"
             variant="secondary"
-            className="w-full text-xl font-bold h-16"
+            className="w-full text-xl font-bold h-16 hover:shadow-2xl hover:shadow-primary/50 transition-all duration-300 hover:scale-105"
           >
-            <Sparkles className="h-6 w-6 mr-2" />
+            <Sparkles className="h-6 w-6 mr-2 animate-pulse" />
             {isLoadingTheme ? 'Generating...' : 'AI Theme'}
           </Button>
         </div>

@@ -40,10 +40,10 @@ const BlackjackGame = () => {
   const dealerTotal = calculateHandValue(dealerHand);
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen bg-background p-6 animate-fade-in">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center animate-scale-in">
           <div>
             <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
               <Sparkles className="h-8 w-8 text-primary" />
@@ -65,7 +65,7 @@ const BlackjackGame = () => {
         </div>
 
         {/* Game Table */}
-        <UICard className="p-8 bg-gradient-to-br from-emerald-950/50 to-background border-2 border-primary/20">
+        <UICard className="p-8 bg-gradient-to-br from-emerald-950/50 to-background border-2 border-primary/20 hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-500">
           {/* Dealer Hand */}
           <div className="mb-12">
             <h2 className="text-xl font-semibold text-foreground mb-4">
@@ -73,13 +73,15 @@ const BlackjackGame = () => {
             </h2>
             <div className="flex gap-3 flex-wrap">
               {dealerHand.map((card, index) => (
-                <div key={index}>
+                <div key={index} className="animate-scale-in" style={{ animationDelay: `${index * 0.1}s` }}>
                   {gameState === 'playing' && index === 1 ? (
-                    <div className="w-16 h-24 rounded-lg border-2 border-primary bg-primary/20 flex items-center justify-center">
-                      <div className="text-4xl">🂠</div>
+                    <div className="w-16 h-24 rounded-lg border-2 border-primary bg-primary/20 flex items-center justify-center hover:scale-105 transition-transform">
+                      <div className="text-4xl animate-pulse">🂠</div>
                     </div>
                   ) : (
-                    <CardDisplay card={card} />
+                    <div className="hover:scale-110 hover:-translate-y-2 transition-all duration-200">
+                      <CardDisplay card={card} />
+                    </div>
                   )}
                 </div>
               ))}
@@ -93,15 +95,17 @@ const BlackjackGame = () => {
             </h2>
             <div className="flex gap-3 flex-wrap mb-4">
               {playerHand.map((card, index) => (
-                <CardDisplay key={index} card={card} />
+                <div key={index} className="animate-scale-in hover:scale-110 hover:-translate-y-2 transition-all duration-200" style={{ animationDelay: `${index * 0.1}s` }}>
+                  <CardDisplay card={card} />
+                </div>
               ))}
             </div>
 
             {/* Strategy Advice */}
             {strategyAdvice && (
-              <div className="mt-4 p-4 bg-primary/10 border border-primary/30 rounded-lg">
+              <div className="mt-4 p-4 bg-primary/10 border border-primary/30 rounded-lg animate-scale-in hover:shadow-lg hover:shadow-primary/20 transition-all duration-300">
                 <div className="flex items-start gap-2">
-                  <Lightbulb className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                  <Lightbulb className="h-5 w-5 text-primary mt-0.5 flex-shrink-0 animate-pulse" />
                   <div>
                     <div className="font-semibold text-foreground mb-1">AI Strategy Advisor</div>
                     <div className="text-sm text-muted-foreground">{strategyAdvice}</div>
@@ -114,9 +118,9 @@ const BlackjackGame = () => {
           {/* Result */}
           {result && (
             <div className={cn(
-              "text-center py-6 mt-6 rounded-lg text-2xl font-bold",
-              result.includes('win') || result.includes('Blackjack') ? 'bg-green-500/20 text-green-400' : 
-              result.includes('Push') ? 'bg-yellow-500/20 text-yellow-400' : 'bg-red-500/20 text-red-400'
+              "text-center py-6 mt-6 rounded-lg text-2xl font-bold animate-bounce-in shadow-2xl",
+              result.includes('win') || result.includes('Blackjack') ? 'bg-green-500/20 text-green-400 shadow-green-500/50' : 
+              result.includes('Push') ? 'bg-yellow-500/20 text-yellow-400 shadow-yellow-500/50' : 'bg-red-500/20 text-red-400 shadow-red-500/50'
             )}>
               {result}
             </div>

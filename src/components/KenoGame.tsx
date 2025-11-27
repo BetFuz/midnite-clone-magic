@@ -28,18 +28,18 @@ export const KenoGame = () => {
   } = useKeno();
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
+    <div className="min-h-screen bg-background p-4 md:p-8 animate-fade-in">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+        <div className="text-center space-y-2 animate-scale-in">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent drop-shadow-lg">
             AI Keno
           </h1>
           <p className="text-muted-foreground">Pick 1-10 numbers and match the draw</p>
         </div>
 
         {/* Balance & Stake */}
-        <Card className="bg-card/50 backdrop-blur">
+        <Card className="bg-card/50 backdrop-blur hover:shadow-2xl hover:shadow-yellow-500/20 transition-all duration-500">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -111,11 +111,11 @@ export const KenoGame = () => {
                         onClick={() => toggleNumber(num)}
                         disabled={isDrawing}
                         className={`
-                          aspect-square rounded-lg font-semibold text-sm transition-all
-                          ${isMatch ? 'bg-green-500 text-white scale-110 shadow-lg' :
-                            isDrawn ? 'bg-blue-500 text-white' :
-                            isSelected ? 'bg-primary text-primary-foreground' :
-                            'bg-muted hover:bg-muted/80'}
+                          aspect-square rounded-lg font-semibold text-sm transition-all duration-300
+                          ${isMatch ? 'bg-green-500 text-white scale-110 shadow-2xl shadow-green-500/70 animate-pulse-glow' :
+                            isDrawn ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/50' :
+                            isSelected ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/50' :
+                            'bg-muted hover:bg-muted/80 hover:scale-105'}
                           disabled:opacity-50
                         `}
                       >
@@ -149,14 +149,14 @@ export const KenoGame = () => {
 
             {/* Results */}
             {drawnNumbers.length === 20 && (
-              <Card className="bg-gradient-to-r from-primary/10 to-accent/10">
+              <Card className="bg-gradient-to-r from-primary/10 to-accent/10 animate-bounce-in shadow-2xl shadow-primary/30">
                 <CardContent className="p-6 text-center">
                   <p className="text-2xl font-bold mb-2">
                     {matchCount} {matchCount === 1 ? 'Match' : 'Matches'}
                   </p>
                   {winAmount > 0 && (
-                    <p className="text-3xl font-bold text-green-500">
-                      Won ₦{winAmount.toLocaleString()}!
+                    <p className="text-3xl font-bold text-green-500 animate-pulse drop-shadow-[0_0_15px_rgba(34,197,94,0.8)]">
+                      Won ₦{winAmount.toLocaleString()}! 🎉
                     </p>
                   )}
                 </CardContent>

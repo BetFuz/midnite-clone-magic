@@ -51,8 +51,8 @@ const BaccaratGame = () => {
   const currentTheme = themes.find(t => t.id === culturalTheme) || themes[0];
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      <UICard className={cn("p-6 bg-gradient-to-br", currentTheme.color, "text-white")}>
+    <div className="max-w-6xl mx-auto space-y-6 animate-fade-in">
+      <UICard className={cn("p-6 bg-gradient-to-br hover:shadow-2xl transition-all duration-500", currentTheme.color, "text-white")}>
         <div className="flex justify-between items-center mb-6">
           <div>
             <h3 className="text-2xl font-bold flex items-center gap-2">
@@ -84,7 +84,7 @@ const BaccaratGame = () => {
         </div>
       </UICard>
 
-      <UICard className="p-6 bg-gradient-to-br from-background to-accent/10">
+      <UICard className="p-6 bg-gradient-to-br from-background to-accent/10 hover:shadow-2xl hover:shadow-red-500/20 transition-all duration-500">
         {/* Playing Area */}
         <div className="grid grid-cols-2 gap-6 mb-6">
           {/* Player Side */}
@@ -94,7 +94,11 @@ const BaccaratGame = () => {
               {playerCards.length === 0 ? (
                 <p className="text-muted-foreground text-sm">Waiting...</p>
               ) : (
-                playerCards.map((card, idx) => <div key={idx}>{renderCard(card)}</div>)
+                playerCards.map((card, idx) => (
+                  <div key={idx} className="animate-scale-in hover:scale-110 hover:-translate-y-2 transition-all duration-200" style={{ animationDelay: `${idx * 0.1}s` }}>
+                    {renderCard(card)}
+                  </div>
+                ))
               )}
             </div>
             {playerCards.length > 0 && (
@@ -109,7 +113,11 @@ const BaccaratGame = () => {
               {bankerCards.length === 0 ? (
                 <p className="text-muted-foreground text-sm">Waiting...</p>
               ) : (
-                bankerCards.map((card, idx) => <div key={idx}>{renderCard(card)}</div>)
+                bankerCards.map((card, idx) => (
+                  <div key={idx} className="animate-scale-in hover:scale-110 hover:-translate-y-2 transition-all duration-200" style={{ animationDelay: `${idx * 0.1}s` }}>
+                    {renderCard(card)}
+                  </div>
+                ))
               )}
             </div>
             {bankerCards.length > 0 && (

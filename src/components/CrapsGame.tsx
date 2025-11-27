@@ -109,18 +109,18 @@ export const CrapsGame = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
+    <div className="min-h-screen bg-background p-4 md:p-8 animate-fade-in">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-green-500 to-emerald-600 bg-clip-text text-transparent">
+        <div className="text-center space-y-2 animate-scale-in">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-green-500 to-emerald-600 bg-clip-text text-transparent drop-shadow-lg">
             AI Craps
           </h1>
           <p className="text-muted-foreground">Roll the dice and test your luck!</p>
         </div>
 
         {/* Balance & Game State */}
-        <Card className="bg-card/50 backdrop-blur">
+        <Card className="bg-card/50 backdrop-blur hover:shadow-2xl hover:shadow-green-500/20 transition-all duration-500">
           <CardContent className="p-6">
             <div className="grid md:grid-cols-3 gap-4">
               <div>
@@ -157,11 +157,11 @@ export const CrapsGame = () => {
 
             {/* Stickman Call */}
             {stickmanCall && (
-              <Card className="bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border-2 border-amber-500">
+              <Card className="bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border-2 border-amber-500 animate-bounce-in shadow-2xl shadow-amber-500/30">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     <Volume2 className="h-6 w-6 text-amber-500 animate-pulse" />
-                    <p className="text-lg font-bold">{stickmanCall}</p>
+                    <p className="text-lg font-bold drop-shadow-lg">{stickmanCall}</p>
                   </div>
                 </CardContent>
               </Card>
