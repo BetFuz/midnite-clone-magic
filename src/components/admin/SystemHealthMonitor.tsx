@@ -96,16 +96,33 @@ export const SystemHealthMonitor = () => {
       
       const responseTime = Date.now() - startTime;
       
-      // Check recent errors
-      const { data: recentErrorLogs, error: errorLogError } = await supabase
+      // Check recent errors from last hour
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+      const { data: recentErrorLogs } = await supabase
         .from('admin_audit_log')
         .select('*')
         .eq('status', 'error')
+        .gte('created_at', oneHourAgo)
         .order('created_at', { ascending: false })
         .limit(5);
 
+      // Get active connections by counting distinct users with activity in last 5 minutes
+      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+      const { data: activeBets } = await supabase
+        .from('bet_slips')
+        .select('user_id')
+        .gte('created_at', fiveMinutesAgo);
+      
+      const activeConnections = new Set(activeBets?.map(bet => bet.user_id) || []).size;
+
+      // Calculate error rate based on total actions vs errors
+      const { count: totalActions } = await supabase
+        .from('admin_audit_log')
+        .select('*', { count: 'exact', head: true })
+        .gte('created_at', oneHourAgo);
+      
       const errorCount = recentErrorLogs?.length || 0;
-      const errorRate = (errorCount / 100) * 100; // Percentage
+      const errorRate = totalActions ? (errorCount / totalActions) * 100 : 0;
 
       // Determine service health
       const dbHealth: 'healthy' | 'warning' | 'critical' = dbError 
@@ -144,7 +161,7 @@ export const SystemHealthMonitor = () => {
         metrics: {
           responseTime,
           errorRate,
-          activeConnections: Math.floor(Math.random() * 100) + 20 // Placeholder for actual connection count
+          activeConnections
         },
         recentErrors: recentErrorLogs?.map(log => ({
           id: log.id,
