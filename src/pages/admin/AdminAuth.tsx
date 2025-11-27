@@ -15,6 +15,7 @@ export default function AdminAuth() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [resetMode, setResetMode] = useState(false);
 
   useEffect(() => {
     // Check if user is already logged in and is admin
@@ -36,6 +37,33 @@ export default function AdminAuth() {
     checkSession();
   }, [navigate]);
 
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/admin/auth`,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Password reset email sent! Check your inbox.",
+      });
+      setResetMode(false);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to send reset email",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -48,35 +76,27 @@ export default function AdminAuth() {
 
       if (authError) throw authError;
 
-      if (authData.user) {
-        // Verify admin role
-        const { data: roleData, error: roleError } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", authData.user.id)
-          .in("role", ["admin", "superadmin"])
-          .maybeSingle();
+      // Check if user has admin role
+      const { data: roleData } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", authData.user.id)
+        .in("role", ["admin", "superadmin"]);
 
-        if (roleError || !roleData) {
-          await supabase.auth.signOut();
-          toast({
-            title: "Access Denied",
-            description: "You do not have admin privileges.",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        toast({
-          title: "Welcome Back",
-          description: "Successfully logged in to admin panel.",
-        });
-        navigate("/admin/dashboard");
+      if (!roleData || roleData.length === 0) {
+        await supabase.auth.signOut();
+        throw new Error("Access denied. Admin privileges required.");
       }
+
+      toast({
+        title: "Success",
+        description: "Welcome back, Admin!",
+      });
+      navigate("/admin/dashboard");
     } catch (error: any) {
       toast({
-        title: "Authentication Failed",
-        description: error.message || "Invalid credentials",
+        title: "Error",
+        description: error.message || "Authentication failed",
         variant: "destructive",
       });
     } finally {
@@ -92,9 +112,14 @@ export default function AdminAuth() {
             <Shield className="w-8 h-8 text-primary" />
           </div>
           <div>
-            <CardTitle className="text-3xl font-bold">Admin Portal</CardTitle>
+            <CardTitle className="text-3xl font-bold">
+              {resetMode ? "Reset Password" : "Admin Portal"}
+            </CardTitle>
             <CardDescription className="text-base mt-2">
-              Secure access for administrators only
+              {resetMode 
+                ? "Enter your email to receive reset instructions"
+                : "Secure access for administrators only"
+              }
             </CardDescription>
           </div>
         </CardHeader>
@@ -107,7 +132,7 @@ export default function AdminAuth() {
             </AlertDescription>
           </Alert>
 
-          <form onSubmit={handleLogin} className="space-y-5">
+          <form onSubmit={resetMode ? handleResetPassword : handleLogin} className="space-y-5">
             <div className="space-y-2">
               <Label htmlFor="admin-email" className="text-sm font-medium">
                 Admin Email
@@ -127,35 +152,49 @@ export default function AdminAuth() {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="admin-password" className="text-sm font-medium">
-                Password
-              </Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="admin-password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="pl-10 pr-10"
-                  disabled={loading}
-                />
+            {!resetMode && (
+              <div className="space-y-2">
+                <Label htmlFor="admin-password" className="text-sm font-medium">
+                  Password
+                </Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="admin-password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="pl-10 pr-10"
+                    disabled={loading}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {!resetMode && (
+              <div className="text-right">
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  onClick={() => setResetMode(true)}
+                  className="text-sm text-primary hover:underline"
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
+                  Forgot password?
                 </button>
               </div>
-            </div>
+            )}
 
             <Button
               type="submit"
@@ -165,15 +204,26 @@ export default function AdminAuth() {
               {loading ? (
                 <>
                   <div className="w-4 h-4 border-2 border-background border-t-transparent rounded-full animate-spin mr-2" />
-                  Authenticating...
+                  {resetMode ? "Sending..." : "Authenticating..."}
                 </>
               ) : (
                 <>
                   <Shield className="mr-2 h-4 w-4" />
-                  Access Admin Panel
+                  {resetMode ? "Send Reset Email" : "Access Admin Panel"}
                 </>
               )}
             </Button>
+
+            {resetMode && (
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full"
+                onClick={() => setResetMode(false)}
+              >
+                Back to Login
+              </Button>
+            )}
           </form>
 
           <div className="mt-6 pt-6 border-t border-border text-center">
