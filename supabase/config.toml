@@ -18,6 +18,9 @@ verify_jwt = true
 [functions.admin-realtime-analytics]
 verify_jwt = true
 
+[functions.admin-security-monitor]
+verify_jwt = true
+
 [functions.admin-user-management]
 verify_jwt = true
 
