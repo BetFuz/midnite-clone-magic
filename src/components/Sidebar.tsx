@@ -42,6 +42,8 @@ const Sidebar = ({ className, showOnMobile = false }: SidebarProps) => {
     { icon: Coins, label: "Coin Flip", url: "/casino/coin-flip", badge: "AI" },
     { icon: Target, label: "Live Casino", url: "/live-casino", badge: "AI" },
     { icon: Trophy, label: "Game Show", url: "/casino/game-show", badge: "AI" },
+    { icon: Target, label: "Bingo", url: "/casino/bingo", badge: "NEW" },
+    { icon: Flame, label: "Burst Games", url: "/casino/burst-games", badge: "HOT" },
     { icon: Dumbbell, label: "Virtuals", url: "/virtuals" },
     { icon: BarChart3, label: "Analytics", url: "/analytics", badge: "NEW" },
   ];

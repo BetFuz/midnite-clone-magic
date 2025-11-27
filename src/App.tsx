@@ -83,6 +83,8 @@ import Craps from "./pages/casino/Craps";
 import RockPaperScissors from "./pages/casino/RockPaperScissors";
 import CoinFlip from "./pages/casino/CoinFlip";
 import GameShow from "./pages/casino/GameShow";
+import Bingo from "./pages/casino/Bingo";
+import BurstGames from "./pages/casino/BurstGames";
 
 // Account
 import Profile from "./pages/account/Profile";
@@ -364,6 +366,8 @@ const App = () => (
           <Route path="/casino/coin-flip" element={<CoinFlip />} />
           <Route path="/live-casino" element={<LiveCasino />} />
           <Route path="/casino/game-show" element={<GameShow />} />
+          <Route path="/casino/bingo" element={<Bingo />} />
+          <Route path="/casino/burst-games" element={<BurstGames />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

@@ -20,10 +20,15 @@ const CasinoLobby = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const categories = [
-    { name: "All Games", count: 120, icon: Grid3x3 },
+    { name: "All Games", count: 150, icon: Grid3x3 },
+    { name: "Hot Games", count: 24, icon: Flame, featured: true },
+    { name: "Betfuz Originals", count: 18, icon: Crown, featured: true },
+    { name: "New Releases", count: 12, icon: Sparkles },
     { name: "Slots", count: 45, icon: Sparkles },
     { name: "Live Casino", count: 24, icon: Users },
     { name: "Table Games", count: 18, icon: Target },
+    { name: "Bingo", count: 8, icon: Target },
+    { name: "Burst Games", count: 4, icon: Zap, featured: true },
     { name: "Jackpots", count: 12, icon: Trophy },
     { name: "African Games", count: 15, icon: Crown },
   ];
@@ -339,11 +344,45 @@ const CasinoLobby = () => {
                 <h3 className="font-bold mb-2">All Slots</h3>
                 <p className="text-sm text-muted-foreground">45 games</p>
               </Card>
-              <Card className="p-6 hover:shadow-lg transition-all cursor-pointer">
-                <Ticket className="h-8 w-8 text-green-500 mb-3" />
-                <h3 className="font-bold mb-2">Lottery</h3>
-                <p className="text-sm text-muted-foreground">Daily draws</p>
+              <Card className="p-6 hover:shadow-lg transition-all cursor-pointer" onClick={() => navigate('/casino/bingo')}>
+                <Target className="h-8 w-8 text-green-500 mb-3" />
+                <h3 className="font-bold mb-2">Bingo</h3>
+                <p className="text-sm text-muted-foreground">8 rooms</p>
+                <Badge className="mt-2 bg-green-500">NEW</Badge>
               </Card>
+            </section>
+
+            {/* Betfuz Originals */}
+            <section>
+              <h2 className="text-2xl font-bold mb-6 flex items-center gap-3">
+                <Crown className="h-6 w-6 text-amber-500" />
+                Betfuz Originals - AI Enhanced
+              </h2>
+              <div className="grid md:grid-cols-4 gap-6">
+                <Card className="overflow-hidden group hover:shadow-2xl transition-all cursor-pointer border-2 border-amber-500/50" onClick={() => navigate('/casino/burst-games')}>
+                  <div className="relative h-48 bg-gradient-to-br from-red-500/20 to-orange-500/20 flex items-center justify-center">
+                    <span className="text-6xl">💥</span>
+                    <Badge className="absolute top-2 right-2 bg-red-500 animate-pulse">
+                      <Flame className="h-3 w-3 mr-1" />
+                      HOT
+                    </Badge>
+                  </div>
+                  <CardContent className="p-4 space-y-3">
+                    <div>
+                      <h3 className="font-bold text-sm mb-1">Burst Games</h3>
+                      <p className="text-xs text-muted-foreground">30-Second Wins</p>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <Badge variant="outline" className="text-xs">RTP 96%</Badge>
+                      <Badge variant="outline" className="gap-1 bg-amber-500/10 text-amber-500 border-amber-500">
+                        <Sparkles className="h-3 w-3" />
+                        AI
+                      </Badge>
+                    </div>
+                    <Button size="sm" className="w-full">Play Now</Button>
+                  </CardContent>
+                </Card>
+              </div>
             </section>
           </div>
         </main>
