@@ -66,6 +66,9 @@ verify_jwt = false
 [functions.live-dealer-voice]
 verify_jwt = false
 
+[functions.ai-game-show]
+verify_jwt = false
+
 [functions.bet-recommendations]
 verify_jwt = false
 
