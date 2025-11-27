@@ -1,56 +1,65 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Header from '@/components/Header';
-import Sidebar from '@/components/Sidebar';
-import BetSlip from '@/components/BetSlip';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Clock, Trophy, MapPin, Play } from 'lucide-react';
-import { useAIImageGeneration } from '@/hooks/useAIImageGeneration';
-import { toast } from 'sonner';
+import Header from "@/components/Header";
+import Sidebar from "@/components/Sidebar";
+import BetSlip from "@/components/BetSlip";
+import { useAIImageGeneration } from "@/hooks/useAIImageGeneration";
+import { useRacingBetting, RaceParticipant } from "@/hooks/useRacingBetting";
+import { Loader2, Trophy, Play } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { useState, useEffect } from "react";
 
 const HorseRacing = () => {
-  const navigate = useNavigate();
-  const { generateImage, generateVideo, isGenerating } = useAIImageGeneration();
-  const [heroImage, setHeroImage] = useState<string | null>(null);
-  const [raceVideo, setRaceVideo] = useState<string | null>(null);
+  const { generateImage, isGenerating } = useAIImageGeneration();
+  const [stakes, setStakes] = useState<Record<string, number>>({});
+  const [heroUrl, setHeroUrl] = useState<string | null>(null);
+
+  const participants: RaceParticipant[] = [
+    { id: '1', name: 'Thunder Strike', odds: 3.2, stats: { wins: 12, races: 45, winRate: '26.7%' } },
+    { id: '2', name: 'Golden Arrow', odds: 4.5, stats: { wins: 8, races: 38, winRate: '21.1%' } },
+    { id: '3', name: 'Desert Wind', odds: 5.8, stats: { wins: 6, races: 32, winRate: '18.8%' } },
+    { id: '4', name: 'Midnight Runner', odds: 7.2, stats: { wins: 5, races: 28, winRate: '17.9%' } },
+    { id: '5', name: 'Silver Bullet', odds: 9.0, stats: { wins: 4, races: 24, winRate: '16.7%' } }
+  ];
+
+  const { raceState, winner, balance, placeBet, startRace, isPlacingBet } = useRacingBetting({
+    raceType: 'Horse Racing',
+    raceId: 'horse-race-001',
+    participants
+  });
 
   useEffect(() => {
-    const loadAssets = async () => {
-      const cachedImage = localStorage.getItem('racing-horse-hero');
-      const cachedVideo = localStorage.getItem('racing-horse-video');
-      
-      if (cachedImage) setHeroImage(cachedImage);
-      else {
-        const img = await generateImage({
-          prompt: 'Epic horse racing scene at Royal Ascot, thoroughbred horses in full gallop, jockeys in colorful silks, dramatic photo finish, photorealistic, 8K quality, golden hour lighting',
-          type: 'hero',
-          style: 'photorealistic'
-        });
-        if (img) {
-          setHeroImage(img);
-          localStorage.setItem('racing-horse-hero', img);
+    const cached = localStorage.getItem('horse-racing-hero');
+    if (cached) {
+      setHeroUrl(cached);
+    } else {
+      generateImage({
+        prompt: 'Epic horse racing scene at Royal Ascot with jockeys in colorful silks racing toward finish line, dramatic lighting, professional photography',
+        type: 'hero',
+        style: 'photorealistic'
+      }).then(url => {
+        if (url) {
+          setHeroUrl(url);
+          localStorage.setItem('horse-racing-hero', url);
         }
-      }
-
-      if (cachedVideo) setRaceVideo(cachedVideo);
-      else {
-        const vid = await generateVideo('Cinematic horse race final stretch, multiple horses neck-and-neck approaching finish line, crowd roaring, dramatic slow motion', 'cinematic');
-        if (vid) {
-          setRaceVideo(vid);
-          localStorage.setItem('racing-horse-video', vid);
-        }
-      }
-    };
-    loadAssets();
+      });
+    }
   }, []);
 
-  const races = [
-    { venue: 'Royal Ascot', time: '14:30', distance: '1m 4f', class: 'Group 1', runners: 12, odds: [3.5, 4.2, 5.5] },
-    { venue: 'Cheltenham', time: '15:10', distance: '2m 3f', class: 'Grade 1', runners: 16, odds: [2.8, 5.0, 6.5] },
-    { venue: 'Kempton Park', time: '16:45', distance: '1m 2f', class: 'Listed', runners: 10, odds: [4.0, 4.5, 7.0] },
-    { venue: 'Newmarket', time: '17:20', distance: '6f', class: 'Group 2', runners: 8, odds: [3.0, 5.5, 8.0] }
-  ];
+  const handleBetClick = (participant: RaceParticipant, betType: 'win' | 'place' | 'show') => {
+    const stake = stakes[participant.id] || 1000;
+    
+    if (raceState === 'pre-race') {
+      placeBet({
+        participantId: participant.id,
+        participantName: participant.name,
+        betType,
+        odds: participant.odds,
+        stake
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -58,63 +67,87 @@ const HorseRacing = () => {
       <div className="flex">
         <Sidebar />
         <main className="flex-1 p-6 overflow-y-auto h-[calc(100vh-4rem)] pb-24 md:pb-6">
-          {/* Hero Section */}
-          <div className="relative h-80 rounded-xl overflow-hidden mb-6">
-            {heroImage ? (
-              <img src={heroImage} alt="Horse Racing" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-r from-primary/20 to-secondary/20 animate-pulse" />
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent flex flex-col justify-end p-8">
-              <h1 className="text-5xl font-bold text-foreground mb-2">🏇 Horse Racing</h1>
-              <p className="text-xl text-muted-foreground">The Sport of Kings - Premium thoroughbred racing</p>
-            </div>
+          <h1 className="text-4xl font-bold mb-2">🏇 Horse Racing</h1>
+          <p className="text-muted-foreground mb-6">The Sport of Kings - Premium Thoroughbred Racing</p>
+
+          <div className="mb-6">
+            {isGenerating ? (
+              <div className="h-[400px] flex items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : heroUrl ? (
+              <img 
+                src={heroUrl} 
+                alt="Horse Racing" 
+                className="w-full h-[400px] object-cover rounded-lg"
+              />
+            ) : null}
           </div>
 
-          {/* Race Video Highlight */}
-          {raceVideo && (
-            <Card className="p-6 mb-6 bg-card border-border">
-              <div className="flex items-center gap-2 mb-4">
-                <Play className="h-5 w-5 text-primary" />
-                <h2 className="text-xl font-bold text-foreground">Today's Feature Race</h2>
-              </div>
-              <video src={raceVideo} controls className="w-full rounded-lg" />
-            </Card>
-          )}
+          <div className="flex items-center justify-between mb-6">
+            <Badge variant={raceState === 'pre-race' ? 'default' : raceState === 'racing' ? 'destructive' : 'secondary'}>
+              {raceState === 'pre-race' ? 'Pre-Race Betting Open' : raceState === 'racing' ? 'Race In Progress' : 'Race Finished'}
+            </Badge>
+            <div className="text-lg font-semibold">Balance: ₦{balance.toLocaleString()}</div>
+            {raceState === 'pre-race' && (
+              <Button onClick={startRace} className="gap-2">
+                <Play className="h-4 w-4" />
+                Start Race
+              </Button>
+            )}
+          </div>
 
-          {/* Upcoming Races */}
-          <h2 className="text-2xl font-bold text-foreground mb-4">Today's Races</h2>
-          <div className="grid gap-4 mb-6">
-            {races.map((race, idx) => (
-              <Card key={idx} className="p-5 bg-card border-border hover:border-primary/50 transition-colors">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
+          <div className="space-y-4">
+            {participants.map((participant) => (
+              <Card key={participant.id} className="p-6 bg-card border-border">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <Trophy className="h-5 w-5 text-primary" />
-                      <h3 className="text-lg font-bold text-foreground">{race.venue}</h3>
-                      <span className="px-2 py-0.5 bg-primary/20 text-primary text-xs font-medium rounded">{race.class}</span>
+                      <h3 className="text-lg font-bold">{participant.name}</h3>
+                      {winner === participant.id && (
+                        <Trophy className="h-5 w-5 text-yellow-500" />
+                      )}
                     </div>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1.5">
-                        <Clock className="h-4 w-4" />
-                        <span>{race.time}</span>
-                      </div>
-                      <span>{race.distance}</span>
-                      <span>{race.runners} runners</span>
+                    <div className="text-sm text-muted-foreground">
+                      {participant.stats.wins} wins in {participant.stats.races} races ({participant.stats.winRate})
                     </div>
                   </div>
+                  <div className="flex items-center gap-4">
+                    <div className="text-center">
+                      <div className="text-sm text-muted-foreground mb-1">Win Odds</div>
+                      <div className="text-2xl font-bold text-primary">{participant.odds.toFixed(2)}</div>
+                    </div>
+                  </div>
+                </div>
+                
+                {raceState === 'pre-race' && (
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline" onClick={() => toast.success(`Viewing ${race.venue} race card`)}>Race Card</Button>
-                    <Button size="sm" onClick={() => toast.success(`Odds: ${race.odds.join(' - ')}`)}>Bet Now</Button>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  {race.odds.map((odd, i) => (
-                    <Button key={i} variant="secondary" size="sm" className="flex-1">
-                      Horse {i + 1} - {odd.toFixed(2)}
+                    <Input
+                      type="number"
+                      placeholder="Stake"
+                      value={stakes[participant.id] || 1000}
+                      onChange={(e) => setStakes({ ...stakes, [participant.id]: Number(e.target.value) })}
+                      className="w-32"
+                      min={100}
+                      step={100}
+                    />
+                    <Button
+                      onClick={() => handleBetClick(participant, 'win')}
+                      disabled={isPlacingBet}
+                      className="flex-1"
+                    >
+                      Bet to Win
                     </Button>
-                  ))}
-                </div>
+                    <Button
+                      onClick={() => handleBetClick(participant, 'place')}
+                      disabled={isPlacingBet}
+                      variant="outline"
+                      className="flex-1"
+                    >
+                      Bet to Place
+                    </Button>
+                  </div>
+                )}
               </Card>
             ))}
           </div>
