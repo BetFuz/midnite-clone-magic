@@ -13,132 +13,141 @@ serve(async (req) => {
   try {
     const { action, prompt, type, style } = await req.json();
     const KIE_AI_API_KEY = Deno.env.get('KIE_AI_API_KEY');
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
-    if (!KIE_AI_API_KEY) {
-      throw new Error('KIE_AI_API_KEY not configured');
-    }
+    console.log('Asset generation request:', { action, type, prompt: prompt?.substring(0, 50) + '...' });
 
-    console.log('kie.ai request:', { action, type, prompt });
+    // Helper function to generate image with Lovable AI (fallback)
+    const generateWithLovableAI = async () => {
+      if (!LOVABLE_API_KEY) {
+        throw new Error('No AI API keys configured');
+      }
 
-    // Generate assets using kie.ai API (Sora 2, Veo 3)
-    if (action === 'generateVideo') {
-      // Use Veo 3 or Sora 2 for video generation
-      const model = type === 'cinematic' ? 'sora-2' : 'veo-3';
+      console.log('Using Lovable AI for image generation...');
       
-      const response = await fetch('https://api.kie.ai/v1/generate', {
+      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${KIE_AI_API_KEY}`,
+          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model,
-          prompt,
-          duration: type === 'win-animation' ? 5 : 10,
-          resolution: '1920x1080',
-          fps: 30,
-          style: style || 'photorealistic'
+          model: 'google/gemini-2.5-flash-image-preview',
+          messages: [{
+            role: 'user',
+            content: prompt
+          }],
+          modalities: ['image', 'text']
         }),
       });
 
       if (!response.ok) {
-        throw new Error(`kie.ai API error: ${response.statusText}`);
+        throw new Error(`Lovable AI error: ${response.statusText}`);
       }
 
       const result = await response.json();
+      const imageData = result.choices?.[0]?.message?.images?.[0]?.image_url?.url;
       
-      return new Response(JSON.stringify({
-        videoUrl: result.video_url,
-        thumbnailUrl: result.thumbnail_url,
-        duration: result.duration,
-        model: model
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
+      if (!imageData) {
+        throw new Error('No image data returned from Lovable AI');
+      }
+
+      return {
+        imageUrl: imageData,
+        prompt: prompt,
+        model: 'lovable-ai-gemini'
+      };
+    };
 
     // Generate static images with premium AI models
     if (action === 'generateImage') {
-      // Model selection based on use case:
-      // - 'flux-1-kontext': Best for photorealistic scenes with context awareness
-      // - 'imagen-4': Google's latest, excellent for sports/action scenes
-      // - 'ideogram-v3': Superior for graphics, logos, and text-in-image
-      // - 'ideogram-character': Best for character/mascot generation
-      // - 'qwen-image-edit': For image editing/enhancement
-      const modelMap: Record<string, string> = {
-        'hero': 'flux-1-kontext',
-        'league': 'ideogram-v3',
-        'team': 'ideogram-v3',
-        'promo': 'imagen-4',
-        'character': 'ideogram-character',
-        'sport': 'flux-1-kontext',
-        'casino': 'flux-1-kontext',
-        'edit': 'qwen-image-edit',
-        'default': 'flux-1-kontext'
-      };
+      // Try kie.ai first if API key is available, fallback to Lovable AI
+      if (KIE_AI_API_KEY) {
+        try {
+          console.log('Attempting kie.ai image generation...');
+          
+          // Correct kie.ai endpoint for Flux Kontext
+          const response = await fetch('https://api.kie.ai/api/v1/flux/kontext/generate', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${KIE_AI_API_KEY}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              prompt: `${prompt}, ultra high quality, 8K resolution, professional photography, cinematic lighting, photorealistic`,
+              aspectRatio: '16:9',
+              model: 'flux-kontext-max', // Use max for best quality
+              callBackUrl: '' // Empty for synchronous mode
+            }),
+          });
 
-      const model = modelMap[type || 'default'] || 'flux-1-kontext';
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.warn('kie.ai failed, falling back to Lovable AI:', response.status, errorText);
+            return new Response(JSON.stringify(await generateWithLovableAI()), {
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            });
+          }
+
+          const result = await response.json();
+          
+          // kie.ai is async, return taskId for polling
+          return new Response(JSON.stringify({
+            taskId: result.data?.taskId,
+            status: 'generating',
+            model: 'flux-kontext-max'
+          }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        } catch (error) {
+          console.warn('kie.ai error, falling back to Lovable AI:', error);
+          return new Response(JSON.stringify(await generateWithLovableAI()), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+      } else {
+        // No kie.ai key, use Lovable AI directly
+        return new Response(JSON.stringify(await generateWithLovableAI()), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
+    // Generate video with kie.ai (Runway)
+    if (action === 'generateVideo') {
+      if (!KIE_AI_API_KEY) {
+        throw new Error('KIE_AI_API_KEY required for video generation');
+      }
+
+      console.log('Generating video with kie.ai Runway API...');
       
-      const response = await fetch('https://api.kie.ai/v1/generate', {
+      const response = await fetch('https://api.kie.ai/api/v1/runway/generate', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${KIE_AI_API_KEY}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model,
-          prompt: `${prompt}, ultra high quality, 8K resolution, professional photography, cinematic lighting, photorealistic`,
-          width: 1920,
-          height: 1080,
-          quality: 'ultra',
-          style: style || 'photorealistic'
+          prompt,
+          aspectRatio: '16:9',
+          imageUrl: '', // Empty for text-to-video
+          callBackUrl: '' // Empty for synchronous mode
         }),
       });
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('kie.ai API error:', response.status, errorText);
+        console.error('kie.ai video error:', response.status, errorText);
         throw new Error(`kie.ai API error: ${response.statusText}`);
       }
 
       const result = await response.json();
       
+      // kie.ai is async, return taskId for polling
       return new Response(JSON.stringify({
-        imageUrl: result.image_url,
-        prompt: result.prompt,
-        model: model
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    // Generate animated slot symbols
-    if (action === 'generateSymbolAnimation') {
-      const response = await fetch('https://api.kie.ai/v1/generate', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${KIE_AI_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'veo-3',
-          prompt: `${prompt}, looping animation, seamless loop, 3D render, casino game symbol`,
-          duration: 3,
-          loop: true,
-          resolution: '512x512',
-          fps: 60
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`kie.ai API error: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      
-      return new Response(JSON.stringify({
-        animationUrl: result.video_url,
-        loop: true
+        taskId: result.data?.taskId,
+        status: 'generating',
+        model: 'runway'
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -147,7 +156,7 @@ serve(async (req) => {
     throw new Error('Invalid action');
 
   } catch (error) {
-    console.error('kie.ai error:', error);
+    console.error('Asset generation error:', error);
     return new Response(JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
