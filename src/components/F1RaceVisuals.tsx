@@ -100,34 +100,85 @@ const F1RaceVisuals = ({ currentLap, totalLaps, drivers, isRacing }: F1RaceVisua
                 transform: 'translateX(-50%)',
               }}
             >
-              {/* Car Body */}
+              {/* F1 Car Shape */}
               <div className="relative">
-                <div 
-                  className="w-12 h-6 rounded-full shadow-lg transform scale-x-150"
-                  style={{
-                    backgroundColor: teamColors[driver.team] || '#6B7280',
-                    boxShadow: `0 0 10px ${teamColors[driver.team] || '#6B7280'}`,
-                  }}
-                >
-                  {/* Car Details */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-2 h-2 bg-white rounded-full opacity-70" />
+                {/* Car Body - F1 Shape */}
+                <div className="relative" style={{ width: '60px', height: '28px' }}>
+                  {/* Front Wing */}
+                  <div 
+                    className="absolute left-0 top-1/2 transform -translate-y-1/2"
+                    style={{
+                      width: '8px',
+                      height: '24px',
+                      backgroundColor: teamColors[driver.team] || '#6B7280',
+                      borderRadius: '2px 0 0 2px',
+                    }}
+                  />
+                  
+                  {/* Main Body */}
+                  <div 
+                    className="absolute left-2 top-1/2 transform -translate-y-1/2 shadow-xl"
+                    style={{
+                      width: '42px',
+                      height: '20px',
+                      backgroundColor: teamColors[driver.team] || '#6B7280',
+                      borderRadius: '8px',
+                      boxShadow: `0 4px 12px ${teamColors[driver.team] || '#6B7280'}`,
+                    }}
+                  >
+                    {/* Cockpit */}
+                    <div 
+                      className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-slate-900/50 rounded"
+                      style={{ width: '12px', height: '10px' }}
+                    />
+                    
+                    {/* Driver Number */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-[8px] font-bold text-white">
+                        {parseInt(driver.id)}
+                      </span>
+                    </div>
                   </div>
+                  
+                  {/* Rear Wing */}
+                  <div 
+                    className="absolute right-0 top-1/2 transform -translate-y-1/2"
+                    style={{
+                      width: '6px',
+                      height: '18px',
+                      backgroundColor: teamColors[driver.team] || '#6B7280',
+                      borderRadius: '0 3px 3px 0',
+                    }}
+                  />
+                  
+                  {/* Wheels */}
+                  <div className="absolute top-1 left-3 w-2 h-2 bg-slate-900 rounded-full border border-slate-700" />
+                  <div className="absolute top-1 right-8 w-2 h-2 bg-slate-900 rounded-full border border-slate-700" />
+                  <div className="absolute bottom-1 left-3 w-2 h-2 bg-slate-900 rounded-full border border-slate-700" />
+                  <div className="absolute bottom-1 right-8 w-2 h-2 bg-slate-900 rounded-full border border-slate-700" />
                 </div>
                 
                 {/* Driver Name Tag */}
-                <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
-                  <span className="text-xs font-bold text-white bg-black/70 px-2 py-1 rounded">
+                <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
+                  <span className="text-xs font-bold text-white bg-black/80 px-2 py-1 rounded shadow-lg">
                     {driver.name.split(' ')[1] || driver.name}
                   </span>
                 </div>
 
-                {/* Speed Lines */}
+                {/* Speed Lines & Exhaust */}
                 {isRacing && (
-                  <div className="absolute right-full top-1/2 transform -translate-y-1/2 flex gap-1 mr-2">
-                    <div className="w-2 h-0.5 bg-white/50 animate-pulse" />
-                    <div className="w-1 h-0.5 bg-white/30 animate-pulse delay-75" />
-                  </div>
+                  <>
+                    <div className="absolute right-full top-1/2 transform -translate-y-1/2 flex gap-1 mr-2">
+                      <div className="w-3 h-0.5 bg-white/60 animate-pulse" />
+                      <div className="w-2 h-0.5 bg-white/40 animate-pulse" style={{ animationDelay: '100ms' }} />
+                      <div className="w-1 h-0.5 bg-white/20 animate-pulse" style={{ animationDelay: '200ms' }} />
+                    </div>
+                    {/* Exhaust flames */}
+                    <div className="absolute right-0 top-1/2 transform translate-x-1 -translate-y-1/2 flex gap-0.5">
+                      <div className="w-1 h-1 bg-orange-500/70 rounded-full animate-pulse" />
+                      <div className="w-0.5 h-0.5 bg-yellow-400/60 rounded-full animate-pulse" style={{ animationDelay: '150ms' }} />
+                    </div>
+                  </>
                 )}
               </div>
             </div>
