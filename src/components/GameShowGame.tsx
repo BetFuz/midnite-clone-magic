@@ -28,10 +28,10 @@ export const GameShowGame = () => {
   }, []);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       {/* Show Host Section */}
       {showHost && (
-        <Card className="p-6 bg-gradient-to-r from-primary/20 to-secondary/20 border-primary/30">
+        <Card className="p-6 bg-gradient-to-r from-primary/20 to-secondary/20 border-primary/30 animate-scale-in hover:shadow-2xl hover:shadow-primary/30 transition-all duration-500">
           <div className="flex items-start gap-4">
             <div className="w-16 h-16 bg-primary/30 rounded-full flex items-center justify-center">
               <Mic className="w-8 h-8 text-primary" />
@@ -46,19 +46,19 @@ export const GameShowGame = () => {
       )}
 
       {/* Jackpot Display */}
-      <Card className="p-6 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border-amber-500/50">
+      <Card className="p-6 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border-amber-500/50 animate-pulse-glow hover:shadow-2xl shadow-amber-500/30 transition-all duration-500">
         <div className="text-center">
-          <Trophy className="w-12 h-12 mx-auto mb-2 text-amber-500" />
-          <h3 className="text-2xl font-bold mb-1">MEGA JACKPOT</h3>
-          <p className="text-4xl font-bold text-amber-500">₦{jackpotAmount.toLocaleString()}</p>
+          <Trophy className="w-12 h-12 mx-auto mb-2 text-amber-500 animate-bounce" />
+          <h3 className="text-2xl font-bold mb-1 drop-shadow-lg">MEGA JACKPOT</h3>
+          <p className="text-4xl font-bold text-amber-500 animate-pulse drop-shadow-[0_0_15px_rgba(245,158,11,0.8)]">₦{jackpotAmount.toLocaleString()}</p>
           <p className="text-sm text-muted-foreground mt-2">1% of every spin contributes to the jackpot!</p>
         </div>
       </Card>
 
       {/* Prize Wheel */}
-      <Card className="p-8 bg-gradient-to-br from-background to-secondary/10">
+      <Card className="p-8 bg-gradient-to-br from-background to-secondary/10 hover:shadow-2xl hover:shadow-yellow-500/20 transition-all duration-500">
         <div className="relative">
-          <div className={`w-full aspect-square max-w-md mx-auto rounded-full border-8 border-primary relative overflow-hidden ${isSpinning ? 'animate-spin' : ''}`}
+          <div className={`w-full aspect-square max-w-md mx-auto rounded-full border-8 border-primary relative overflow-hidden shadow-2xl transition-all duration-300 ${isSpinning ? 'animate-spin-slow shadow-primary/70' : ''}`}
                style={{ animationDuration: isSpinning ? '0.5s' : '0s' }}>
             {prizes.map((prize, index) => {
               const angle = (360 / prizes.length) * index;
@@ -95,13 +95,13 @@ export const GameShowGame = () => {
 
           {/* Result Display */}
           {selectedPrize && !isSpinning && (
-            <div className="absolute inset-0 flex items-center justify-center z-30">
-              <Card className="p-6 bg-background/95 backdrop-blur border-primary">
+            <div className="absolute inset-0 flex items-center justify-center z-30 animate-bounce-in">
+              <Card className="p-6 bg-background/95 backdrop-blur border-primary shadow-2xl shadow-primary/50">
                 <div className="text-center">
-                  <Sparkles className="w-12 h-12 mx-auto mb-2 text-primary" />
-                  <h3 className="text-2xl font-bold mb-2">{selectedPrize.name}</h3>
+                  <Sparkles className="w-12 h-12 mx-auto mb-2 text-primary animate-pulse" />
+                  <h3 className="text-2xl font-bold mb-2 drop-shadow-lg">{selectedPrize.name}</h3>
                   {selectedPrize.multiplier > 0 && (
-                    <p className="text-3xl font-bold text-primary">
+                    <p className="text-3xl font-bold text-primary animate-pulse drop-shadow-[0_0_15px_rgba(139,92,246,0.8)]">
                       ₦{(currentStake * selectedPrize.multiplier).toLocaleString()}
                     </p>
                   )}

@@ -109,8 +109,8 @@ const PokerGame = () => {
   const callAmount = humanPlayer ? maxBet - humanPlayer.currentBet : 0;
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      <UICard className="p-6 bg-gradient-to-br from-background to-accent/10">
+    <div className="max-w-6xl mx-auto space-y-6 animate-fade-in">
+      <UICard className="p-6 bg-gradient-to-br from-background to-accent/10 hover:shadow-2xl hover:shadow-indigo-500/30 transition-all duration-500">
         <div className="flex justify-between items-center mb-6">
           <div>
             <h3 className="text-2xl font-bold">Texas Hold'em</h3>

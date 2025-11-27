@@ -28,10 +28,10 @@ const RouletteGame = () => {
     const numbers = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
     
     return (
-      <div className="relative w-80 h-80 mx-auto mb-8">
+      <div className="relative w-80 h-80 mx-auto mb-8 animate-scale-in">
         <div className={cn(
-          "w-full h-full rounded-full border-8 border-primary relative overflow-hidden transition-transform duration-3000",
-          isSpinning && "animate-spin"
+          "w-full h-full rounded-full border-8 border-primary relative overflow-hidden transition-transform duration-3000 shadow-2xl",
+          isSpinning && "animate-spin-slow shadow-primary/50"
         )}>
           <div className="absolute inset-0 bg-gradient-conic from-primary via-accent to-primary">
             {numbers.map((num, idx) => {
@@ -59,11 +59,11 @@ const RouletteGame = () => {
         </div>
         
         {currentResult && !isSpinning && (
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center justify-center animate-bounce-in">
             <div className={cn(
-              "w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold border-4 border-background shadow-2xl",
-              currentResult.color === 'green' ? "bg-green-500 text-white" :
-              currentResult.color === 'red' ? "bg-red-500 text-white" : "bg-black text-white"
+              "w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold border-4 border-background shadow-2xl animate-pulse-glow",
+              currentResult.color === 'green' ? "bg-green-500 text-white shadow-green-500/70" :
+              currentResult.color === 'red' ? "bg-red-500 text-white shadow-red-500/70" : "bg-black text-white shadow-white/50"
             )}>
               {currentResult.number}
             </div>
@@ -162,8 +162,8 @@ const RouletteGame = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      <Card className="p-6 bg-gradient-to-br from-background to-accent/10">
+    <div className="max-w-6xl mx-auto space-y-6 animate-fade-in">
+      <Card className="p-6 bg-gradient-to-br from-background to-accent/10 hover:shadow-2xl hover:shadow-red-500/20 transition-all duration-500">
         <div className="flex justify-between items-center mb-6">
           <div>
             <h3 className="text-2xl font-bold">AI Roulette</h3>
