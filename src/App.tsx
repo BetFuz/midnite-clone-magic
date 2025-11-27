@@ -77,6 +77,7 @@ import WTAFinals from "./pages/tennis/WTAFinals";
 import Slots from "./pages/casino/Slots";
 import Roulette from "./pages/casino/Roulette";
 import Blackjack from "./pages/casino/Blackjack";
+import Keno from "./pages/casino/Keno";
 
 // Account
 import Profile from "./pages/account/Profile";
@@ -349,6 +350,7 @@ const App = () => (
           <Route path="/live-table/lightning-roulette" element={<LightningRoulette />} />
           <Route path="/live-table/poker" element={<Poker />} />
           <Route path="/live-table/baccarat" element={<Baccarat />} />
+          <Route path="/casino/keno" element={<Keno />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
