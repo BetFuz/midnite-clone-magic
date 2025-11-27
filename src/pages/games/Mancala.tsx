@@ -22,7 +22,7 @@ export default function Mancala() {
   const [variant, setVariant] = useState<Variant>('Oware');
   const [gameStarted, setGameStarted] = useState(false);
 
-  const { gameState, handlePitClick, isProcessing, resetGame } = useMancalaGame({
+  const { gameState, handlePitClick, isProcessing, resetGame, createGameSession, sessionId, betting } = useMancalaGame({
     gameId: null,
     mode: activeMode,
     userId: null,
@@ -32,13 +32,31 @@ export default function Mancala() {
     culturalMode: activeMode === 'cultural',
   });
 
-  const startGame = () => {
+  const startGame = async () => {
     resetGame();
+    
+    // Create game session for betting
+    const newSessionId = await createGameSession();
+    
     setGameStarted(true);
     toast({
       title: 'Game Started',
       description: `Mancala (${variant}) ${activeMode} game started${activeMode === 'human-ai' ? ` at ${difficulty} level` : ''}`,
     });
+  };
+
+  // Place pre-game bet
+  const handlePlaceBet = async (betType: string, betValue: string) => {
+    if (!sessionId) {
+      toast({
+        title: 'Start Game First',
+        description: 'Please start a game before placing bets',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    await betting.placeBet(sessionId, betType, betValue);
   };
 
   return (
@@ -152,6 +170,40 @@ export default function Mancala() {
                       </Button>
                     </div>
 
+                    {/* Active Bets Display */}
+                    {betting.activeBets.length > 0 && (
+                      <div className="mb-4 p-3 bg-muted/30 rounded-lg">
+                        <p className="text-sm font-medium mb-2">Active Bets:</p>
+                        {betting.activeBets.map((bet) => (
+                          <div key={bet.id} className="text-xs text-muted-foreground flex justify-between">
+                            <span>{bet.bet_type}: {bet.bet_value}</span>
+                            <span className="text-primary">₦{bet.potential_win.toFixed(2)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Quick Bet Options */}
+                    {!gameState.gameOver && betting.availableBets.length > 0 && (
+                      <div className="mb-4 p-3 bg-primary/5 rounded-lg">
+                        <p className="text-sm font-medium mb-2">Quick Bets:</p>
+                        <div className="grid grid-cols-2 gap-2">
+                          {betting.availableBets.slice(0, 2).map((betType) => (
+                            <Button
+                              key={betType.id}
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handlePlaceBet(betType.id, 'player1')}
+                              disabled={betting.isPlacingBet}
+                            >
+                              {betType.culturalName || betType.name}
+                              <Badge variant="secondary" className="ml-2">{betType.odds}x</Badge>
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     <div className="flex flex-col items-center gap-6">
                       <div className={`text-lg font-bold text-center ${gameState.currentPlayer === 'player1' ? 'text-destructive' : 'text-primary'}`}>
                         {gameState.gameOver 
@@ -239,6 +291,52 @@ export default function Mancala() {
                       </Button>
                     </div>
 
+                    {/* Active Bets Display */}
+                    {betting.activeBets.length > 0 && (
+                      <div className="mb-4 p-3 bg-muted/30 rounded-lg">
+                        <p className="text-sm font-medium mb-2">Your Bets:</p>
+                        {betting.activeBets.map((bet) => (
+                          <div key={bet.id} className="text-xs text-muted-foreground flex justify-between mb-1">
+                            <span>{bet.bet_type}: {bet.bet_value}</span>
+                            <Badge variant={bet.status === 'won' ? 'default' : bet.status === 'lost' ? 'destructive' : 'secondary'}>
+                              {bet.status === 'active' ? `₦${bet.potential_win.toFixed(2)}` : bet.status}
+                            </Badge>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Performance Bets */}
+                    {!gameState.gameOver && betting.availableBets.length > 0 && (
+                      <div className="mb-4 p-3 bg-primary/5 rounded-lg">
+                        <p className="text-sm font-medium mb-2">Bet on Your Performance:</p>
+                        <div className="grid grid-cols-2 gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handlePlaceBet('winner', 'player1')}
+                            disabled={betting.isPlacingBet}
+                          >
+                            Win Game
+                            <Badge variant="secondary" className="ml-2">
+                              {betting.calculateOdds('winner', difficulty)}x
+                            </Badge>
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handlePlaceBet('seeds_captured', '30')}
+                            disabled={betting.isPlacingBet}
+                          >
+                            30+ Seeds
+                            <Badge variant="secondary" className="ml-2">
+                              {betting.calculateOdds('seeds_captured', difficulty)}x
+                            </Badge>
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
                     <div className="flex flex-col items-center gap-6">
                       <div className={`text-lg font-bold ${gameState.currentPlayer === 'player1' ? 'text-destructive' : 'text-primary'}`}>
                         {gameState.gameOver 
@@ -270,17 +368,157 @@ export default function Mancala() {
 
               {/* AI vs AI Mode */}
               <TabsContent value="ai-ai" className="space-y-4">
+                {!gameStarted ? (
+                  <Card className="p-6">
+                    <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                      <Bot className="h-5 w-5 text-primary" />
+                      AI Tournament
+                    </h3>
+                    <div className="space-y-4 mb-6">
+                      <div>
+                        <Label>Game Variant</Label>
+                        <div className="grid grid-cols-2 gap-2 mt-2">
+                          {(['Oware', 'Kalah'] as const).map((v) => (
+                            <Button
+                              key={v}
+                              variant={variant === v ? 'default' : 'outline'}
+                              onClick={() => setVariant(v)}
+                            >
+                              {v}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <Label>Tournament Stake (₦)</Label>
+                        <Input
+                          type="number"
+                          value={stakeAmount}
+                          onChange={(e) => setStakeAmount(Number(e.target.value))}
+                          min={500}
+                          max={20000}
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-3 mb-4">
+                      <div className="flex items-start gap-3">
+                        <Zap className="h-5 w-5 text-primary mt-0.5" />
+                        <div>
+                          <p className="font-medium">AI Strategy Matchups</p>
+                          <p className="text-sm text-muted-foreground">Watch AI seed counting strategies compete</p>
+                        </div>
+                      </div>
+                    </div>
+                    <Button 
+                      className="w-full mt-4" 
+                      size="lg"
+                      onClick={startGame}
+                    >
+                      Watch AI Tournament
+                    </Button>
+                  </Card>
+                ) : (
+                  <Card className="p-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <div>
+                        <h3 className="text-xl font-semibold">AI Tournament ({variant})</h3>
+                        <p className="text-sm text-muted-foreground">Bet on AI matchups</p>
+                      </div>
+                      <Button variant="outline" onClick={() => { resetGame(); setGameStarted(false); }}>
+                        <RotateCcw className="h-4 w-4 mr-2" />
+                        New Tournament
+                      </Button>
+                    </div>
+
+                    {/* AI Tournament Betting */}
+                    {betting.availableBets.length > 0 && !gameState.gameOver && (
+                      <div className="mb-4 p-3 bg-primary/5 rounded-lg">
+                        <p className="text-sm font-medium mb-2">Bet on Winner:</p>
+                        <div className="grid grid-cols-2 gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handlePlaceBet('winner', 'player1')}
+                            disabled={betting.isPlacingBet}
+                          >
+                            AI 1 Wins
+                            <Badge variant="secondary" className="ml-2">1.9x</Badge>
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handlePlaceBet('winner', 'player2')}
+                            disabled={betting.isPlacingBet}
+                          >
+                            AI 2 Wins
+                            <Badge variant="secondary" className="ml-2">1.9x</Badge>
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Active Tournament Bets */}
+                    {betting.activeBets.length > 0 && (
+                      <div className="mb-4 p-3 bg-muted/30 rounded-lg">
+                        <p className="text-sm font-medium mb-2">Tournament Bets:</p>
+                        {betting.activeBets.map((bet) => (
+                          <div key={bet.id} className="text-xs text-muted-foreground flex justify-between">
+                            <span>{bet.bet_type}: {bet.bet_value}</span>
+                            <Badge variant={bet.status === 'won' ? 'default' : bet.status === 'lost' ? 'destructive' : 'secondary'}>
+                              {bet.status === 'active' ? `₦${bet.potential_win.toFixed(2)}` : bet.status}
+                            </Badge>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="flex flex-col items-center gap-6">
+                      <div className="text-lg font-bold text-center">
+                        {gameState.gameOver 
+                          ? `Tournament Over! ${gameState.winner === 'player1' ? 'AI 1 Wins!' : gameState.winner === 'player2' ? 'AI 2 Wins!' : 'Draw!'}`
+                          : `AI Tournament in Progress...`}
+                      </div>
+
+                      <MancalaBoard
+                        gameState={gameState}
+                        onPitClick={() => {}}
+                        culturalMode={false}
+                      />
+
+                      <div className="text-center text-sm text-muted-foreground">
+                        {!gameState.gameOver && <p>AI players are competing for victory</p>}
+                        {gameState.gameOver && (
+                          <p className="text-foreground font-medium">
+                            Final Score: {gameState.player1Seeds} - {gameState.player2Seeds}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </Card>
+                )}
+              </TabsContent>
+
+              {/* Cultural Mode - Seed Master */}
+              <TabsContent value="cultural" className="space-y-4">
                 <Card className="p-6">
                   <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                    <Bot className="h-5 w-5 text-primary" />
-                    AI Tournament
+                    <Globe className="h-5 w-5 text-primary" />
+                    Seed Master Mode
                   </h3>
-                  <div className="space-y-3 mb-4">
+                  <div className="space-y-3 mb-4 text-sm">
                     <div className="flex items-start gap-3">
-                      <Zap className="h-5 w-5 text-primary mt-0.5" />
+                      <Sprout className="h-5 w-5 text-primary mt-0.5" />
                       <div>
-                        <p className="font-medium">AI Strategy Matchups</p>
-                        <p className="text-sm text-muted-foreground">Watch AI seed counting strategies compete</p>
+                        <p className="font-medium">Traditional Seed Counting</p>
+                        <p className="text-muted-foreground">Experience authentic African seed-sowing gameplay</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <Crown className="h-5 w-5 text-primary mt-0.5" />
+                      <div>
+                        <p className="font-medium">Cultural Celebrations</p>
+                        <p className="text-muted-foreground">Receive ancestral blessings and traditional messages</p>
                       </div>
                     </div>
                   </div>
@@ -289,7 +527,7 @@ export default function Mancala() {
                     size="lg"
                     onClick={startGame}
                   >
-                    Watch AI Tournament
+                    Begin Seed Master Journey
                   </Button>
                 </Card>
               </TabsContent>
