@@ -79,6 +79,7 @@ import Roulette from "./pages/casino/Roulette";
 import Blackjack from "./pages/casino/Blackjack";
 import Keno from "./pages/casino/Keno";
 import ScratchCards from "./pages/casino/ScratchCards";
+import Craps from "./pages/casino/Craps";
 
 // Account
 import Profile from "./pages/account/Profile";
@@ -353,6 +354,7 @@ const App = () => (
           <Route path="/live-table/baccarat" element={<Baccarat />} />
           <Route path="/casino/keno" element={<Keno />} />
           <Route path="/casino/scratch-cards" element={<ScratchCards />} />
+          <Route path="/casino/craps" element={<Craps />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
