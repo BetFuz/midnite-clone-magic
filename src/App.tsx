@@ -3,183 +3,196 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { BetSlipProvider } from "@/contexts/BetSlipContext";
+import { lazy, Suspense } from "react";
+import { Loader2 } from "lucide-react";
+
+// Critical pages - loaded immediately
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
-import Live from "./pages/Live";
-import Racing from "./pages/Racing";
-import Games from "./pages/Games";
-import LiveCasino from "./pages/LiveCasino";
-import Virtuals from "./pages/Virtuals";
-import NotFound from "./pages/NotFound";
+
+// Lazy load all other pages for faster initial load
+const Live = lazy(() => import("./pages/Live"));
+const Racing = lazy(() => import("./pages/Racing"));
+const Games = lazy(() => import("./pages/Games"));
+const LiveCasino = lazy(() => import("./pages/LiveCasino"));
+const Virtuals = lazy(() => import("./pages/Virtuals"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Sports
-import Football from "./pages/sports/Football";
-import Tennis from "./pages/sports/Tennis";
-import Basketball from "./pages/sports/Basketball";
-import Cricket from "./pages/sports/Cricket";
-import AmericanFootball from "./pages/sports/AmericanFootball";
-import Rugby from "./pages/sports/Rugby";
-import Golf from "./pages/sports/Golf";
-import Boxing from "./pages/sports/Boxing";
-import MMA from "./pages/sports/MMA";
-import Darts from "./pages/sports/Darts";
-import Snooker from "./pages/sports/Snooker";
-import Volleyball from "./pages/sports/Volleyball";
-import IceHockey from "./pages/sports/IceHockey";
-import Baseball from "./pages/sports/Baseball";
-import TableTennis from "./pages/sports/TableTennis";
-import Handball from "./pages/sports/Handball";
-import Badminton from "./pages/sports/Badminton";
-import Futsal from "./pages/sports/Futsal";
-import Cycling from "./pages/sports/Cycling";
-import MotorSports from "./pages/sports/MotorSports";
-import BeachVolleyball from "./pages/sports/BeachVolleyball";
-import Esports from "./pages/sports/Esports";
+const Football = lazy(() => import("./pages/sports/Football"));
+const Tennis = lazy(() => import("./pages/sports/Tennis"));
+const Basketball = lazy(() => import("./pages/sports/Basketball"));
+const Cricket = lazy(() => import("./pages/sports/Cricket"));
+const AmericanFootball = lazy(() => import("./pages/sports/AmericanFootball"));
+const Rugby = lazy(() => import("./pages/sports/Rugby"));
+const Golf = lazy(() => import("./pages/sports/Golf"));
+const Boxing = lazy(() => import("./pages/sports/Boxing"));
+const MMA = lazy(() => import("./pages/sports/MMA"));
+const Darts = lazy(() => import("./pages/sports/Darts"));
+const Snooker = lazy(() => import("./pages/sports/Snooker"));
+const Volleyball = lazy(() => import("./pages/sports/Volleyball"));
+const IceHockey = lazy(() => import("./pages/sports/IceHockey"));
+const Baseball = lazy(() => import("./pages/sports/Baseball"));
+const TableTennis = lazy(() => import("./pages/sports/TableTennis"));
+const Handball = lazy(() => import("./pages/sports/Handball"));
+const Badminton = lazy(() => import("./pages/sports/Badminton"));
+const Futsal = lazy(() => import("./pages/sports/Futsal"));
+const Cycling = lazy(() => import("./pages/sports/Cycling"));
+const MotorSports = lazy(() => import("./pages/sports/MotorSports"));
+const BeachVolleyball = lazy(() => import("./pages/sports/BeachVolleyball"));
+const Esports = lazy(() => import("./pages/sports/Esports"));
 
 // Football Leagues
-import PremierLeague from "./pages/football/PremierLeague";
-import ChampionsLeague from "./pages/football/ChampionsLeague";
-import LaLiga from "./pages/football/LaLiga";
-import SerieA from "./pages/football/SerieA";
-import Bundesliga from "./pages/football/Bundesliga";
-import Ligue1 from "./pages/football/Ligue1";
-import Championship from "./pages/football/Championship";
-import EuropaLeague from "./pages/football/EuropaLeague";
-import WorldCup from "./pages/football/WorldCup";
-import U20WorldCup from "./pages/football/U20WorldCup";
-import U17WorldCup from "./pages/football/U17WorldCup";
-import CAFChampionsLeague from "./pages/football/CAFChampionsLeague";
-import AFCON from "./pages/football/AFCON";
-import EgyptianPremierLeague from "./pages/football/EgyptianPremierLeague";
-import SouthAfricanPremierLeague from "./pages/football/SouthAfricanPremierLeague";
+const PremierLeague = lazy(() => import("./pages/football/PremierLeague"));
+const ChampionsLeague = lazy(() => import("./pages/football/ChampionsLeague"));
+const LaLiga = lazy(() => import("./pages/football/LaLiga"));
+const SerieA = lazy(() => import("./pages/football/SerieA"));
+const Bundesliga = lazy(() => import("./pages/football/Bundesliga"));
+const Ligue1 = lazy(() => import("./pages/football/Ligue1"));
+const Championship = lazy(() => import("./pages/football/Championship"));
+const EuropaLeague = lazy(() => import("./pages/football/EuropaLeague"));
+const WorldCup = lazy(() => import("./pages/football/WorldCup"));
+const U20WorldCup = lazy(() => import("./pages/football/U20WorldCup"));
+const U17WorldCup = lazy(() => import("./pages/football/U17WorldCup"));
+const CAFChampionsLeague = lazy(() => import("./pages/football/CAFChampionsLeague"));
+const AFCON = lazy(() => import("./pages/football/AFCON"));
+const EgyptianPremierLeague = lazy(() => import("./pages/football/EgyptianPremierLeague"));
+const SouthAfricanPremierLeague = lazy(() => import("./pages/football/SouthAfricanPremierLeague"));
 
 // Racing Venues
-import Ascot from "./pages/racing/Ascot";
-import Cheltenham from "./pages/racing/Cheltenham";
-import Kempton from "./pages/racing/Kempton";
+const Ascot = lazy(() => import("./pages/racing/Ascot"));
+const Cheltenham = lazy(() => import("./pages/racing/Cheltenham"));
+const Kempton = lazy(() => import("./pages/racing/Kempton"));
 
 // Basketball Leagues
-import NBA from "./pages/basketball/NBA";
-import EuroLeague from "./pages/basketball/EuroLeague";
-import NCAABasketball from "./pages/basketball/NCAABasketball";
-import WNBA from "./pages/basketball/WNBA";
-import SpanishACB from "./pages/basketball/SpanishACB";
+const NBA = lazy(() => import("./pages/basketball/NBA"));
+const EuroLeague = lazy(() => import("./pages/basketball/EuroLeague"));
+const NCAABasketball = lazy(() => import("./pages/basketball/NCAABasketball"));
+const WNBA = lazy(() => import("./pages/basketball/WNBA"));
+const SpanishACB = lazy(() => import("./pages/basketball/SpanishACB"));
 
 // Tennis Tournaments
-import FrenchOpen from "./pages/tennis/FrenchOpen";
-import Wimbledon from "./pages/tennis/Wimbledon";
-import AustralianOpen from "./pages/tennis/AustralianOpen";
-import USOpen from "./pages/tennis/USOpen";
-import ATPMasters1000 from "./pages/tennis/ATPMasters1000";
-import WTAFinals from "./pages/tennis/WTAFinals";
+const FrenchOpen = lazy(() => import("./pages/tennis/FrenchOpen"));
+const Wimbledon = lazy(() => import("./pages/tennis/Wimbledon"));
+const AustralianOpen = lazy(() => import("./pages/tennis/AustralianOpen"));
+const USOpen = lazy(() => import("./pages/tennis/USOpen"));
+const ATPMasters1000 = lazy(() => import("./pages/tennis/ATPMasters1000"));
+const WTAFinals = lazy(() => import("./pages/tennis/WTAFinals"));
 
 // Casino
-import Slots from "./pages/casino/Slots";
-import Roulette from "./pages/casino/Roulette";
-import Blackjack from "./pages/casino/Blackjack";
-import Keno from "./pages/casino/Keno";
-import ScratchCards from "./pages/casino/ScratchCards";
-import Craps from "./pages/casino/Craps";
-import RockPaperScissors from "./pages/casino/RockPaperScissors";
-import CoinFlip from "./pages/casino/CoinFlip";
-import GameShow from "./pages/casino/GameShow";
-import Bingo from "./pages/casino/Bingo";
-import BurstGames from "./pages/casino/BurstGames";
+const Slots = lazy(() => import("./pages/casino/Slots"));
+const Roulette = lazy(() => import("./pages/casino/Roulette"));
+const Blackjack = lazy(() => import("./pages/casino/Blackjack"));
+const Keno = lazy(() => import("./pages/casino/Keno"));
+const ScratchCards = lazy(() => import("./pages/casino/ScratchCards"));
+const Craps = lazy(() => import("./pages/casino/Craps"));
+const RockPaperScissors = lazy(() => import("./pages/casino/RockPaperScissors"));
+const CoinFlip = lazy(() => import("./pages/casino/CoinFlip"));
+const GameShow = lazy(() => import("./pages/casino/GameShow"));
+const Bingo = lazy(() => import("./pages/casino/Bingo"));
+const BurstGames = lazy(() => import("./pages/casino/BurstGames"));
 
 // Account
-import Profile from "./pages/account/Profile";
-import Deposits from "./pages/account/Deposits";
-import Withdrawals from "./pages/account/Withdrawals";
-import Transactions from "./pages/account/Transactions";
-import Statistics from "./pages/account/Statistics";
-import BettingHistory from "./pages/account/BettingHistory";
-import BetTickets from "./pages/account/BetTickets";
-import BetTicketDetail from "./pages/account/BetTicketDetail";
-import AccountSettings from "./pages/account/AccountSettings";
-import Leaderboard from "./pages/account/Leaderboard";
+const Profile = lazy(() => import("./pages/account/Profile"));
+const Deposits = lazy(() => import("./pages/account/Deposits"));
+const Withdrawals = lazy(() => import("./pages/account/Withdrawals"));
+const Transactions = lazy(() => import("./pages/account/Transactions"));
+const Statistics = lazy(() => import("./pages/account/Statistics"));
+const BettingHistory = lazy(() => import("./pages/account/BettingHistory"));
+const BetTickets = lazy(() => import("./pages/account/BetTickets"));
+const BetTicketDetail = lazy(() => import("./pages/account/BetTicketDetail"));
+const AccountSettings = lazy(() => import("./pages/account/AccountSettings"));
+const Leaderboard = lazy(() => import("./pages/account/Leaderboard"));
 
 // Account Tiers
-import DiamondTier from "./pages/account/tiers/DiamondTier";
-import PlatinumTier from "./pages/account/tiers/PlatinumTier";
-import GoldTier from "./pages/account/tiers/GoldTier";
-import SilverTier from "./pages/account/tiers/SilverTier";
-import BronzeTier from "./pages/account/tiers/BronzeTier";
-import RookieTier from "./pages/account/tiers/RookieTier";
+const DiamondTier = lazy(() => import("./pages/account/tiers/DiamondTier"));
+const PlatinumTier = lazy(() => import("./pages/account/tiers/PlatinumTier"));
+const GoldTier = lazy(() => import("./pages/account/tiers/GoldTier"));
+const SilverTier = lazy(() => import("./pages/account/tiers/SilverTier"));
+const BronzeTier = lazy(() => import("./pages/account/tiers/BronzeTier"));
+const RookieTier = lazy(() => import("./pages/account/tiers/RookieTier"));
 
 // Promotions
-import Promotions from "./pages/promotions/Promotions";
-import Welcome from "./pages/promotions/Welcome";
-import AccaBoost from "./pages/promotions/AccaBoost";
-import WeekendSpecials from "./pages/promotions/WeekendSpecials";
-import Cashback from "./pages/promotions/Cashback";
-import LoyaltyRewards from "./pages/promotions/LoyaltyRewards";
-import ReferFriend from "./pages/promotions/ReferFriend";
+const Promotions = lazy(() => import("./pages/promotions/Promotions"));
+const Welcome = lazy(() => import("./pages/promotions/Welcome"));
+const AccaBoost = lazy(() => import("./pages/promotions/AccaBoost"));
+const WeekendSpecials = lazy(() => import("./pages/promotions/WeekendSpecials"));
+const Cashback = lazy(() => import("./pages/promotions/Cashback"));
+const LoyaltyRewards = lazy(() => import("./pages/promotions/LoyaltyRewards"));
+const ReferFriend = lazy(() => import("./pages/promotions/ReferFriend"));
 
 // Info
-import About from "./pages/info/About";
-import HelpCenter from "./pages/info/HelpCenter";
-import ResponsibleGambling from "./pages/info/ResponsibleGambling";
-import Terms from "./pages/info/Terms";
-import Privacy from "./pages/info/Privacy";
-import Contact from "./pages/info/Contact";
-import FAQ from "./pages/info/FAQ";
+const About = lazy(() => import("./pages/info/About"));
+const HelpCenter = lazy(() => import("./pages/info/HelpCenter"));
+const ResponsibleGambling = lazy(() => import("./pages/info/ResponsibleGambling"));
+const Terms = lazy(() => import("./pages/info/Terms"));
+const Privacy = lazy(() => import("./pages/info/Privacy"));
+const Contact = lazy(() => import("./pages/info/Contact"));
+const FAQ = lazy(() => import("./pages/info/FAQ"));
 
 // Admin
-import AdminAuth from "./pages/admin/AdminAuth";
-import WebhookSettings from "./pages/admin/WebhookSettings";
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import AdminSetup from "./pages/admin/AdminSetup";
-import AdminAssets from "./pages/admin/AIAssets";
-import SeedData from "./pages/admin/SeedData";
-import DataManagement from "./pages/admin/DataManagement";
-import AdminUsers from "./pages/admin/Users";
-import AdminBets from "./pages/admin/Bets";
-import AdminFinances from "./pages/admin/Finances";
-import AdminEvents from "./pages/admin/Events";
-import AdminOdds from "./pages/admin/Odds";
-import AdminKYC from "./pages/admin/KYC";
-import AdminWithdrawals from "./pages/admin/Withdrawals";
-import AdminReports from "./pages/admin/Reports";
-import AdminAuditLog from "./pages/admin/AuditLog";
-import AdminSettings from "./pages/admin/Settings";
-import AdminSecurity from "./pages/admin/Security";
+const AdminAuth = lazy(() => import("./pages/admin/AdminAuth"));
+const WebhookSettings = lazy(() => import("./pages/admin/WebhookSettings"));
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
+const AdminSetup = lazy(() => import("./pages/admin/AdminSetup"));
+const AdminAssets = lazy(() => import("./pages/admin/AIAssets"));
+const SeedData = lazy(() => import("./pages/admin/SeedData"));
+const DataManagement = lazy(() => import("./pages/admin/DataManagement"));
+const AdminUsers = lazy(() => import("./pages/admin/Users"));
+const AdminBets = lazy(() => import("./pages/admin/Bets"));
+const AdminFinances = lazy(() => import("./pages/admin/Finances"));
+const AdminEvents = lazy(() => import("./pages/admin/Events"));
+const AdminOdds = lazy(() => import("./pages/admin/Odds"));
+const AdminKYC = lazy(() => import("./pages/admin/KYC"));
+const AdminWithdrawals = lazy(() => import("./pages/admin/Withdrawals"));
+const AdminReports = lazy(() => import("./pages/admin/Reports"));
+const AdminAuditLog = lazy(() => import("./pages/admin/AuditLog"));
+const AdminSettings = lazy(() => import("./pages/admin/Settings"));
+const AdminSecurity = lazy(() => import("./pages/admin/Security"));
 
-import MobileBetSlip from "./components/MobileBetSlip";
-import { BottomNav } from "./components/mobile/BottomNav";
-import NetworkStatus from "./components/NetworkStatus";
+const MobileBetSlip = lazy(() => import("./components/MobileBetSlip"));
+const BottomNav = lazy(() => import("./components/mobile/BottomNav").then(m => ({ default: m.BottomNav })));
+const NetworkStatus = lazy(() => import("./components/NetworkStatus"));
 
 // Match & Live Casino
-import MatchDetail from "./pages/matches/MatchDetail";
-import LightningRoulette from "./pages/live-casino/LightningRoulette";
-import LiveCasinoPoker from "./pages/live-casino/Poker";
-import LiveCasinoBaccarat from "./pages/live-casino/Baccarat";
-import LiveCasinoBlackjack from "./pages/live-casino/Blackjack";
-import BetFeatures from "./pages/BetFeatures";
-import EnhancedAccountHub from "./pages/account/EnhancedAccountHub";
-import Politics from "./pages/politics/Politics";
-import BettingHub from "./pages/BettingHub";
-import Economy from "./pages/economy/Economy";
-import Social from "./pages/social/Social";
-import Predict from "./pages/predict/Predict";
-import AIFeatures from "./pages/AIFeatures";
-import SocialBetting from "./pages/SocialBetting";
-import BetMarketplace from "./pages/BetMarketplace";
-import AIPredictions from "./pages/AIPredictions";
-import PoolBetting from "./pages/PoolBetting";
-import FantasySports from "./pages/FantasySports";
-import LiveStreaming from "./pages/LiveStreaming";
-import Web3Hub from "./pages/Web3Hub";
-import VirtualStadium from "./pages/VirtualStadium";
-import FuzFlix from "./pages/FuzFlix";
-import CasinoLobby from "./pages/casino/CasinoLobby";
-import Analytics from "./pages/Analytics";
-import FuzInsurance from "./pages/promotions/FuzInsurance";
+const MatchDetail = lazy(() => import("./pages/matches/MatchDetail"));
+const LightningRoulette = lazy(() => import("./pages/live-casino/LightningRoulette"));
+const LiveCasinoPoker = lazy(() => import("./pages/live-casino/Poker"));
+const LiveCasinoBaccarat = lazy(() => import("./pages/live-casino/Baccarat"));
+const LiveCasinoBlackjack = lazy(() => import("./pages/live-casino/Blackjack"));
+const BetFeatures = lazy(() => import("./pages/BetFeatures"));
+const EnhancedAccountHub = lazy(() => import("./pages/account/EnhancedAccountHub"));
+const Politics = lazy(() => import("./pages/politics/Politics"));
+const BettingHub = lazy(() => import("./pages/BettingHub"));
+const Economy = lazy(() => import("./pages/economy/Economy"));
+const Social = lazy(() => import("./pages/social/Social"));
+const Predict = lazy(() => import("./pages/predict/Predict"));
+const AIFeatures = lazy(() => import("./pages/AIFeatures"));
+const SocialBetting = lazy(() => import("./pages/SocialBetting"));
+const BetMarketplace = lazy(() => import("./pages/BetMarketplace"));
+const AIPredictions = lazy(() => import("./pages/AIPredictions"));
+const PoolBetting = lazy(() => import("./pages/PoolBetting"));
+const FantasySports = lazy(() => import("./pages/FantasySports"));
+const LiveStreaming = lazy(() => import("./pages/LiveStreaming"));
+const Web3Hub = lazy(() => import("./pages/Web3Hub"));
+const VirtualStadium = lazy(() => import("./pages/VirtualStadium"));
+const FuzFlix = lazy(() => import("./pages/FuzFlix"));
+const CasinoLobby = lazy(() => import("./pages/casino/CasinoLobby"));
+const Analytics = lazy(() => import("./pages/Analytics"));
+const FuzInsurance = lazy(() => import("./pages/promotions/FuzInsurance"));
 
 // Traditional African Games
-import AfricanDraft from "./pages/games/AfricanDraft";
-import Morabaraba from "./pages/games/Morabaraba";
-import Mancala from "./pages/games/Mancala";
-import Tournament from "./pages/games/Tournament";
+const AfricanDraft = lazy(() => import("./pages/games/AfricanDraft"));
+const Morabaraba = lazy(() => import("./pages/games/Morabaraba"));
+const Mancala = lazy(() => import("./pages/games/Mancala"));
+const Tournament = lazy(() => import("./pages/games/Tournament"));
+
+// Loading component
+const PageLoader = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <Loader2 className="w-8 h-8 animate-spin text-primary" />
+  </div>
+);
 
 const queryClient = new QueryClient();
 
@@ -189,9 +202,12 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <NetworkStatus />
+        <Suspense fallback={<PageLoader />}>
+          <NetworkStatus />
+        </Suspense>
         <div className="pb-20 md:pb-0">
-          <Routes>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/live" element={<Live />} />
@@ -380,10 +396,13 @@ const App = () => (
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
-        </Routes>
+          </Routes>
+          </Suspense>
         </div>
-        <MobileBetSlip />
-        <BottomNav />
+        <Suspense fallback={null}>
+          <MobileBetSlip />
+          <BottomNav />
+        </Suspense>
       </BrowserRouter>
     </BetSlipProvider>
   </QueryClientProvider>
