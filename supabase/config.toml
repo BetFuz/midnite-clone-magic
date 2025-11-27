@@ -51,6 +51,9 @@ verify_jwt = false
 [functions.ai-keno]
 verify_jwt = false
 
+[functions.ai-scratch-card]
+verify_jwt = false
+
 [functions.bet-recommendations]
 verify_jwt = false
 

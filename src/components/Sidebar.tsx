@@ -36,6 +36,7 @@ const Sidebar = ({ className, showOnMobile = false }: SidebarProps) => {
     { icon: Gamepad2, label: "AI Poker", url: "/live-table/poker", badge: "AI" },
     { icon: Gamepad2, label: "AI Baccarat", url: "/live-table/baccarat", badge: "AI" },
     { icon: Gamepad2, label: "AI Keno", url: "/casino/keno", badge: "AI" },
+    { icon: Gamepad2, label: "Scratch Cards", url: "/casino/scratch-cards", badge: "AI" },
     { icon: Target, label: "Live Casino", url: "/live-casino" },
     { icon: Dumbbell, label: "Virtuals", url: "/virtuals" },
     { icon: BarChart3, label: "Analytics", url: "/analytics", badge: "NEW" },
