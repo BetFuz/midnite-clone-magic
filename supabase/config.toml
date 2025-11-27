@@ -45,6 +45,9 @@ verify_jwt = false
 [functions.ai-poker]
 verify_jwt = false
 
+[functions.ai-baccarat]
+verify_jwt = false
+
 [functions.bet-recommendations]
 verify_jwt = false
 
