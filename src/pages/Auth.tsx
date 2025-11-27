@@ -119,10 +119,43 @@ const Auth = () => {
           });
         }
       } else {
-        toast({
-          title: "Welcome back!",
-          description: "You've successfully logged in.",
-        });
+        // If login succeeded, check if user is a superadmin and force password change
+        try {
+          const { data: { user } } = await supabase.auth.getUser();
+
+          if (user) {
+            const { data: roleData } = await supabase
+              .from("user_roles")
+              .select("role")
+              .eq("user_id", user.id)
+              .eq("role", "superadmin")
+              .maybeSingle();
+
+            if (roleData?.role === "superadmin") {
+              // Show the reset password form immediately for superadmin
+              setIsResetting(true);
+              setNewPassword("");
+              setConfirmNewPassword("");
+
+              toast({
+                title: "Security check",
+                description: "As superadmin, please set a new password now.",
+              });
+              return;
+            }
+          }
+
+          toast({
+            title: "Welcome back!",
+            description: "You've successfully logged in.",
+          });
+        } catch (err) {
+          console.error("Error checking superadmin role:", err);
+          toast({
+            title: "Welcome back!",
+            description: "You've successfully logged in.",
+          });
+        }
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
