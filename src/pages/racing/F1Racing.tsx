@@ -3,13 +3,14 @@ import Sidebar from "@/components/Sidebar";
 import BetSlip from "@/components/BetSlip";
 import { useF1Racing } from "@/hooks/useF1Racing";
 import { useRacingBetting, RaceParticipant } from "@/hooks/useRacingBetting";
-import { Loader2, Trophy, Play, Flag, Wind } from "lucide-react";
+import { Loader2, Trophy, Play, Flag, Wind, Volume2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useState } from "react";
+import F1RaceVisuals from "@/components/F1RaceVisuals";
 
 const F1Racing = () => {
   const circuit = "Monaco";
@@ -129,23 +130,32 @@ const F1Racing = () => {
           </div>
 
           {f1RaceState === 'racing' && (
-            <Card className="p-6 mb-6 bg-card border-border">
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between mb-2">
-                    <span className="text-sm font-medium">Race Progress</span>
-                    <span className="text-sm text-muted-foreground">{Math.round((currentLap / totalLaps) * 100)}%</span>
+            <>
+              <F1RaceVisuals
+                currentLap={currentLap}
+                totalLaps={totalLaps}
+                drivers={drivers.map((d, idx) => ({
+                  id: d.id,
+                  name: d.name,
+                  team: d.team,
+                  color: ['#1E40AF', '#06B6D4', '#DC2626', '#EA580C', '#059669'][idx] || '#6B7280',
+                  position: idx,
+                }))}
+                isRacing={true}
+              />
+
+              {commentary && (
+                <Card className="p-4 mb-6 bg-card border-border">
+                  <div className="flex items-start gap-3">
+                    <Volume2 className="h-5 w-5 text-primary mt-1" />
+                    <div>
+                      <div className="text-xs font-semibold text-primary mb-1">RACE COMMENTARY</div>
+                      <p className="text-sm italic">&quot;{commentary}&quot;</p>
+                    </div>
                   </div>
-                  <Progress value={(currentLap / totalLaps) * 100} />
-                </div>
-                
-                {commentary && (
-                  <div className="p-4 bg-muted rounded-lg">
-                    <p className="text-sm italic">&quot;{commentary}&quot;</p>
-                  </div>
-                )}
-              </div>
-            </Card>
+                </Card>
+              )}
+            </>
           )}
 
           {scenario && (
