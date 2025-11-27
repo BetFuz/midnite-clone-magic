@@ -8,8 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Play, Star, TrendingUp, Zap, Dice1, Hash, Grid3x3, CircleDot, Sparkles, Disc, CreditCard, Shuffle, Search, Shield, Crown, Users, Bot, Trophy } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Games = () => {
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   
@@ -29,10 +31,10 @@ const Games = () => {
 
   const allGames = [
     // Traditional African Games (4) - Each game supports P2P, Human vs AI, AI vs AI, and Cultural Mode
-    { id: 41, name: "African Draft", category: "Traditional", minBet: 500, maxBet: 100000, multiplier: "2x - 20x", featured: true, african: true, provablyFair: true, modes: ["P2P Betting", "Beat AI", "AI Tournament", "Traditional"] },
-    { id: 42, name: "Morabaraba", category: "Traditional", minBet: 300, maxBet: 75000, multiplier: "2x - 15x", featured: true, african: true, provablyFair: true, modes: ["Cow Trading", "Beat AI", "AI Tournament", "Sacred Cows"] },
-    { id: 43, name: "Mancala", category: "Traditional", minBet: 200, maxBet: 50000, multiplier: "2x - 12x", featured: true, african: true, provablyFair: true, modes: ["Seed Betting", "Beat AI", "AI Tournament", "Seed Master"] },
-    { id: 44, name: "Pan-African Tournament", category: "Traditional", minBet: 1000, maxBet: 200000, multiplier: "5x - 100x", featured: true, african: true, provablyFair: true, modes: ["Multi-Player", "Skill Levels", "AI Championship", "Pan-African"] },
+    { id: 41, name: "African Draft", category: "Traditional", minBet: 500, maxBet: 100000, multiplier: "2x - 20x", featured: true, african: true, provablyFair: true, modes: ["P2P Betting", "Beat AI", "AI Tournament", "Traditional"], slug: "african-draft" },
+    { id: 42, name: "Morabaraba", category: "Traditional", minBet: 300, maxBet: 75000, multiplier: "2x - 15x", featured: true, african: true, provablyFair: true, modes: ["Cow Trading", "Beat AI", "AI Tournament", "Sacred Cows"], slug: "morabaraba" },
+    { id: 43, name: "Mancala", category: "Traditional", minBet: 200, maxBet: 50000, multiplier: "2x - 12x", featured: true, african: true, provablyFair: true, modes: ["Seed Betting", "Beat AI", "AI Tournament", "Seed Master"], slug: "mancala" },
+    { id: 44, name: "Pan-African Tournament", category: "Traditional", minBet: 1000, maxBet: 200000, multiplier: "5x - 100x", featured: true, african: true, provablyFair: true, modes: ["Multi-Player", "Skill Levels", "AI Championship", "Pan-African"], slug: "tournament" },
 
     // Crash Games (5)
     { id: 1, name: "Aviator Classic", category: "Crash", minBet: 10, maxBet: 100000, multiplier: "1.00x - 1000x+", featured: true, african: false, provablyFair: true },
@@ -270,7 +272,11 @@ const Games = () => {
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {allGames.filter(g => g.category === "Traditional").map((game) => (
-                  <Card key={game.id} className="group overflow-hidden bg-card border-yellow-600/20 hover:border-yellow-600/50 transition-all cursor-pointer">
+                  <Card 
+                    key={game.id} 
+                    className="group overflow-hidden bg-card border-yellow-600/20 hover:border-yellow-600/50 transition-all cursor-pointer"
+                    onClick={() => game.slug && navigate(`/games/${game.slug}`)}
+                  >
                     <div className="aspect-square bg-gradient-to-br from-yellow-600/20 via-yellow-600/5 to-background relative flex items-center justify-center">
                       <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button size="sm" className="rounded-full w-10 h-10 p-0" onClick={(e) => { e.stopPropagation(); handlePlayGame(game.name, false); }}>
