@@ -162,6 +162,12 @@ import CasinoLobby from "./pages/casino/CasinoLobby";
 import Analytics from "./pages/Analytics";
 import FuzInsurance from "./pages/promotions/FuzInsurance";
 
+// Traditional African Games
+import AfricanDraft from "./pages/games/AfricanDraft";
+import Morabaraba from "./pages/games/Morabaraba";
+import Mancala from "./pages/games/Mancala";
+import Tournament from "./pages/games/Tournament";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -269,6 +275,12 @@ const App = () => (
           <Route path="/casino/slots" element={<Slots />} />
           <Route path="/casino/roulette" element={<Roulette />} />
           <Route path="/casino/blackjack" element={<Blackjack />} />
+          
+          {/* Traditional African Games */}
+          <Route path="/games/african-draft" element={<AfricanDraft />} />
+          <Route path="/games/morabaraba" element={<Morabaraba />} />
+          <Route path="/games/mancala" element={<Mancala />} />
+          <Route path="/games/tournament" element={<Tournament />} />
           
           {/* Account */}
           <Route path="/account/profile" element={<Profile />} />
