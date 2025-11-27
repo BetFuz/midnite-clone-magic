@@ -1,4 +1,4 @@
-import { Home, Trophy, CircleDot, Flame, Hammer, Target, TrendingUp, Dumbbell, Volleyball, Table2, TicketCheck, BarChart3, History, CreditCard, Vote, LayoutGrid, DollarSign, Users, Sparkles, Globe, Bot, ShoppingCart, Brain, Wallet, Glasses, Play, Film, Gamepad2, Shield, Lock } from "lucide-react";
+import { Home, Trophy, CircleDot, Flame, Hammer, Target, TrendingUp, Dumbbell, Volleyball, Table2, TicketCheck, BarChart3, History, CreditCard, Vote, LayoutGrid, DollarSign, Users, Sparkles, Globe, Bot, ShoppingCart, Brain, Wallet, Glasses, Play, Film, Gamepad2, Shield, Lock, Hexagon, Puzzle, Shapes } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NavLink } from "@/components/NavLink";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
@@ -44,6 +44,12 @@ const Sidebar = ({ className, showOnMobile = false }: SidebarProps) => {
     { icon: Play, label: "Live Streaming", url: "/live-streaming", badge: "LIVE" },
     { icon: Wallet, label: "Web3 Hub", url: "/web3-hub", badge: "NFT" },
     { icon: Glasses, label: "Virtual Stadium", url: "/virtual-stadium", badge: "VR" },
+  ];
+
+  const traditionalGames = [
+    { icon: Hexagon, label: "African Draft", url: "/games/african-draft", badge: "PLAY" },
+    { icon: Puzzle, label: "Morabaraba", url: "/games/morabaraba", badge: "SOON" },
+    { icon: Shapes, label: "Mancala", url: "/games/mancala", badge: "SOON" },
   ];
 
   const adminFeatures = [
@@ -162,6 +168,36 @@ const Sidebar = ({ className, showOnMobile = false }: SidebarProps) => {
                   <span className="flex-1 text-left">{item.label}</span>
                   {item.badge && (
                     <span className="px-2 py-0.5 text-xs font-bold bg-primary text-primary-foreground rounded">
+                      {item.badge}
+                    </span>
+                  )}
+                </div>
+              </NavLink>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <h3 className="px-4 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Traditional Games
+          </h3>
+          <div className="space-y-1">
+            {traditionalGames.map((item) => (
+              <NavLink
+                key={item.label}
+                to={item.url}
+                className="w-full"
+                activeClassName="bg-sidebar-accent text-sidebar-accent-foreground"
+              >
+                <div
+                  className={cn(
+                    "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-sidebar-foreground hover:bg-sidebar-accent/50"
+                  )}
+                >
+                  <item.icon className="h-5 w-5 text-amber-500" />
+                  <span className="flex-1 text-left">{item.label}</span>
+                  {item.badge && (
+                    <span className="px-2 py-0.5 text-xs font-bold bg-amber-500 text-white rounded">
                       {item.badge}
                     </span>
                   )}
