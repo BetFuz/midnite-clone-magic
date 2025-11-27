@@ -9,6 +9,9 @@ verify_jwt = true
 [functions.admin-bet-settlement]
 verify_jwt = true
 
+[functions.admin-platform-control]
+verify_jwt = true
+
 [functions.admin-financial-reports]
 verify_jwt = true
 
