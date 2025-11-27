@@ -57,6 +57,9 @@ verify_jwt = false
 [functions.ai-craps]
 verify_jwt = false
 
+[functions.ai-rps]
+verify_jwt = false
+
 [functions.bet-recommendations]
 verify_jwt = false
 
