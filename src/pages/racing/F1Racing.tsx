@@ -24,6 +24,7 @@ const F1Racing = () => {
     raceState: f1RaceState,
     currentLap,
     totalLaps,
+    liveRaceState,
     generateRaceScenario,
     startRace: startF1Race
   } = useF1Racing(circuit);
@@ -134,14 +135,18 @@ const F1Racing = () => {
               <F1RaceVisuals
                 currentLap={currentLap}
                 totalLaps={totalLaps}
-                drivers={drivers.map((d, idx) => ({
-                  id: d.id,
-                  name: d.name,
-                  team: d.team,
-                  color: ['#1E40AF', '#06B6D4', '#DC2626', '#EA580C', '#059669'][idx] || '#6B7280',
-                  position: idx,
-                }))}
-                isRacing={true}
+                drivers={liveRaceState.racers.map((racer) => {
+                  const driver = drivers.find(d => d.id === racer.id);
+                  return {
+                    id: racer.id,
+                    name: racer.name,
+                    team: driver?.team || 'Unknown',
+                    color: ['#1E40AF', '#06B6D4', '#DC2626', '#EA580C', '#059669'][parseInt(racer.id) - 1] || '#6B7280',
+                    position: racer.position - 1,
+                    progress: racer.distance,
+                  };
+                })}
+                isRacing={liveRaceState.isRunning}
               />
 
               {commentary && (

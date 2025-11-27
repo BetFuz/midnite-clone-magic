@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { RacingEngine, RacerState, RaceEvent } from '@/lib/racingEngine';
 
 export interface F1Driver {
   id: string;
@@ -23,6 +24,13 @@ export interface F1RaceScenario {
   raceNarrative: string;
 }
 
+export interface RaceState {
+  racers: RacerState[];
+  events: RaceEvent[];
+  currentLap: number;
+  isRunning: boolean;
+}
+
 export const useF1Racing = (circuit: string) => {
   const [scenario, setScenario] = useState<F1RaceScenario | null>(null);
   const [commentary, setCommentary] = useState<string>('');
@@ -31,7 +39,14 @@ export const useF1Racing = (circuit: string) => {
   const [isLoading, setIsLoading] = useState(false);
   const [raceState, setRaceState] = useState<'pre-race' | 'racing' | 'finished'>('pre-race');
   const [currentLap, setCurrentLap] = useState(0);
+  const [liveRaceState, setLiveRaceState] = useState<RaceState>({
+    racers: [],
+    events: [],
+    currentLap: 0,
+    isRunning: false,
+  });
   const totalLaps = 50;
+  const raceEngineRef = useRef<RacingEngine | null>(null);
 
   const drivers: F1Driver[] = [
     { id: '1', name: 'Max Verstappen', team: 'Red Bull Racing', odds: 1.8, stats: { wins: 54, podiums: 98, championships: 3 } },
@@ -138,47 +153,83 @@ export const useF1Racing = (circuit: string) => {
    };
  
   const startRace = async () => {
-     setRaceState('racing');
-     // Fire-and-forget race video generation so UI stays responsive
-     generateRaceVideo();
-     await generateRaceScenario();
-     await generateLiveCommentary('Lights out and away we go!');
- 
-     // Simulate race progression
-     const raceInterval = setInterval(async () => {
-       setCurrentLap(prev => {
-         const next = prev + 1;
-         
-         if (next >= totalLaps) {
-           clearInterval(raceInterval);
-           setRaceState('finished');
-           generateLiveCommentary('Checkered flag! Race complete!');
-           return totalLaps;
-         }
- 
-         // Generate commentary at key moments
-         if (next % 10 === 0) {
-           generateLiveCommentary(`Intense battle for position`);
-         }
- 
-         return next;
-       });
-     }, 3000); // 3 seconds per lap
-   };
+    setRaceState('racing');
+    generateRaceVideo(); // Fire-and-forget
+    await generateRaceScenario();
+    await generateLiveCommentary('Lights out and away we go!');
+
+    // Initialize racing engine with drivers
+    const racers = drivers.map((driver, index) => ({
+      id: driver.id,
+      name: driver.name,
+      baseSpeed: 85 + (5 - index) * 3, // Better drivers start with slight advantage
+    }));
+
+    raceEngineRef.current = new RacingEngine(racers, {
+      totalLaps,
+      updateInterval: 50, // Update every 50ms for smooth racing
+      crashProbability: 0.0005,
+      overtakeDifficulty: 0.3,
+    });
+
+    // Subscribe to race updates
+    raceEngineRef.current.onUpdate((racers, events) => {
+      const state = raceEngineRef.current?.getCurrentState();
+      if (state) {
+        setLiveRaceState({
+          racers: state.racers,
+          events: state.events,
+          currentLap: state.currentLap,
+          isRunning: state.isRunning,
+        });
+        setCurrentLap(state.currentLap);
+
+        // Generate commentary for major events
+        if (events.length > 0) {
+          const latestEvent = events[events.length - 1];
+          if (latestEvent.type === 'overtake' || latestEvent.type === 'crash') {
+            generateLiveCommentary(latestEvent.description);
+          }
+        }
+
+        // Check for race finish
+        if (state.currentLap > totalLaps) {
+          const winner = raceEngineRef.current?.getWinner();
+          if (winner) {
+            setRaceState('finished');
+            generateLiveCommentary(`Checkered flag! ${winner.name} wins the ${circuit} Grand Prix!`);
+          }
+        }
+      }
+    });
+
+    // Start the race simulation
+    raceEngineRef.current.start();
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (raceEngineRef.current) {
+        raceEngineRef.current.stop();
+      }
+    };
+  }, []);
 
   return {
-     drivers,
-     scenario,
-     commentary,
-     raceVideo,
-     heroImage,
-     isLoading,
-     raceState,
-     currentLap,
-     totalLaps,
-     generateRaceScenario,
-     startRace,
-     loadAssets,
-     generateRaceVideo,
-   };
- };
+    drivers,
+    scenario,
+    commentary,
+    raceVideo,
+    heroImage,
+    isLoading,
+    raceState,
+    currentLap,
+    totalLaps,
+    liveRaceState,
+    generateRaceScenario,
+    startRace,
+    loadAssets,
+    generateRaceVideo,
+  };
+};

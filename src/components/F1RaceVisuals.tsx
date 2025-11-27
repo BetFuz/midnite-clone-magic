@@ -8,6 +8,7 @@ interface F1Driver {
   team: string;
   color: string;
   position: number;
+  progress?: number; // 0-100 percentage through current lap
 }
 
 interface F1RaceVisualsProps {
@@ -18,17 +19,10 @@ interface F1RaceVisualsProps {
 }
 
 const F1RaceVisuals = ({ currentLap, totalLaps, drivers, isRacing }: F1RaceVisualsProps) => {
-  const [carPositions, setCarPositions] = useState<Record<string, number>>({});
   const [engineSound, setEngineSound] = useState<HTMLAudioElement | null>(null);
 
-  useEffect(() => {
-    // Initialize car positions
-    const initialPositions: Record<string, number> = {};
-    drivers.forEach((driver, idx) => {
-      initialPositions[driver.id] = idx * 15; // Stagger starting positions
-    });
-    setCarPositions(initialPositions);
-  }, [drivers]);
+  // Sort drivers by position for display
+  const sortedDrivers = [...drivers].sort((a, b) => a.position - b.position);
 
   useEffect(() => {
     if (isRacing) {
@@ -40,27 +34,13 @@ const F1RaceVisuals = ({ currentLap, totalLaps, drivers, isRacing }: F1RaceVisua
       audio.play().catch(e => console.log('Audio autoplay blocked:', e));
       setEngineSound(audio);
 
-      // Animate car positions
-      const interval = setInterval(() => {
-        setCarPositions(prev => {
-          const updated = { ...prev };
-          drivers.forEach(driver => {
-            // Move cars forward with slight randomization for realism
-            const speed = 2 + Math.random() * 1;
-            updated[driver.id] = ((updated[driver.id] || 0) + speed) % 100;
-          });
-          return updated;
-        });
-      }, 50);
-
       return () => {
-        clearInterval(interval);
         audio?.pause();
       };
     } else {
       engineSound?.pause();
     }
-  }, [isRacing, drivers, engineSound]);
+  }, [isRacing, engineSound]);
 
   const teamColors: Record<string, string> = {
     'Red Bull Racing': '#1E40AF',
@@ -90,12 +70,12 @@ const F1RaceVisuals = ({ currentLap, totalLaps, drivers, isRacing }: F1RaceVisua
           </div>
 
           {/* Cars */}
-          {drivers.map((driver) => (
+          {sortedDrivers.map((driver) => (
             <div
               key={driver.id}
-              className="absolute transition-all duration-100 ease-linear"
+              className="absolute transition-all duration-200 ease-linear"
               style={{
-                left: `${carPositions[driver.id] || 0}%`,
+                left: `${driver.progress || 0}%`,
                 top: `${30 + driver.position * 30}px`,
                 transform: 'translateX(-50%)',
               }}
@@ -212,13 +192,13 @@ const F1RaceVisuals = ({ currentLap, totalLaps, drivers, isRacing }: F1RaceVisua
 
         {/* Position Board */}
         <div className="grid grid-cols-5 gap-2">
-          {drivers.map((driver, idx) => (
+          {sortedDrivers.map((driver, idx) => (
             <div 
               key={driver.id}
               className="flex items-center gap-2 bg-slate-800/50 rounded px-2 py-1"
             >
               <div className="text-sm font-bold text-primary">
-                P{idx + 1}
+                P{driver.position + 1}
               </div>
               <div 
                 className="w-3 h-3 rounded-full"
