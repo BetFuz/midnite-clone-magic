@@ -135,6 +135,20 @@ export function usePoker() {
     return { rank: 'High Card', value: 1 };
   }, []);
 
+  const nextPlayer = useCallback(() => {
+    setCurrentPlayerIndex(prev => {
+      const nextIdx = (prev + 1) % players.length;
+      // Find next active player
+      let idx = nextIdx;
+      let attempts = 0;
+      while (players[idx]?.folded && attempts < players.length) {
+        idx = (idx + 1) % players.length;
+        attempts++;
+      }
+      return idx;
+    });
+  }, [players]);
+
   const bet = useCallback((amount: number) => {
     setPlayers(prev => {
       const updated = [...prev];
@@ -144,8 +158,8 @@ export function usePoker() {
       setPot(p => p + amount);
       return updated;
     });
-    nextPlayer();
-  }, [currentPlayerIndex]);
+    setTimeout(() => nextPlayer(), 100);
+  }, [currentPlayerIndex, nextPlayer]);
 
   const call = useCallback(() => {
     const maxBet = Math.max(...players.map(p => p.currentBet));
@@ -165,18 +179,8 @@ export function usePoker() {
       updated[currentPlayerIndex].folded = true;
       return updated;
     });
-    nextPlayer();
-  }, [currentPlayerIndex]);
-
-  const nextPlayer = useCallback(() => {
-    setCurrentPlayerIndex(prev => {
-      let next = (prev + 1) % players.length;
-      while (players[next]?.folded && next !== prev) {
-        next = (next + 1) % players.length;
-      }
-      return next;
-    });
-  }, [players]);
+    setTimeout(() => nextPlayer(), 100);
+  }, [currentPlayerIndex, nextPlayer]);
 
   const nextPhase = useCallback(() => {
     const newDeck = [...deck];
