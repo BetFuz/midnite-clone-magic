@@ -7,16 +7,34 @@ import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Users, Bot, Globe, Shield, Zap, Crown } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Users, Bot, Globe, Shield, Zap, Crown, RotateCcw } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { MorabarabaBoard } from '@/components/games/MorabarabaBoard';
+import { useMorabarabaGame } from '@/hooks/useMorabarabaGame';
 
 export default function Morabaraba() {
-  const [activeMode, setActiveMode] = useState('p2p');
+  const [activeMode, setActiveMode] = useState<'p2p' | 'human-ai' | 'ai-ai' | 'cultural'>('p2p');
+  const [difficulty, setDifficulty] = useState<'Novice' | 'Skilled' | 'Expert' | 'Master'>('Skilled');
+  const [stakeAmount, setStakeAmount] = useState<number>(1000);
+  const [gameStarted, setGameStarted] = useState(false);
 
-  const handlePlaceBet = (mode: string, difficulty?: string) => {
+  const { gameState, handlePositionClick, isProcessing, resetGame } = useMorabarabaGame({
+    gameId: null,
+    mode: activeMode,
+    userId: null,
+    stakeAmount,
+    difficulty,
+    culturalMode: activeMode === 'cultural',
+  });
+
+  const startGame = () => {
+    resetGame();
+    setGameStarted(true);
     toast({
-      title: 'Bet Placed',
-      description: `Morabaraba ${mode} bet placed${difficulty ? ` at ${difficulty} level` : ''}`,
+      title: 'Game Started',
+      description: `Morabaraba ${activeMode} game started${activeMode === 'human-ai' ? ` at ${difficulty} level` : ''}`,
     });
   };
 
@@ -51,7 +69,7 @@ export default function Morabaraba() {
             </Card>
 
             {/* Game Modes */}
-            <Tabs value={activeMode} onValueChange={setActiveMode}>
+            <Tabs value={activeMode} onValueChange={(val) => setActiveMode(val as 'p2p' | 'human-ai' | 'ai-ai' | 'cultural')}>
               <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="p2p" className="gap-2">
                   <Users className="h-4 w-4" />
@@ -77,109 +95,209 @@ export default function Morabaraba() {
 
               {/* P2P Mode - Cow Trading */}
               <TabsContent value="p2p" className="space-y-4">
-                <Card className="p-6">
-                  <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                    <Users className="h-5 w-5 text-primary" />
-                    Cow Trading Betting
-                  </h3>
-                  <div className="space-y-3">
-                    <div className="flex items-start gap-3">
-                      <Zap className="h-5 w-5 text-primary mt-0.5" />
+                {!gameStarted ? (
+                  <Card className="p-6">
+                    <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                      <Users className="h-5 w-5 text-primary" />
+                      Cow Trading Betting
+                    </h3>
+                    <div className="space-y-4 mb-6">
                       <div>
-                        <p className="font-medium">Traditional Cow Stakes</p>
-                        <p className="text-sm text-muted-foreground">Bet using traditional cow-based value system</p>
+                        <Label>Stake Amount (₦)</Label>
+                        <Input
+                          type="number"
+                          value={stakeAmount}
+                          onChange={(e) => setStakeAmount(Number(e.target.value))}
+                          min={300}
+                          max={75000}
+                          className="mt-1"
+                        />
                       </div>
                     </div>
-                    <div className="flex items-start gap-3">
-                      <Zap className="h-5 w-5 text-primary mt-0.5" />
-                      <div>
-                        <p className="font-medium">Player vs Player Matching</p>
-                        <p className="text-sm text-muted-foreground">Direct competition with stake trading</p>
+                    <div className="space-y-3">
+                      <div className="flex items-start gap-3">
+                        <Zap className="h-5 w-5 text-primary mt-0.5" />
+                        <div>
+                          <p className="font-medium">Traditional Cow Stakes</p>
+                          <p className="text-sm text-muted-foreground">Bet using traditional cow-based value system</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <Zap className="h-5 w-5 text-primary mt-0.5" />
+                        <div>
+                          <p className="font-medium">Player vs Player Matching</p>
+                          <p className="text-sm text-muted-foreground">Direct competition with stake trading</p>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex items-start gap-3">
-                      <Zap className="h-5 w-5 text-primary mt-0.5" />
+                    <Button 
+                      className="w-full mt-6" 
+                      size="lg"
+                      onClick={startGame}
+                    >
+                      Start Cow Trading Match
+                    </Button>
+                  </Card>
+                ) : (
+                  <Card className="p-6">
+                    <div className="flex items-center justify-between mb-6">
                       <div>
-                        <p className="font-medium">Community Pools</p>
-                        <p className="text-sm text-muted-foreground">Join traditional betting circles</p>
+                        <h3 className="text-xl font-semibold">Cow Trading Match</h3>
+                        <p className="text-sm text-muted-foreground">Stake: ₦{stakeAmount.toLocaleString()}</p>
+                      </div>
+                      <Button variant="outline" onClick={resetGame}>
+                        <RotateCcw className="h-4 w-4 mr-2" />
+                        Reset
+                      </Button>
+                    </div>
+
+                    <div className="flex flex-col items-center gap-6">
+                      {/* Game status */}
+                      <div className="flex items-center gap-4 w-full justify-center">
+                        <div className="text-center">
+                          <div className="text-sm text-muted-foreground mb-1">Red Player</div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-full bg-destructive" />
+                            <span className="font-medium">{gameState.redPiecesRemaining} pieces</span>
+                          </div>
+                        </div>
+                        <div className="text-center px-4">
+                          <div className={`text-lg font-bold ${gameState.currentPlayer === 'red' ? 'text-destructive' : 'text-primary'}`}>
+                            {gameState.gameOver ? 'Game Over!' : `${gameState.currentPlayer === 'red' ? 'Red' : 'Black'}'s Turn`}
+                          </div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-sm text-muted-foreground mb-1">Black Player</div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-full bg-primary" />
+                            <span className="font-medium">{gameState.blackPiecesRemaining} pieces</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Game board */}
+                      <MorabarabaBoard
+                        gameState={gameState}
+                        onPositionClick={handlePositionClick}
+                        culturalMode={false}
+                      />
+
+                      {/* Instructions */}
+                      <div className="text-center text-sm text-muted-foreground max-w-md">
+                        {gameState.mustCapture && (
+                          <p className="font-medium text-destructive">Select an opponent piece to capture!</p>
+                        )}
+                        {!gameState.mustCapture && gameState.phase === 'placement' && (
+                          <p>Click an empty position to place your piece</p>
+                        )}
+                        {!gameState.mustCapture && gameState.phase !== 'placement' && !gameState.selectedPiece && (
+                          <p>Select one of your pieces to move</p>
+                        )}
+                        {!gameState.mustCapture && gameState.selectedPiece !== null && (
+                          <p>Click a highlighted position to move your piece</p>
+                        )}
                       </div>
                     </div>
-                    <div className="flex items-start gap-3">
-                      <Zap className="h-5 w-5 text-primary mt-0.5" />
-                      <div>
-                        <p className="font-medium">Honor System</p>
-                        <p className="text-sm text-muted-foreground">Respected traditional betting protocols</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-6 p-4 bg-muted/50 rounded-lg">
-                    <div className="flex justify-between text-sm mb-2">
-                      <span className="text-muted-foreground">Min Bet</span>
-                      <span className="font-medium">₦300</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Max Bet</span>
-                      <span className="font-medium">₦75,000</span>
-                    </div>
-                  </div>
-                  <Button 
-                    className="w-full mt-4" 
-                    size="lg"
-                    onClick={() => handlePlaceBet('Cow Trading')}
-                  >
-                    Enter Cow Trading Match
-                  </Button>
-                </Card>
+                  </Card>
+                )}
               </TabsContent>
 
               {/* Human vs AI Mode */}
               <TabsContent value="human-ai" className="space-y-4">
-                <Card className="p-6">
-                  <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                    <Bot className="h-5 w-5 text-primary" />
-                    Beat the AI
-                  </h3>
-                  <div className="space-y-3 mb-6">
-                    <div className="flex items-start gap-3">
-                      <Zap className="h-5 w-5 text-primary mt-0.5" />
+                {!gameStarted ? (
+                  <Card className="p-6">
+                    <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                      <Bot className="h-5 w-5 text-primary" />
+                      Beat the AI
+                    </h3>
+                    <div className="space-y-4 mb-6">
                       <div>
-                        <p className="font-medium">Mill Formation Challenge</p>
-                        <p className="text-sm text-muted-foreground">Test your strategic mill-building skills</p>
+                        <Label>Difficulty Level</Label>
+                        <div className="grid grid-cols-2 gap-2 mt-2">
+                          {(['Novice', 'Skilled', 'Expert', 'Master'] as const).map((level) => (
+                            <Button
+                              key={level}
+                              variant={difficulty === level ? 'default' : 'outline'}
+                              onClick={() => setDifficulty(level)}
+                              className="justify-between"
+                            >
+                              <span>{level}</span>
+                              <Badge variant="secondary">
+                                {level === 'Novice' ? '2x' : level === 'Skilled' ? '4x' : level === 'Expert' ? '8x' : '15x'}
+                              </Badge>
+                            </Button>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                    <div className="flex items-start gap-3">
-                      <Zap className="h-5 w-5 text-primary mt-0.5" />
+                    <Button 
+                      className="w-full mt-4" 
+                      size="lg"
+                      onClick={startGame}
+                    >
+                      Challenge AI ({difficulty})
+                    </Button>
+                  </Card>
+                ) : (
+                  <Card className="p-6">
+                    <div className="flex items-center justify-between mb-6">
                       <div>
-                        <p className="font-medium">Capture Performance Bets</p>
-                        <p className="text-sm text-muted-foreground">Bonus multipliers for capture streaks</p>
+                        <h3 className="text-xl font-semibold">vs AI ({difficulty})</h3>
+                        <p className="text-sm text-muted-foreground">You are Red</p>
                       </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <Zap className="h-5 w-5 text-primary mt-0.5" />
-                      <div>
-                        <p className="font-medium">Strategic Mastery</p>
-                        <p className="text-sm text-muted-foreground">Unlock advanced tactical achievements</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <h4 className="font-semibold">Select Difficulty:</h4>
-                    {['Novice', 'Skilled', 'Expert', 'Master'].map((level) => (
-                      <Button
-                        key={level}
-                        variant="outline"
-                        className="w-full justify-between"
-                        onClick={() => handlePlaceBet('Human vs AI', level)}
-                      >
-                        <span>{level}</span>
-                        <Badge variant="secondary">
-                          {level === 'Novice' ? '2x' : level === 'Skilled' ? '4x' : level === 'Expert' ? '8x' : '15x'}
-                        </Badge>
+                      <Button variant="outline" onClick={resetGame}>
+                        <RotateCcw className="h-4 w-4 mr-2" />
+                        Reset
                       </Button>
-                    ))}
-                  </div>
-                </Card>
+                    </div>
+
+                    <div className="flex flex-col items-center gap-6">
+                      <div className="flex items-center gap-4 w-full justify-center">
+                        <div className="text-center">
+                          <div className="text-sm text-muted-foreground mb-1">You (Red)</div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-full bg-destructive" />
+                            <span className="font-medium">{gameState.redPiecesRemaining} pieces</span>
+                          </div>
+                        </div>
+                        <div className="text-center px-4">
+                          <div className={`text-lg font-bold ${gameState.currentPlayer === 'red' ? 'text-destructive' : 'text-primary'}`}>
+                            {gameState.gameOver ? (gameState.winner === 'red' ? 'You Win!' : 'AI Wins!') : (gameState.currentPlayer === 'red' ? 'Your Turn' : 'AI Thinking...')}
+                          </div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-sm text-muted-foreground mb-1">AI (Black)</div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-full bg-primary" />
+                            <span className="font-medium">{gameState.blackPiecesRemaining} pieces</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <MorabarabaBoard
+                        gameState={gameState}
+                        onPositionClick={handlePositionClick}
+                        culturalMode={false}
+                      />
+
+                      <div className="text-center text-sm text-muted-foreground max-w-md">
+                        {isProcessing && <p className="text-primary font-medium">Processing...</p>}
+                        {gameState.mustCapture && (
+                          <p className="font-medium text-destructive">Select an opponent piece to capture!</p>
+                        )}
+                        {!isProcessing && !gameState.mustCapture && gameState.phase === 'placement' && (
+                          <p>Click an empty position to place your piece</p>
+                        )}
+                        {!isProcessing && !gameState.mustCapture && gameState.phase !== 'placement' && !gameState.selectedPiece && (
+                          <p>Select one of your pieces to move</p>
+                        )}
+                        {!isProcessing && !gameState.mustCapture && gameState.selectedPiece !== null && (
+                          <p>Click a highlighted position to move your piece</p>
+                        )}
+                      </div>
+                    </div>
+                  </Card>
+                )}
               </TabsContent>
 
               {/* AI vs AI Mode */}
@@ -197,44 +315,19 @@ export default function Morabaraba() {
                         <p className="text-sm text-muted-foreground">Different AI mill-building strategies compete</p>
                       </div>
                     </div>
-                    <div className="flex items-start gap-3">
-                      <Zap className="h-5 w-5 text-primary mt-0.5" />
-                      <div>
-                        <p className="font-medium">Historical Performance</p>
-                        <p className="text-sm text-muted-foreground">Track AI win patterns and tendencies</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <Zap className="h-5 w-5 text-primary mt-0.5" />
-                      <div>
-                        <p className="font-medium">24/7 Tournaments</p>
-                        <p className="text-sm text-muted-foreground">Continuous AI competitions running</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <Zap className="h-5 w-5 text-primary mt-0.5" />
-                      <div>
-                        <p className="font-medium">Live Odds Adjustment</p>
-                        <p className="text-sm text-muted-foreground">Real-time odds based on AI moves</p>
-                      </div>
-                    </div>
                   </div>
                   <div className="mt-6 p-4 bg-muted/50 rounded-lg">
                     <div className="flex justify-between text-sm mb-2">
                       <span className="text-muted-foreground">Next Tournament</span>
                       <span className="font-medium">8m 45s</span>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Active Bets</span>
-                      <span className="font-medium">1,832</span>
-                    </div>
                   </div>
                   <Button 
                     className="w-full mt-4" 
                     size="lg"
-                    onClick={() => handlePlaceBet('AI Tournament')}
+                    onClick={startGame}
                   >
-                    Bet on AI Tournament
+                    Watch AI Tournament
                   </Button>
                 </Card>
               </TabsContent>
@@ -254,30 +347,11 @@ export default function Morabaraba() {
                         <p className="text-sm text-muted-foreground">Play as practiced by Sotho-Tswana ancestors</p>
                       </div>
                     </div>
-                    <div className="flex items-start gap-3">
-                      <Globe className="h-5 w-5 text-amber-500 mt-0.5" />
-                      <div>
-                        <p className="font-medium">Sacred Game Rules</p>
-                        <p className="text-sm text-muted-foreground">Traditional rules honoring cultural heritage</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <Globe className="h-5 w-5 text-amber-500 mt-0.5" />
-                      <div>
-                        <p className="font-medium">Cow Symbolism</p>
-                        <p className="text-sm text-muted-foreground">Each piece represents cattle wealth and prosperity</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-6 p-4 bg-amber-500/10 rounded-lg border border-amber-500/20">
-                    <p className="text-sm text-center italic text-muted-foreground">
-                      "Morabaraba teaches patience, strategy, and respect for tradition" - Sotho-Tswana Wisdom
-                    </p>
                   </div>
                   <Button 
                     className="w-full mt-4 bg-amber-600 hover:bg-amber-700" 
                     size="lg"
-                    onClick={() => handlePlaceBet('Sacred Cows')}
+                    onClick={startGame}
                   >
                     Play Sacred Cows Mode
                   </Button>
