@@ -6,9 +6,16 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Play, Clock } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const Virtuals = () => {
-  const handlePlayVirtual = (gameName: string) => {
+  const navigate = useNavigate();
+  
+  const handlePlayVirtual = (gameName: string, path?: string) => {
+    if (path) {
+      navigate(path);
+      return;
+    }
     toast({
       title: "Loading Virtual Game",
       description: `${gameName} is starting...`,
@@ -53,6 +60,13 @@ const Virtuals = () => {
       nextRace: "3 mins",
       frequency: "Every 5 mins",
       description: "Watch virtual tennis matches unfold",
+    },
+    {
+      name: "🏎️ AI-Powered F1 Racing",
+      nextRace: "Now Live",
+      frequency: "On Demand",
+      description: "Experience Formula 1 Grand Prix with AI-generated scenarios, live commentary, and real betting",
+      path: "/racing/f1",
     },
     {
       name: "Virtual Motorsports",
@@ -108,7 +122,7 @@ const Virtuals = () => {
             <h2 className="text-xl font-bold text-foreground mb-4">Available Virtual Sports</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {virtualGames.map((game, index) => (
-                <Card key={index} className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all cursor-pointer" onClick={() => handlePlayVirtual(game.name)}>
+                <Card key={index} className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all cursor-pointer" onClick={() => handlePlayVirtual(game.name, game.path)}>
                   <div className="aspect-video bg-gradient-card relative">
                     <div className="absolute top-3 left-3">
                       <Badge className="bg-success/90 text-white">
@@ -117,7 +131,7 @@ const Virtuals = () => {
                       </Badge>
                     </div>
                     <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button size="lg" className="rounded-full w-16 h-16 p-0 bg-primary text-primary-foreground hover:bg-primary/90" onClick={(e) => { e.stopPropagation(); handlePlayVirtual(game.name); }}>
+                      <Button size="lg" className="rounded-full w-16 h-16 p-0 bg-primary text-primary-foreground hover:bg-primary/90" onClick={(e) => { e.stopPropagation(); handlePlayVirtual(game.name, game.path); }}>
                         <Play className="h-6 w-6" fill="currentColor" />
                       </Button>
                     </div>
