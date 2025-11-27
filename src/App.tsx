@@ -139,6 +139,7 @@ import AdminWithdrawals from "./pages/admin/Withdrawals";
 import AdminReports from "./pages/admin/Reports";
 import AdminAuditLog from "./pages/admin/AuditLog";
 import AdminSettings from "./pages/admin/Settings";
+import AdminSecurity from "./pages/admin/Security";
 
 import MobileBetSlip from "./components/MobileBetSlip";
 import { BottomNav } from "./components/mobile/BottomNav";
@@ -348,6 +349,7 @@ const App = () => (
           <Route path="/admin/audit" element={<AdminAuditLog />} />
           <Route path="/admin/audit-log" element={<AdminAuditLog />} />
           <Route path="/admin/settings" element={<AdminSettings />} />
+          <Route path="/admin/security" element={<AdminSecurity />} />
           <Route path="/admin/seed" element={<SeedData />} />
           
           {/* Match & Live Tables */}
