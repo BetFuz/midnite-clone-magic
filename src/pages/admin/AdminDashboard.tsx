@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AdminGuard } from "@/components/admin/AdminGuard";
 import { AdminLayout } from "@/components/admin/AdminLayout";
+import { RealtimeActivityFeed } from "@/components/admin/RealtimeActivityFeed";
 import { useAdminPlatformControl } from "@/hooks/useAdminPlatformControl";
 import { 
   Shield, Users, TrendingUp, Activity, 
@@ -164,8 +165,8 @@ const AdminDashboard = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle>Recent Activity</CardTitle>
-                <CardDescription>Latest platform events</CardDescription>
+                <CardTitle>Platform Metrics</CardTitle>
+                <CardDescription>Key performance indicators</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2 text-sm">
@@ -189,6 +190,9 @@ const AdminDashboard = () => {
               </CardContent>
             </Card>
           </div>
+
+          {/* Real-time Activity Feed */}
+          <RealtimeActivityFeed />
 
           {/* Management Tabs */}
           <Tabs defaultValue="overview" className="space-y-4">
