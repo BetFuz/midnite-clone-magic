@@ -4,14 +4,14 @@ import Sidebar from '@/components/Sidebar';
 import BetSlip from '@/components/BetSlip';
 import MobileNav from '@/components/MobileNav';
 import { Card } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Users, Bot, Globe, Shield, Zap, Crown, RotateCcw, Sprout } from 'lucide-react';
+import { Shield, Crown, RotateCcw, Sprout } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { MancalaBoard } from '@/components/games/MancalaBoard';
+import { UniversalGameInterface } from '@/components/games/UniversalGameInterface';
 import { useMancalaGame } from '@/hooks/useMancalaGame';
 import type { Variant } from '@/lib/games/mancalaEngine';
 
@@ -89,40 +89,119 @@ export default function Mancala() {
               </div>
             </Card>
 
-            {/* Game Modes */}
-            <Tabs value={activeMode} onValueChange={(val) => setActiveMode(val as 'p2p' | 'human-ai' | 'ai-ai' | 'cultural')}>
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="p2p" className="gap-2">
-                  <Users className="h-4 w-4" />
-                  <span className="hidden sm:inline">Seed Betting</span>
-                  <span className="sm:hidden">P2P</span>
-                </TabsTrigger>
-                <TabsTrigger value="human-ai" className="gap-2">
-                  <Bot className="h-4 w-4" />
-                  <span className="hidden sm:inline">Beat AI</span>
-                  <span className="sm:hidden">AI</span>
-                </TabsTrigger>
-                <TabsTrigger value="ai-ai" className="gap-2">
-                  <Bot className="h-4 w-4" />
-                  <span className="hidden sm:inline">AI Tournament</span>
-                  <span className="sm:hidden">AI vs AI</span>
-                </TabsTrigger>
-                <TabsTrigger value="cultural" className="gap-2">
-                  <Globe className="h-4 w-4" />
-                  <span className="hidden sm:inline">Seed Master</span>
-                  <span className="sm:hidden">Cultural</span>
-                </TabsTrigger>
-              </TabsList>
+            {/* Universal Game Interface */}
+            <UniversalGameInterface
+              gameType="mancala"
+              gameState={gameState}
+              gameMode={{
+                mode: activeMode,
+                bettingEnabled: true,
+                stakeAmount,
+                aiDifficulty: difficulty,
+              }}
+              onModeChange={(mode) => setActiveMode(mode)}
+              bettingState={betting}
+              onBetPlace={handlePlaceBet}
+              culturalMode={activeMode === 'cultural'}
+              onCulturalToggle={() => setActiveMode('p2p')}
+              freePlay={false}
+              onDifficultyChange={(diff) => setDifficulty(diff)}
+            >
+              {/* Game Setup and Board Area */}
+              {!gameStarted ? (
+                <Card className="p-6">
+                  <h3 className="text-xl font-semibold mb-4">Game Setup</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <Label>Stake Amount (₦)</Label>
+                      <Input
+                        type="number"
+                        value={stakeAmount}
+                        onChange={(e) => setStakeAmount(Number(e.target.value))}
+                        min={200}
+                        max={50000}
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label>Game Variant</Label>
+                      <div className="grid grid-cols-2 gap-2 mt-2">
+                        {(['Oware', 'Kalah'] as const).map((v) => (
+                          <Button
+                            key={v}
+                            variant={variant === v ? 'default' : 'outline'}
+                            onClick={() => setVariant(v)}
+                          >
+                            {v}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                    <Button 
+                      className="w-full mt-4" 
+                      size="lg"
+                      onClick={startGame}
+                    >
+                      Start {activeMode === 'p2p' ? 'Seed Betting' : activeMode === 'human-ai' ? 'Challenge AI' : activeMode === 'ai-ai' ? 'AI Tournament' : 'Cultural'} Game
+                    </Button>
+                  </div>
+                </Card>
+              ) : (
+                <Card className="p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <h3 className="text-xl font-semibold">
+                        {activeMode === 'p2p' && `Seed Betting (${variant})`}
+                        {activeMode === 'human-ai' && `vs AI (${difficulty})`}
+                        {activeMode === 'ai-ai' && `AI Tournament (${variant})`}
+                        {activeMode === 'cultural' && `Seed Master (${variant})`}
+                      </h3>
+                      <p className="text-sm text-muted-foreground">Stake: ₦{stakeAmount.toLocaleString()}</p>
+                    </div>
+                    <Button variant="outline" onClick={() => { resetGame(); setGameStarted(false); }}>
+                      <RotateCcw className="h-4 w-4 mr-2" />
+                      New Game
+                    </Button>
+                  </div>
 
-              {/* P2P Mode - Seed Betting */}
-              <TabsContent value="p2p" className="space-y-4">
-                {!gameStarted ? (
-                  <Card className="p-6">
-                    <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                      <Users className="h-5 w-5 text-primary" />
-                      Seed Betting
-                    </h3>
-                    <div className="space-y-4 mb-6">
+                  <div className="flex flex-col items-center gap-6">
+                    <div className={`text-lg font-bold text-center ${gameState.currentPlayer === 'player1' ? 'text-destructive' : 'text-primary'}`}>
+                      {gameState.gameOver 
+                        ? `Game Over! ${gameState.winner === 'player1' ? 
+                            (activeMode === 'human-ai' ? 'You Win!' : 'Player 1 Wins!') : 
+                            gameState.winner === 'player2' ? 
+                            (activeMode === 'human-ai' ? 'AI Wins!' : activeMode === 'ai-ai' ? 'AI 2 Wins!' : 'Player 2 Wins!') : 
+                            'Draw!'}`
+                        : `${gameState.currentPlayer === 'player1' ? 
+                            (activeMode === 'human-ai' ? 'Your Turn' : 'Player 1') : 
+                            (activeMode === 'human-ai' ? 'AI Thinking...' : activeMode === 'ai-ai' ? 'AI 2' : 'Player 2')}'s Turn`}
+                    </div>
+
+                    <MancalaBoard
+                      gameState={gameState}
+                      onPitClick={handlePitClick}
+                      culturalMode={activeMode === 'cultural'}
+                    />
+
+                    <div className="text-center text-sm text-muted-foreground max-w-md">
+                      {isProcessing && <p className="text-primary font-medium">Processing...</p>}
+                      {!isProcessing && !gameState.gameOver && (
+                        <p>Click a pit on your side to sow seeds counter-clockwise</p>
+                      )}
+                      {gameState.gameOver && (
+                        <p className="text-foreground font-medium">
+                          Final Score: {gameState.player1Seeds} - {gameState.player2Seeds}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </Card>
+              )}
+            </UniversalGameInterface>
+
+            {/* Rules */}
+            <Card className="p-6">
+              <h3 className="text-xl font-semibold mb-4">Game Rules</h3>
                       <div>
                         <Label>Stake Amount (₦)</Label>
                         <Input
@@ -226,10 +305,6 @@ export default function Mancala() {
                     </div>
                   </Card>
                 )}
-              </TabsContent>
-
-              {/* Human vs AI Mode */}
-              <TabsContent value="human-ai" className="space-y-4">
                 {!gameStarted ? (
                   <Card className="p-6">
                     <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
@@ -364,10 +439,6 @@ export default function Mancala() {
                     </div>
                   </Card>
                 )}
-              </TabsContent>
-
-              {/* AI vs AI Mode */}
-              <TabsContent value="ai-ai" className="space-y-4">
                 {!gameStarted ? (
                   <Card className="p-6">
                     <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
@@ -497,10 +568,6 @@ export default function Mancala() {
                     </div>
                   </Card>
                 )}
-              </TabsContent>
-
-              {/* Cultural Mode - Seed Master */}
-              <TabsContent value="cultural" className="space-y-4">
                 <Card className="p-6">
                   <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
                     <Globe className="h-5 w-5 text-primary" />
@@ -530,8 +597,6 @@ export default function Mancala() {
                     Begin Seed Master Journey
                   </Button>
                 </Card>
-              </TabsContent>
-            </Tabs>
 
             {/* Rules */}
             <Card className="p-6">
