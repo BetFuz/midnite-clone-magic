@@ -126,8 +126,8 @@ verify_jwt = false
 [functions.user-registration-webhook]
 verify_jwt = false
 
-[functions.voice-betting-token]
-verify_jwt = true
+[functions.racing-simulation]
+verify_jwt = false
 
 [functions.withdraw]
 verify_jwt = true
