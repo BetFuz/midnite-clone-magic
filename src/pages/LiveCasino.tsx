@@ -8,16 +8,30 @@ import { Users, Play } from "lucide-react";
 import { formatCurrency } from "@/lib/currency";
 import { toast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const LiveCasino = () => {
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState("All Tables");
   const categories = ["All Tables", "Roulette", "Blackjack", "Baccarat", "Game Shows", "Poker"];
   
-  const handleJoinTable = (tableName: string) => {
+  const handleJoinTable = (tableName: string, category: string) => {
     toast({
       title: "Joining Table",
-      description: `${tableName} is loading...`,
+      description: `Loading ${tableName}...`,
     });
+    
+    // Navigate to the appropriate game page
+    const gameRoutes: Record<string, string> = {
+      'Roulette': '/live-casino/lightning-roulette',
+      'Blackjack': '/live-casino/blackjack',
+      'Baccarat': '/live-casino/baccarat',
+      'Poker': '/live-casino/poker',
+      'Game Shows': '/casino/game-show'
+    };
+    
+    const route = gameRoutes[category] || '/live-casino/blackjack';
+    setTimeout(() => navigate(route), 500);
   };
   
   const handleCategoryClick = (category: string) => {
@@ -81,7 +95,7 @@ const LiveCasino = () => {
             <h2 className="text-xl font-bold text-foreground mb-4">Featured Tables</h2>
             <div className="grid grid-cols-2 gap-4">
             {featuredTables.map((table, index) => (
-                <Card key={index} className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all cursor-pointer" onClick={() => handleJoinTable(table.name)}>
+                <Card key={index} className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all cursor-pointer" onClick={() => handleJoinTable(table.name, table.category)}>
                   <div className="aspect-video bg-gradient-card relative">
                     <div className="absolute top-3 left-3 flex gap-2">
                       <Badge className="bg-destructive/90 text-white">
@@ -94,7 +108,7 @@ const LiveCasino = () => {
                       </Badge>
                     </div>
                     <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button size="lg" className="rounded-full w-16 h-16 p-0 bg-primary text-primary-foreground hover:bg-primary/90" onClick={(e) => { e.stopPropagation(); handleJoinTable(table.name); }}>
+                      <Button size="lg" className="rounded-full w-16 h-16 p-0 bg-primary text-primary-foreground hover:bg-primary/90" onClick={(e) => { e.stopPropagation(); handleJoinTable(table.name, table.category); }}>
                         <Play className="h-6 w-6" fill="currentColor" />
                       </Button>
                     </div>
@@ -118,7 +132,7 @@ const LiveCasino = () => {
             <h2 className="text-xl font-bold text-foreground mb-4">All Live Tables</h2>
             <div className="grid grid-cols-2 gap-4">
             {liveTables.map((table, index) => (
-                <Card key={index} className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all cursor-pointer" onClick={() => handleJoinTable(table.name)}>
+                <Card key={index} className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all cursor-pointer" onClick={() => handleJoinTable(table.name, table.category)}>
                   <div className="aspect-video bg-gradient-card relative">
                     <div className="absolute top-3 left-3 flex gap-2">
                       <Badge className="bg-destructive/90 text-white">
@@ -131,7 +145,7 @@ const LiveCasino = () => {
                       </Badge>
                     </div>
                     <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button size="lg" className="rounded-full w-16 h-16 p-0 bg-primary text-primary-foreground hover:bg-primary/90" onClick={(e) => { e.stopPropagation(); handleJoinTable(table.name); }}>
+                      <Button size="lg" className="rounded-full w-16 h-16 p-0 bg-primary text-primary-foreground hover:bg-primary/90" onClick={(e) => { e.stopPropagation(); handleJoinTable(table.name, table.category); }}>
                         <Play className="h-6 w-6" fill="currentColor" />
                       </Button>
                     </div>

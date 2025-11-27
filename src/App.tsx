@@ -151,8 +151,9 @@ import NetworkStatus from "./components/NetworkStatus";
 // Match & Live Casino
 import MatchDetail from "./pages/matches/MatchDetail";
 import LightningRoulette from "./pages/live-casino/LightningRoulette";
-import Poker from "./pages/live-casino/Poker";
-import Baccarat from "./pages/live-casino/Baccarat";
+import LiveCasinoPoker from "./pages/live-casino/Poker";
+import LiveCasinoBaccarat from "./pages/live-casino/Baccarat";
+import LiveCasinoBlackjack from "./pages/live-casino/Blackjack";
 import BetFeatures from "./pages/BetFeatures";
 import EnhancedAccountHub from "./pages/account/EnhancedAccountHub";
 import Politics from "./pages/politics/Politics";
@@ -359,8 +360,8 @@ const App = () => (
           {/* Match & Live Tables */}
           <Route path="/match/:id" element={<MatchDetail />} />
           <Route path="/live-table/lightning-roulette" element={<LightningRoulette />} />
-          <Route path="/live-table/poker" element={<Poker />} />
-          <Route path="/live-table/baccarat" element={<Baccarat />} />
+          <Route path="/live-table/poker" element={<LiveCasinoPoker />} />
+          <Route path="/live-table/baccarat" element={<LiveCasinoBaccarat />} />
           <Route path="/casino/keno" element={<Keno />} />
           <Route path="/casino/scratch-cards" element={<ScratchCards />} />
           <Route path="/casino/craps" element={<Craps />} />
@@ -370,6 +371,12 @@ const App = () => (
           <Route path="/casino/game-show" element={<GameShow />} />
           <Route path="/casino/bingo" element={<Bingo />} />
           <Route path="/casino/burst-games" element={<BurstGames />} />
+          
+          {/* Live Casino Routes */}
+          <Route path="/live-casino/lightning-roulette" element={<LightningRoulette />} />
+          <Route path="/live-casino/poker" element={<LiveCasinoPoker />} />
+          <Route path="/live-casino/baccarat" element={<LiveCasinoBaccarat />} />
+          <Route path="/live-casino/blackjack" element={<LiveCasinoBlackjack />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
