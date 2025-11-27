@@ -100,6 +100,19 @@ const Sidebar = ({ className, showOnMobile = false }: SidebarProps) => {
     { icon: TrendingUp, label: "Horse Racing", url: "/racing" },
   ];
 
+  const racingCategories = [
+    { icon: TrendingUp, label: "🏇 Horse Racing", url: "/racing/horse" },
+    { icon: TrendingUp, label: "🐕 Dog Racing", url: "/racing/dog" },
+    { icon: TrendingUp, label: "🏎️ Formula 1", url: "/racing/f1" },
+    { icon: TrendingUp, label: "🚗 Street Racing", url: "/racing/street" },
+    { icon: TrendingUp, label: "🏍️ MotoGP", url: "/racing/motogp" },
+    { icon: TrendingUp, label: "🚤 Powerboat", url: "/racing/powerboat" },
+    { icon: TrendingUp, label: "🚴 Cycling", url: "/racing/cycling" },
+    { icon: TrendingUp, label: "🤖 Robot Racing", url: "/racing/robot" },
+    { icon: TrendingUp, label: "🚀 Space Racing", url: "/racing/space" },
+    { icon: TrendingUp, label: "🐉 Dragon Boat", url: "/racing/dragon-boat" },
+  ];
+
   return (
     <aside className={cn(showOnMobile ? "flex" : "hidden md:flex", "w-64 border-r border-border bg-sidebar h-[calc(100vh-4rem)] overflow-y-auto flex-col", className)}>
       <div className="p-4 space-y-6">
@@ -265,6 +278,27 @@ const Sidebar = ({ className, showOnMobile = false }: SidebarProps) => {
           </h3>
           <div className="space-y-1">
             {sportsCategories.map((item) => (
+              <NavLink
+                key={item.label}
+                to={item.url}
+                className="w-full"
+                activeClassName="bg-sidebar-accent text-sidebar-accent-foreground"
+              >
+                <div className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors">
+                  <item.icon className="h-4 w-4" />
+                  <span>{item.label}</span>
+                </div>
+              </NavLink>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <h3 className="px-4 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Racing Portfolio
+          </h3>
+          <div className="space-y-1">
+            {racingCategories.map((item) => (
               <NavLink
                 key={item.label}
                 to={item.url}

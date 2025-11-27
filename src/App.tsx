@@ -64,6 +64,18 @@ const Ascot = lazy(() => import("./pages/racing/Ascot"));
 const Cheltenham = lazy(() => import("./pages/racing/Cheltenham"));
 const Kempton = lazy(() => import("./pages/racing/Kempton"));
 
+// Racing Types
+const HorseRacing = lazy(() => import("./pages/racing/HorseRacing"));
+const DogRacing = lazy(() => import("./pages/racing/DogRacing"));
+const F1Racing = lazy(() => import("./pages/racing/F1Racing"));
+const StreetRacing = lazy(() => import("./pages/racing/StreetRacing"));
+const MotoGPRacing = lazy(() => import("./pages/racing/MotoGPRacing"));
+const PowerboatRacing = lazy(() => import("./pages/racing/PowerboatRacing"));
+const CyclingRacing = lazy(() => import("./pages/racing/CyclingRacing"));
+const RobotRacing = lazy(() => import("./pages/racing/RobotRacing"));
+const SpaceRacing = lazy(() => import("./pages/racing/SpaceRacing"));
+const DragonBoatRacing = lazy(() => import("./pages/racing/DragonBoatRacing"));
+
 // Basketball Leagues
 const NBA = lazy(() => import("./pages/basketball/NBA"));
 const EuroLeague = lazy(() => import("./pages/basketball/EuroLeague"));
@@ -299,6 +311,16 @@ const App = () => (
           <Route path="/racing/ascot" element={<Ascot />} />
           <Route path="/racing/cheltenham" element={<Cheltenham />} />
           <Route path="/racing/kempton" element={<Kempton />} />
+          <Route path="/racing/horse" element={<HorseRacing />} />
+          <Route path="/racing/dog" element={<DogRacing />} />
+          <Route path="/racing/f1" element={<F1Racing />} />
+          <Route path="/racing/street" element={<StreetRacing />} />
+          <Route path="/racing/motogp" element={<MotoGPRacing />} />
+          <Route path="/racing/powerboat" element={<PowerboatRacing />} />
+          <Route path="/racing/cycling" element={<CyclingRacing />} />
+          <Route path="/racing/robot" element={<RobotRacing />} />
+          <Route path="/racing/space" element={<SpaceRacing />} />
+          <Route path="/racing/dragon-boat" element={<DragonBoatRacing />} />
           
           {/* Casino */}
           <Route path="/casino/slots" element={<Slots />} />
