@@ -81,6 +81,7 @@ import Keno from "./pages/casino/Keno";
 import ScratchCards from "./pages/casino/ScratchCards";
 import Craps from "./pages/casino/Craps";
 import RockPaperScissors from "./pages/casino/RockPaperScissors";
+import CoinFlip from "./pages/casino/CoinFlip";
 
 // Account
 import Profile from "./pages/account/Profile";
@@ -357,6 +358,7 @@ const App = () => (
           <Route path="/casino/scratch-cards" element={<ScratchCards />} />
           <Route path="/casino/craps" element={<Craps />} />
           <Route path="/casino/rps" element={<RockPaperScissors />} />
+          <Route path="/casino/coin-flip" element={<CoinFlip />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
