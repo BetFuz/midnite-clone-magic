@@ -122,19 +122,12 @@ const Promotions = () => {
                       </div>
                       <p className="text-2xl font-bold text-white mb-2">{promo.tagline}</p>
                       <p className="text-white/90 mb-6">{promo.description}</p>
-                      {promo.path && (
-                        <Button 
-                          className="bg-white text-foreground hover:bg-white/90 font-semibold gap-2 group-hover:scale-105 transition-transform"
-                        >
-                          View Offer
-                          <ArrowRight className="h-4 w-4" />
-                        </Button>
-                      )}
-                      {!promo.path && (
-                        <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
-                          Coming Soon
-                        </Badge>
-                      )}
+                      <Button 
+                        className="bg-white text-foreground hover:bg-white/90 font-semibold gap-2 group-hover:scale-105 transition-transform"
+                      >
+                        View Offer
+                        <ArrowRight className="h-4 w-4" />
+                      </Button>
                     </div>
                   </Card>
                 ))}
