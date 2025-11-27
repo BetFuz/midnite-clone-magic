@@ -1,4 +1,4 @@
-import { Home, Trophy, CircleDot, Flame, Hammer, Target, TrendingUp, Dumbbell, Volleyball, Table2, TicketCheck, BarChart3, History, CreditCard, Vote, LayoutGrid, DollarSign, Users, Sparkles, Globe, Bot, ShoppingCart, Brain, Wallet, Glasses, Play, Film, Gamepad2, Shield, Lock, Hexagon, Puzzle, Shapes } from "lucide-react";
+import { Home, Trophy, CircleDot, Flame, Hammer, Target, TrendingUp, Dumbbell, Volleyball, Table2, TicketCheck, BarChart3, History, CreditCard, Vote, LayoutGrid, DollarSign, Users, Sparkles, Globe, Bot, ShoppingCart, Brain, Wallet, Glasses, Play, Film, Gamepad2, Shield, Lock, Hexagon, Puzzle, Shapes, Coins } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NavLink } from "@/components/NavLink";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
@@ -39,6 +39,7 @@ const Sidebar = ({ className, showOnMobile = false }: SidebarProps) => {
     { icon: Gamepad2, label: "Scratch Cards", url: "/casino/scratch-cards", badge: "AI" },
     { icon: Gamepad2, label: "AI Craps", url: "/casino/craps", badge: "AI" },
     { icon: Gamepad2, label: "AI RPS", url: "/casino/rps", badge: "AI" },
+    { icon: Coins, label: "Coin Flip", url: "/casino/coin-flip", badge: "AI" },
     { icon: Target, label: "Live Casino", url: "/live-casino" },
     { icon: Dumbbell, label: "Virtuals", url: "/virtuals" },
     { icon: BarChart3, label: "Analytics", url: "/analytics", badge: "NEW" },
