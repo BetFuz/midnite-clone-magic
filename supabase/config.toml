@@ -42,6 +42,9 @@ verify_jwt = false
 [functions.ai-roulette]
 verify_jwt = false
 
+[functions.ai-poker]
+verify_jwt = false
+
 [functions.bet-recommendations]
 verify_jwt = false
 

@@ -141,6 +141,7 @@ import NetworkStatus from "./components/NetworkStatus";
 // Match & Live Casino
 import MatchDetail from "./pages/matches/MatchDetail";
 import LightningRoulette from "./pages/live-casino/LightningRoulette";
+import Poker from "./pages/live-casino/Poker";
 import BetFeatures from "./pages/BetFeatures";
 import EnhancedAccountHub from "./pages/account/EnhancedAccountHub";
 import Politics from "./pages/politics/Politics";
@@ -345,6 +346,7 @@ const App = () => (
           {/* Match & Live Tables */}
           <Route path="/match/:id" element={<MatchDetail />} />
           <Route path="/live-table/lightning-roulette" element={<LightningRoulette />} />
+          <Route path="/live-table/poker" element={<Poker />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
