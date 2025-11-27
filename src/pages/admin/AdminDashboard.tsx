@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AdminGuard } from "@/components/admin/AdminGuard";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { RealtimeActivityFeed } from "@/components/admin/RealtimeActivityFeed";
+import { SystemHealthMonitor } from "@/components/admin/SystemHealthMonitor";
 import { useAdminPlatformControl } from "@/hooks/useAdminPlatformControl";
 import { 
   Shield, Users, TrendingUp, Activity, 
@@ -191,8 +192,15 @@ const AdminDashboard = () => {
             </Card>
           </div>
 
+          {/* System Health Monitor */}
+          <div>
+            <SystemHealthMonitor />
+          </div>
+
           {/* Real-time Activity Feed */}
-          <RealtimeActivityFeed />
+          <div>
+            <RealtimeActivityFeed />
+          </div>
 
           {/* Management Tabs */}
           <Tabs defaultValue="overview" className="space-y-4">
