@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Play, Star, TrendingUp, Zap, Dice1, Hash, Grid3x3, CircleDot, Sparkles, Disc, CreditCard, Shuffle, Search, Shield } from "lucide-react";
+import { Play, Star, TrendingUp, Zap, Dice1, Hash, Grid3x3, CircleDot, Sparkles, Disc, CreditCard, Shuffle, Search, Shield, Crown, Users, Bot, Trophy } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useState } from "react";
 
@@ -15,6 +15,7 @@ const Games = () => {
   
   const gameCategories = [
     { id: "All", label: "All Games", icon: Shuffle },
+    { id: "Traditional", label: "Traditional", icon: Crown },
     { id: "Crash", label: "Crash", icon: TrendingUp },
     { id: "Spin", label: "Spin", icon: Disc },
     { id: "Dice", label: "Dice", icon: Dice1 },
@@ -27,6 +28,12 @@ const Games = () => {
   ];
 
   const allGames = [
+    // Traditional African Games (4) - Each game supports P2P, Human vs AI, AI vs AI, and Cultural Mode
+    { id: 41, name: "African Draft", category: "Traditional", minBet: 500, maxBet: 100000, multiplier: "2x - 20x", featured: true, african: true, provablyFair: true, modes: ["P2P Betting", "Beat AI", "AI Tournament", "Traditional"] },
+    { id: 42, name: "Morabaraba", category: "Traditional", minBet: 300, maxBet: 75000, multiplier: "2x - 15x", featured: true, african: true, provablyFair: true, modes: ["Cow Trading", "Beat AI", "AI Tournament", "Sacred Cows"] },
+    { id: 43, name: "Mancala", category: "Traditional", minBet: 200, maxBet: 50000, multiplier: "2x - 12x", featured: true, african: true, provablyFair: true, modes: ["Seed Betting", "Beat AI", "AI Tournament", "Seed Master"] },
+    { id: 44, name: "Pan-African Tournament", category: "Traditional", minBet: 1000, maxBet: 200000, multiplier: "5x - 100x", featured: true, african: true, provablyFair: true, modes: ["Multi-Player", "Skill Levels", "AI Championship", "Pan-African"] },
+
     // Crash Games (5)
     { id: 1, name: "Aviator Classic", category: "Crash", minBet: 10, maxBet: 100000, multiplier: "1.00x - 1000x+", featured: true, african: false, provablyFair: true },
     { id: 2, name: "Space Rocket", category: "Crash", minBet: 10, maxBet: 100000, multiplier: "1.00x - 500x", featured: true, african: true, provablyFair: true },
@@ -235,6 +242,78 @@ const Games = () => {
                     <div className="p-2">
                       <h3 className="font-semibold text-xs text-foreground truncate">{game.name}</h3>
                       <p className="text-xs text-muted-foreground">{game.multiplier}</p>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Traditional African Games Section */}
+          {allGames.filter(g => g.category === "Traditional").length > 0 && searchQuery === "" && selectedCategory === "All" && (
+            <section className="mb-8">
+              <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+                <Crown className="h-5 w-5 text-yellow-500" />
+                Traditional African Games
+                <Badge variant="secondary" className="text-xs bg-yellow-600/10 text-yellow-600">4 Games • All Modes</Badge>
+              </h2>
+              <div className="bg-card border border-yellow-600/20 rounded-lg p-4 mb-4">
+                <p className="text-sm text-muted-foreground mb-2">
+                  Experience authentic African games with modern betting. Each game supports multiple modes:
+                </p>
+                <div className="flex flex-wrap gap-2 mt-3">
+                  <Badge variant="outline" className="text-xs"><Users className="h-3 w-3 mr-1" />P2P Betting</Badge>
+                  <Badge variant="outline" className="text-xs"><Bot className="h-3 w-3 mr-1" />Human vs AI</Badge>
+                  <Badge variant="outline" className="text-xs"><Trophy className="h-3 w-3 mr-1" />AI Tournament</Badge>
+                  <Badge variant="outline" className="text-xs"><Crown className="h-3 w-3 mr-1" />Cultural Mode</Badge>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {allGames.filter(g => g.category === "Traditional").map((game) => (
+                  <Card key={game.id} className="group overflow-hidden bg-card border-yellow-600/20 hover:border-yellow-600/50 transition-all cursor-pointer">
+                    <div className="aspect-square bg-gradient-to-br from-yellow-600/20 via-yellow-600/5 to-background relative flex items-center justify-center">
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button size="sm" className="rounded-full w-10 h-10 p-0" onClick={(e) => { e.stopPropagation(); handlePlayGame(game.name, false); }}>
+                          <Play className="h-4 w-4" fill="currentColor" />
+                        </Button>
+                        <Button size="sm" variant="secondary" onClick={(e) => { e.stopPropagation(); handlePlayGame(game.name, true); }}>
+                          Demo
+                        </Button>
+                      </div>
+                      <Badge className="absolute top-2 left-2 bg-yellow-600 text-white text-xs">
+                        🏆 Traditional
+                      </Badge>
+                      <div className="absolute top-2 right-2">
+                        <div className="bg-yellow-600/20 backdrop-blur-sm rounded-full p-1.5" title="Provably Fair">
+                          <Shield className="h-3.5 w-3.5 text-yellow-600" />
+                        </div>
+                      </div>
+                      <Crown className="h-12 w-12 text-yellow-600/40" />
+                    </div>
+                    <div className="p-3">
+                      <h3 className="font-semibold text-sm text-foreground mb-1 truncate">{game.name}</h3>
+                      <p className="text-xs text-muted-foreground mb-2">{game.multiplier}</p>
+                      <div className="flex flex-wrap gap-1">
+                        {game.modes?.slice(0, 2).map((mode: string, idx: number) => (
+                          <Badge key={idx} variant="outline" className="text-[10px] px-1 py-0">
+                            {mode === "P2P Betting" || mode === "Cow Trading" || mode === "Seed Betting" || mode === "Multi-Player" ? (
+                              <Users className="h-2.5 w-2.5 mr-0.5" />
+                            ) : mode === "Beat AI" || mode === "Skill Levels" ? (
+                              <Bot className="h-2.5 w-2.5 mr-0.5" />
+                            ) : mode === "AI Tournament" || mode === "AI Championship" ? (
+                              <Trophy className="h-2.5 w-2.5 mr-0.5" />
+                            ) : (
+                              <Crown className="h-2.5 w-2.5 mr-0.5" />
+                            )}
+                            {mode}
+                          </Badge>
+                        ))}
+                        {game.modes && game.modes.length > 2 && (
+                          <Badge variant="outline" className="text-[10px] px-1 py-0">
+                            +{game.modes.length - 2}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </Card>
                 ))}
