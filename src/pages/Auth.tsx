@@ -39,7 +39,7 @@ const Auth = () => {
       if (!session) return;
       
       try {
-        // Check if user has admin role
+        // Check if user has admin or superadmin role
         const { data: roleData } = await supabase
           .from("user_roles")
           .select("role")
@@ -47,8 +47,16 @@ const Auth = () => {
           .in("role", ["admin", "superadmin"])
           .maybeSingle();
 
+        // If superadmin, force password reset flow instead of redirecting
+        if (roleData?.role === "superadmin") {
+          setIsResetting(true);
+          setNewPassword("");
+          setConfirmNewPassword("");
+          return;
+        }
+
         // Redirect based on role
-        if (roleData?.role === 'admin' || roleData?.role === 'superadmin') {
+        if (roleData?.role === "admin") {
           navigate("/admin/dashboard");
         } else {
           navigate("/");
