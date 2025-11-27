@@ -72,6 +72,9 @@ verify_jwt = false
 [functions.ai-fraud-detection]
 verify_jwt = false
 
+[functions.ai-provably-fair]
+verify_jwt = false
+
 [functions.bet-recommendations]
 verify_jwt = false
 
