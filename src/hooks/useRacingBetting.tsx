@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { RacingEngine, RacerState } from '@/lib/racingEngine';
 
 export interface RaceParticipant {
   id: string;
   name: string;
   odds: number;
   position?: number;
+  progress?: number;
   stats: {
     wins: number;
     races: number;
@@ -35,6 +37,8 @@ export const useRacingBetting = ({ raceType, raceId, participants }: UseRacingBe
   const [isPlacingBet, setIsPlacingBet] = useState(false);
   const [activeBets, setActiveBets] = useState<RaceBet[]>([]);
   const [balance, setBalance] = useState(0);
+  const [racingEngine, setRacingEngine] = useState<RacingEngine | null>(null);
+  const [liveRaceState, setLiveRaceState] = useState<{ racers: RacerState[] } | null>(null);
 
   useEffect(() => {
     fetchBalance();
@@ -167,7 +171,45 @@ export const useRacingBetting = ({ raceType, raceId, participants }: UseRacingBe
   const startRace = async () => {
     setRaceState('racing');
     
-    // Simulate race with AI commentary
+    // Initialize racing engine with participants
+    const initialRacers = participants.map((p, idx) => ({
+      id: p.id,
+      name: p.name,
+      baseSpeed: 280 - (idx * 15) + Math.random() * 20, // Faster horses have lower odds
+    }));
+
+    const engine = new RacingEngine(initialRacers, {
+      totalLaps: 1,
+      lapDistance: 2000, // 2000 meters = standard race distance
+      updateInterval: 50,
+      crashProbability: 0.002, // Lower crash chance for horses
+      overtakeDifficulty: 0.3, // Easier overtaking in horse racing
+    });
+
+    engine.onUpdate((racers, events) => {
+      setLiveRaceState({ racers });
+      
+      // Update positions for realtime broadcast
+      const positions: Record<string, number> = {};
+      racers.forEach((racer) => {
+        positions[racer.id] = racer.position;
+      });
+      setCurrentPositions(positions);
+      
+      // Check if race finished
+      const winner = engine.getWinner();
+      if (winner) {
+        setWinner(winner.id);
+        setRaceState('finished');
+        settleBets(winner.id);
+        engine.stop();
+      }
+    });
+
+    setRacingEngine(engine);
+    engine.start();
+
+    // Get AI commentary
     const { data, error } = await supabase.functions.invoke('racing-simulation', {
       body: {
         raceType,
@@ -178,15 +220,7 @@ export const useRacingBetting = ({ raceType, raceId, participants }: UseRacingBe
 
     if (error) {
       console.error('Race simulation error:', error);
-      toast({
-        title: "Race Error",
-        description: "Failed to start race simulation",
-        variant: "destructive"
-      });
-      return;
     }
-
-    // Race simulation will broadcast updates via realtime
   };
 
   const settleBets = async (winnerId: string) => {
@@ -222,6 +256,14 @@ export const useRacingBetting = ({ raceType, raceId, participants }: UseRacingBe
     setActiveBets([]);
   };
 
+  useEffect(() => {
+    return () => {
+      if (racingEngine) {
+        racingEngine.stop();
+      }
+    };
+  }, [racingEngine]);
+
   return {
     raceState,
     currentPositions,
@@ -230,6 +272,7 @@ export const useRacingBetting = ({ raceType, raceId, participants }: UseRacingBe
     activeBets,
     balance,
     placeBet,
-    startRace
+    startRace,
+    liveRaceState
   };
 };

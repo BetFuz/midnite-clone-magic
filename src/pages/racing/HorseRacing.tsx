@@ -3,6 +3,7 @@ import Sidebar from "@/components/Sidebar";
 import BetSlip from "@/components/BetSlip";
 import { useAIImageGeneration } from "@/hooks/useAIImageGeneration";
 import { useRacingBetting, RaceParticipant } from "@/hooks/useRacingBetting";
+import { HorseRaceVisuals } from "@/components/HorseRaceVisuals";
 import { Loader2, Trophy, Play } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,11 +24,21 @@ const HorseRacing = () => {
     { id: '5', name: 'Silver Bullet', odds: 9.0, stats: { wins: 4, races: 24, winRate: '16.7%' } }
   ];
 
-  const { raceState, winner, balance, placeBet, startRace, isPlacingBet } = useRacingBetting({
+  const { raceState, winner, balance, placeBet, startRace, isPlacingBet, liveRaceState } = useRacingBetting({
     raceType: 'Horse Racing',
     raceId: 'horse-race-001',
     participants
   });
+
+  const horseColors = ['#8B4513', '#D2691E', '#F4A460', '#DEB887', '#CD853F'];
+
+  const visualHorses = (liveRaceState?.racers || participants).map((racer, idx) => ({
+    id: racer.id,
+    name: racer.name,
+    position: 'position' in racer ? racer.position : idx + 1,
+    progress: 'distance' in racer ? racer.distance / 2000 : 0,
+    color: horseColors[idx % horseColors.length]
+  }));
 
   useEffect(() => {
     const cached = localStorage.getItem('horse-racing-hero');
@@ -71,17 +82,11 @@ const HorseRacing = () => {
           <p className="text-muted-foreground mb-6">The Sport of Kings - Premium Thoroughbred Racing</p>
 
           <div className="mb-6">
-            {isGenerating ? (
-              <div className="h-[400px] flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              </div>
-            ) : heroUrl ? (
-              <img 
-                src={heroUrl} 
-                alt="Horse Racing" 
-                className="w-full h-[400px] object-cover rounded-lg"
-              />
-            ) : null}
+            <HorseRaceVisuals 
+              horses={visualHorses}
+              isRacing={raceState === 'racing'}
+              raceState={raceState}
+            />
           </div>
 
           <div className="flex items-center justify-between mb-6">
