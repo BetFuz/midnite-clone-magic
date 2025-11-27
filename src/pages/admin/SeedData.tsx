@@ -3,14 +3,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Database, RefreshCw } from "lucide-react";
+import { Loader2, Database, RefreshCw, Users } from "lucide-react";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
+import { useSeedData } from "@/hooks/useSeedData";
 
 const SeedData = () => {
   const [loading, setLoading] = useState(false);
   const [updating, setUpdating] = useState(false);
   const { toast } = useToast();
+  const { loading: seedingUserData, seedUserData } = useSeedData();
 
   const handleSeedData = async () => {
     setLoading(true);
@@ -115,6 +117,49 @@ const SeedData = () => {
               <Card className="p-6">
                 <div className="space-y-4">
                   <div className="flex items-start gap-4">
+                    <Users className="h-8 w-8 text-primary mt-1" />
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg mb-2">Seed Your Betting Data</h3>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Generate sample betting data for your account:
+                      </p>
+                      <ul className="text-sm text-muted-foreground space-y-1 mb-4">
+                        <li>• 10 bet slips (5 pending, 3 won, 2 lost)</li>
+                        <li>• Realistic bet selections with odds</li>
+                        <li>• User statistics and leaderboard entry</li>
+                        <li>• Sample admin audit log entries</li>
+                      </ul>
+                      <p className="text-xs text-green-600 dark:text-green-400 mb-4">
+                        Creates data for your currently logged-in user account.
+                      </p>
+                    </div>
+                  </div>
+
+                  <Button 
+                    onClick={seedUserData} 
+                    disabled={loading || updating || seedingUserData}
+                    className="w-full"
+                    size="lg"
+                    variant="secondary"
+                  >
+                    {seedingUserData ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Seeding Your Data...
+                      </>
+                    ) : (
+                      <>
+                        <Users className="mr-2 h-4 w-4" />
+                        Seed My Betting Data
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </Card>
+
+              <Card className="p-6">
+                <div className="space-y-4">
+                  <div className="flex items-start gap-4">
                     <RefreshCw className="h-8 w-8 text-primary mt-1" />
                     <div className="flex-1">
                       <h3 className="font-semibold text-lg mb-2">Update Live Data</h3>
@@ -136,7 +181,7 @@ const SeedData = () => {
 
                   <Button 
                     onClick={handleUpdateLive} 
-                    disabled={loading || updating}
+                    disabled={loading || updating || seedingUserData}
                     className="w-full"
                     size="lg"
                     variant="default"
