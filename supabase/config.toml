@@ -129,6 +129,9 @@ verify_jwt = false
 [functions.racing-simulation]
 verify_jwt = false
 
+[functions.f1-racing-ai]
+verify_jwt = false
+
 [functions.withdraw]
 verify_jwt = true
 
