@@ -1,17 +1,52 @@
 import { Button } from "@/components/ui/button";
-import heroImage from "@/assets/hero-sports.jpg";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useAIImageGeneration } from "@/hooks/useAIImageGeneration";
+import { Sparkles } from "lucide-react";
 
 const HeroBanner = () => {
+  const { generateImage, isGenerating } = useAIImageGeneration();
+  const [heroBackground, setHeroBackground] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadHeroImage = async () => {
+      const cachedImage = localStorage.getItem('betfuz-hero-image');
+      if (cachedImage) {
+        setHeroBackground(cachedImage);
+      } else {
+        const imageUrl = await generateImage({
+          prompt: 'Nigerian football stadium at sunset, vibrant atmosphere, excited crowd celebrating, premium sports betting scene, dynamic action, Lagos cityscape in background',
+          type: 'hero',
+          style: 'cinematic'
+        });
+        if (imageUrl) {
+          setHeroBackground(imageUrl);
+          localStorage.setItem('betfuz-hero-image', imageUrl);
+        }
+      }
+    };
+    loadHeroImage();
+  }, []);
+
   return (
     <div className="relative overflow-hidden rounded-2xl bg-gradient-hero h-64 mb-6">
-      <div className="absolute inset-0 opacity-30">
-        <img 
-          src={heroImage} 
-          alt="Sports promotion" 
-          className="w-full h-full object-cover"
-        />
-      </div>
+      {heroBackground && (
+        <div className="absolute inset-0 opacity-40">
+          <img 
+            src={heroBackground} 
+            alt="Sports promotion" 
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
+      {isGenerating && (
+        <div className="absolute inset-0 flex items-center justify-center bg-background/50 backdrop-blur-sm">
+          <div className="flex flex-col items-center gap-2 text-primary">
+            <Sparkles className="w-8 h-8 animate-pulse" />
+            <p className="text-sm font-medium">Generating AI-powered visuals...</p>
+          </div>
+        </div>
+      )}
       <div className="relative h-full flex items-center px-8">
         <div className="max-w-2xl">
           <h2 className="text-3xl font-bold text-white mb-2">

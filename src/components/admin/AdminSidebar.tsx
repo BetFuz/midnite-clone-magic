@@ -14,6 +14,7 @@ import {
   FileText,
   Bell,
   Zap,
+  Sparkles,
 } from "lucide-react";
 import {
   Sidebar,
@@ -56,6 +57,7 @@ const menuItems = [
   {
     title: "Configuration",
     items: [
+      { title: "AI Assets", url: "/admin/ai-assets", icon: Sparkles },
       { title: "Settings", url: "/admin/settings", icon: Settings },
       { title: "Security", url: "/admin/security", icon: Shield },
       { title: "Notifications", url: "/admin/notifications", icon: Bell },

@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { useAIImageGeneration } from './useAIImageGeneration';
 
 export interface SlotSymbol {
   id: string;
@@ -174,6 +175,34 @@ export const useSlotMachine = () => {
     }, spinInterval);
   }, [isSpinning, balance, betAmount, theme.symbols, checkWinningLines]);
 
+  const { generateImage } = useAIImageGeneration();
+  const [themeBackground, setThemeBackground] = useState<string | null>(null);
+
+  // Generate AI background when theme changes
+  useEffect(() => {
+    const generateThemeBackground = async () => {
+      if (theme.name !== DEFAULT_THEME.name) {
+        const cacheKey = `slot-bg-${theme.name.toLowerCase().replace(/\s/g, '-')}`;
+        const cached = localStorage.getItem(cacheKey);
+        
+        if (cached) {
+          setThemeBackground(cached);
+        } else {
+          const bgUrl = await generateImage({
+            prompt: `Slot machine theme background for ${theme.name}, vibrant colors, casino atmosphere, premium graphics, ${theme.name} themed elements`,
+            type: 'casino',
+            style: 'vibrant'
+          });
+          if (bgUrl) {
+            setThemeBackground(bgUrl);
+            localStorage.setItem(cacheKey, bgUrl);
+          }
+        }
+      }
+    };
+    generateThemeBackground();
+  }, [theme.name]);
+
   return {
     theme,
     reels,
@@ -183,6 +212,7 @@ export const useSlotMachine = () => {
     totalWin,
     winningLines,
     isLoadingTheme,
+    themeBackground,
     spin,
     setBetAmount,
     generateAITheme,

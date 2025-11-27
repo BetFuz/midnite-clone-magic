@@ -129,6 +129,7 @@ import AdminAuth from "./pages/admin/AdminAuth";
 import WebhookSettings from "./pages/admin/WebhookSettings";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminSetup from "./pages/admin/AdminSetup";
+import AdminAssets from "./pages/admin/AIAssets";
 import SeedData from "./pages/admin/SeedData";
 import DataManagement from "./pages/admin/DataManagement";
 import AdminUsers from "./pages/admin/Users";
@@ -336,6 +337,7 @@ const App = () => (
           {/* Admin */}
           <Route path="/admin/auth" element={<AdminAuth />} />
           <Route path="/admin/login" element={<AdminAuth />} />
+          <Route path="/admin/ai-assets" element={<AdminAssets />} />
           <Route path="/admin/setup" element={<AdminSetup />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/events" element={<AdminEvents />} />

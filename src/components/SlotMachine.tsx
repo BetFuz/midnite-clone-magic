@@ -15,13 +15,24 @@ export const SlotMachine = () => {
     totalWin,
     winningLines,
     isLoadingTheme,
+    themeBackground,
     spin,
     setBetAmount,
     generateAITheme,
   } = useSlotMachine();
 
   return (
-    <Card className={`w-full max-w-4xl mx-auto bg-gradient-to-br ${theme.backgroundColor} p-8 shadow-2xl hover:shadow-purple-500/30 transition-all duration-500 animate-fade-in`}>
+    <Card className={`relative w-full max-w-4xl mx-auto bg-gradient-to-br ${theme.backgroundColor} p-8 shadow-2xl hover:shadow-purple-500/30 transition-all duration-500 animate-fade-in overflow-hidden`}>
+      {/* AI-Generated Background */}
+      {themeBackground && (
+        <div className="absolute inset-0 opacity-20">
+          <img 
+            src={themeBackground} 
+            alt={`${theme.name} background`}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
       {/* Header */}
       <div className="text-center mb-6 animate-scale-in">
         <h2 className={`text-4xl font-bold ${theme.accentColor} mb-2 drop-shadow-lg`}>{theme.name}</h2>

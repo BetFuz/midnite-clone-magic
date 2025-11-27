@@ -57,8 +57,28 @@ serve(async (req) => {
       });
     }
 
-    // Generate static images for backgrounds, symbols, etc.
+    // Generate static images with premium AI models
     if (action === 'generateImage') {
+      // Model selection based on use case:
+      // - 'flux-1-kontext': Best for photorealistic scenes with context awareness
+      // - 'imagen-4': Google's latest, excellent for sports/action scenes
+      // - 'ideogram-v3': Superior for graphics, logos, and text-in-image
+      // - 'ideogram-character': Best for character/mascot generation
+      // - 'qwen-image-edit': For image editing/enhancement
+      const modelMap: Record<string, string> = {
+        'hero': 'flux-1-kontext',
+        'league': 'ideogram-v3',
+        'team': 'ideogram-v3',
+        'promo': 'imagen-4',
+        'character': 'ideogram-character',
+        'sport': 'flux-1-kontext',
+        'casino': 'flux-1-kontext',
+        'edit': 'qwen-image-edit',
+        'default': 'flux-1-kontext'
+      };
+
+      const model = modelMap[type || 'default'] || 'flux-1-kontext';
+      
       const response = await fetch('https://api.kie.ai/v1/generate', {
         method: 'POST',
         headers: {
@@ -66,16 +86,18 @@ serve(async (req) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'stable-diffusion-xl',
-          prompt,
+          model,
+          prompt: `${prompt}, ultra high quality, 8K resolution, professional photography, cinematic lighting, photorealistic`,
           width: 1920,
           height: 1080,
-          steps: 50,
+          quality: 'ultra',
           style: style || 'photorealistic'
         }),
       });
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('kie.ai API error:', response.status, errorText);
         throw new Error(`kie.ai API error: ${response.statusText}`);
       }
 
@@ -83,7 +105,8 @@ serve(async (req) => {
       
       return new Response(JSON.stringify({
         imageUrl: result.image_url,
-        prompt: result.prompt
+        prompt: result.prompt,
+        model: model
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
