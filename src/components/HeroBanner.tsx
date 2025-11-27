@@ -9,23 +9,10 @@ const HeroBanner = () => {
   const [heroBackground, setHeroBackground] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadHeroImage = async () => {
-      const cachedImage = localStorage.getItem('betfuz-hero-image');
-      if (cachedImage) {
-        setHeroBackground(cachedImage);
-      } else {
-        const imageUrl = await generateImage({
-          prompt: 'Nigerian football stadium at sunset, vibrant atmosphere, excited crowd celebrating, premium sports betting scene, dynamic action, Lagos cityscape in background',
-          type: 'hero',
-          style: 'cinematic'
-        });
-        if (imageUrl) {
-          setHeroBackground(imageUrl);
-          localStorage.setItem('betfuz-hero-image', imageUrl);
-        }
-      }
-    };
-    loadHeroImage();
+    const cachedImage = localStorage.getItem('betfuz-hero-image');
+    if (cachedImage) {
+      setHeroBackground(cachedImage);
+    }
   }, []);
 
   return (
