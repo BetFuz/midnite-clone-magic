@@ -12,9 +12,11 @@ const corsHeaders = {
   'Content-Security-Policy': "default-src 'self'; frame-ancestors 'none';",
 };
 
-// IP Allowlist - configure for production
+// IP Allowlist - PRODUCTION REQUIRED
 const ALLOWED_IPS = Deno.env.get('ADMIN_ALLOWED_IPS')?.split(',') || [];
 const ENABLE_IP_WHITELIST = Deno.env.get('ENABLE_ADMIN_IP_WHITELIST') === 'true';
+const REQUIRE_MFA = Deno.env.get('ADMIN_REQUIRE_MFA') === 'true'; // Set to 'true' in production
+const MAX_TOKEN_AGE = parseInt(Deno.env.get('ADMIN_MAX_TOKEN_AGE') || '900'); // Default 15 minutes
 
 // Rate limiting state (in production, use Redis)
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
@@ -60,18 +62,19 @@ async function validateAdminAccess(req: Request): Promise<AdminValidationResult>
       return { valid: false, error: 'Invalid token' };
     }
 
-    // 3. Check token age (must be fresh - not older than 15 minutes)
+    // 3. Check token age (must be fresh - configurable, default 15 minutes)
     const token = authHeader.replace('Bearer ', '');
     const tokenParts = token.split('.');
     if (tokenParts.length === 3) {
       try {
         const payload = JSON.parse(atob(tokenParts[1]));
         const tokenAge = Date.now() / 1000 - (payload.iat || 0);
-        if (tokenAge > 900) { // 15 minutes
-          return { valid: false, error: 'Token too old, please re-authenticate' };
+        if (tokenAge > MAX_TOKEN_AGE) {
+          return { valid: false, error: `Token too old (max age: ${MAX_TOKEN_AGE}s), please re-authenticate` };
         }
       } catch (e) {
         console.error('Error parsing token:', e);
+        return { valid: false, error: 'Invalid token format' };
       }
     }
 
@@ -86,9 +89,13 @@ async function validateAdminAccess(req: Request): Promise<AdminValidationResult>
       return { valid: false, error: 'Admin role required' };
     }
 
-    // 5. Check MFA verification (optional but recommended)
+    // 5. Check MFA verification (REQUIRED in production if ADMIN_REQUIRE_MFA is enabled)
     const mfaHeader = req.headers.get('x-admin-mfa');
     const mfaVerified = mfaHeader === 'verified';
+    
+    if (REQUIRE_MFA && !mfaVerified) {
+      return { valid: false, error: 'MFA verification required for admin access' };
+    }
 
     // 6. Rate limiting per admin user
     const adminId = user.id;
