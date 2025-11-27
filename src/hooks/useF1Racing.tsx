@@ -42,20 +42,25 @@ export const useF1Racing = (circuit: string) => {
   ];
 
   // Remove auto-loading of assets to prevent blocking
-
-  const loadAssets = async () => {
-    // Load from cache only - don't generate on mount
-    const cachedImage = localStorage.getItem(`f1-${circuit}-hero`);
-    const cachedVideo = localStorage.getItem(`f1-${circuit}-video`);
-
-    if (cachedImage) {
-      setHeroImage(cachedImage);
-    }
-
-    if (cachedVideo) {
-      setRaceVideo(cachedVideo);
-    }
-  };
+ 
+   const loadAssets = async () => {
+     // Load from cache only - don't generate on mount
+     const cachedImage = localStorage.getItem(`f1-${circuit}-hero`);
+     const cachedVideo = localStorage.getItem(`f1-${circuit}-video`);
+ 
+     if (cachedImage) {
+       setHeroImage(cachedImage);
+     }
+ 
+     if (cachedVideo) {
+       setRaceVideo(cachedVideo);
+     }
+   };
+ 
+   useEffect(() => {
+     // Only load from cache on mount so UI is instant
+     loadAssets();
+   }, [circuit]);
 
   const generateRaceScenario = async () => {
     setIsLoading(true);
@@ -95,58 +100,85 @@ export const useF1Racing = (circuit: string) => {
   };
 
   const generateLiveCommentary = async (moment: string) => {
-    // Generate default commentary immediately
-    const commentaryOptions = [
-      `${moment} - This is incredible racing at ${circuit}!`,
-      `What a moment at ${circuit}! ${moment}`,
-      `The battle intensifies - ${moment}`,
-      `Spectacular racing action on lap ${currentLap}!`,
-      `${moment} - The crowd is on their feet!`
-    ];
-    
-    const randomCommentary = commentaryOptions[Math.floor(Math.random() * commentaryOptions.length)];
-    setCommentary(randomCommentary);
-  };
-
+     // Generate default commentary immediately
+     const commentaryOptions = [
+       `${moment} - This is incredible racing at ${circuit}!`,
+       `What a moment at ${circuit}! ${moment}`,
+       `The battle intensifies - ${moment}`,
+       `Spectacular racing action on lap ${currentLap}!`,
+       `${moment} - The crowd is on their feet!`
+     ];
+     
+     const randomCommentary = commentaryOptions[Math.floor(Math.random() * commentaryOptions.length)];
+     setCommentary(randomCommentary);
+   };
+ 
+   const generateRaceVideo = async () => {
+     try {
+       const { data, error } = await supabase.functions.invoke('f1-racing-ai', {
+         body: {
+           action: 'generateRaceVideo',
+           circuit,
+         },
+       });
+ 
+       if (error) throw error;
+ 
+       if (data?.videoUrl) {
+         setRaceVideo(data.videoUrl);
+         localStorage.setItem(`f1-${circuit}-video`, data.videoUrl);
+       }
+     } catch (error) {
+       console.error('Race video generation error:', error);
+       toast({
+         title: 'Race Video Unavailable',
+         description: 'Starting race without live video, visuals will still run.',
+       });
+     }
+   };
+ 
   const startRace = async () => {
-    setRaceState('racing');
-    await generateRaceScenario();
-    await generateLiveCommentary('Lights out and away we go!');
-
-    // Simulate race progression
-    const raceInterval = setInterval(async () => {
-      setCurrentLap(prev => {
-        const next = prev + 1;
-        
-        if (next >= totalLaps) {
-          clearInterval(raceInterval);
-          setRaceState('finished');
-          generateLiveCommentary('Checkered flag! Race complete!');
-          return totalLaps;
-        }
-
-        // Generate commentary at key moments
-        if (next % 10 === 0) {
-          generateLiveCommentary(`Intense battle for position`);
-        }
-
-        return next;
-      });
-    }, 3000); // 3 seconds per lap
-  };
+     setRaceState('racing');
+     // Fire-and-forget race video generation so UI stays responsive
+     generateRaceVideo();
+     await generateRaceScenario();
+     await generateLiveCommentary('Lights out and away we go!');
+ 
+     // Simulate race progression
+     const raceInterval = setInterval(async () => {
+       setCurrentLap(prev => {
+         const next = prev + 1;
+         
+         if (next >= totalLaps) {
+           clearInterval(raceInterval);
+           setRaceState('finished');
+           generateLiveCommentary('Checkered flag! Race complete!');
+           return totalLaps;
+         }
+ 
+         // Generate commentary at key moments
+         if (next % 10 === 0) {
+           generateLiveCommentary(`Intense battle for position`);
+         }
+ 
+         return next;
+       });
+     }, 3000); // 3 seconds per lap
+   };
 
   return {
-    drivers,
-    scenario,
-    commentary,
-    raceVideo,
-    heroImage,
-    isLoading,
-    raceState,
-    currentLap,
-    totalLaps,
-    generateRaceScenario,
-    startRace,
-    loadAssets
-  };
-};
+     drivers,
+     scenario,
+     commentary,
+     raceVideo,
+     heroImage,
+     isLoading,
+     raceState,
+     currentLap,
+     totalLaps,
+     generateRaceScenario,
+     startRace,
+     loadAssets,
+     generateRaceVideo,
+   };
+ };
