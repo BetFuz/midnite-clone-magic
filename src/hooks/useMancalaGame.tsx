@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { MancalaEngine, GameState, Move, Player, Variant } from '@/lib/games/mancalaEngine';
 import { toast } from '@/hooks/use-toast';
+import { useBettingEngine } from '@/hooks/useBettingEngine';
 
 interface UseMancalaGameProps {
   gameId: string | null;
@@ -24,6 +25,18 @@ export const useMancalaGame = ({
 }: UseMancalaGameProps) => {
   const [gameState, setGameState] = useState<GameState>(MancalaEngine.createInitialState(variant));
   const [isProcessing, setIsProcessing] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+
+  // Initialize betting engine
+  const betting = useBettingEngine({
+    gameId,
+    gameType: 'mancala',
+    mode,
+    userId,
+    stakeAmount,
+    difficulty,
+    culturalMode,
+  });
 
   // AI difficulty mapping
   const getDifficulty = () => {
@@ -83,6 +96,16 @@ export const useMancalaGame = ({
           title: 'Game Over!',
           description: `${winnerText} wins! Final score: ${newState.player1Seeds} - ${newState.player2Seeds}`,
         });
+
+        // Settle bets
+        if (sessionId) {
+          await betting.settleBets(sessionId, {
+            winner: newState.winner,
+            player1Stats: { captured: newState.player1Seeds },
+            player2Stats: { captured: newState.player2Seeds },
+            gameStats: { perfect: newState.player1Seeds === 48 || newState.player2Seeds === 48 },
+          });
+        }
 
         if (mode === 'p2p' && gameId) {
           await supabase.rpc('settle_game_bets', {
@@ -195,12 +218,43 @@ export const useMancalaGame = ({
 
   const resetGame = () => {
     setGameState(MancalaEngine.createInitialState(variant));
+    setSessionId(null);
   };
+
+  // Create new game session with betting
+  const createGameSession = useCallback(async () => {
+    if (!userId) return null;
+
+    try {
+      const { data, error } = await supabase
+        .from('game_sessions')
+        .insert([{
+          game_type: 'mancala',
+          player1_id: userId,
+          mode,
+          stake_amount: stakeAmount,
+          game_state: MancalaEngine.createInitialState(variant) as any,
+          status: 'active',
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+      setSessionId(data.id);
+      return data.id;
+    } catch (error) {
+      console.error('Error creating game session:', error);
+      return null;
+    }
+  }, [userId, mode, stakeAmount, variant]);
 
   return {
     gameState,
     handlePitClick,
     isProcessing,
     resetGame,
+    createGameSession,
+    sessionId,
+    betting,
   };
 };
