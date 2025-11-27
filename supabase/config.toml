@@ -63,6 +63,9 @@ verify_jwt = false
 [functions.ai-coin-flip]
 verify_jwt = false
 
+[functions.live-dealer-voice]
+verify_jwt = false
+
 [functions.bet-recommendations]
 verify_jwt = false
 
