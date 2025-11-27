@@ -200,9 +200,20 @@ const MatchCard = ({
               <div className="font-semibold text-orange-600">2</div>
             </div>
             <div>
-              <div className="text-muted-foreground mb-1">Avg Goals</div>
-              <div className="font-semibold">2.8</div>
-              <div className="font-semibold">2.3</div>
+              <div className="text-muted-foreground mb-1">
+                {sport?.toLowerCase().includes('basketball') ? 'Avg Points' : 
+                 sport?.toLowerCase().includes('tennis') ? 'Sets Won' :
+                 sport?.toLowerCase().includes('football') && !sport?.toLowerCase().includes('american') ? 'Avg Goals' :
+                 'Avg Score'}
+              </div>
+              <div className="font-semibold">
+                {sport?.toLowerCase().includes('basketball') ? '112.5' : 
+                 sport?.toLowerCase().includes('tennis') ? '6.2' : '2.8'}
+              </div>
+              <div className="font-semibold">
+                {sport?.toLowerCase().includes('basketball') ? '108.3' : 
+                 sport?.toLowerCase().includes('tennis') ? '5.8' : '2.3'}
+              </div>
             </div>
           </div>
         </div>
