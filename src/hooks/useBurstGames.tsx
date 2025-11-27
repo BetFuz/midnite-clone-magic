@@ -1,4 +1,5 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { InstantGameEngine, CrashGameState } from '@/lib/simulation/instantGameEngine';
 import { toast } from '@/hooks/use-toast';
 
 export interface BurstGame {
@@ -19,13 +20,33 @@ const BURST_GAMES: BurstGame[] = [
 ];
 
 export const useBurstGames = () => {
+  const [engine] = useState(() => new InstantGameEngine());
+  const [gameState, setGameState] = useState<CrashGameState | null>(null);
   const [balance, setBalance] = useState(50000);
   const [activeGame, setActiveGame] = useState<BurstGame | null>(null);
   const [stake, setStake] = useState(100);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [multiplier, setMultiplier] = useState(1.00);
-  const [countdown, setCountdown] = useState(0);
+  const [cashedOut, setCashedOut] = useState(false);
+  const [winAmount, setWinAmount] = useState(0);
   const [result, setResult] = useState<{ won: boolean; amount: number } | null>(null);
+
+  useEffect(() => {
+    engine.onUpdate((state: CrashGameState) => {
+      setGameState(state);
+      
+      if (state.crashed && !cashedOut) {
+        setResult({ won: false, amount: 0 });
+        toast({
+          title: `Crashed at ${state.crashPoint.toFixed(2)}x!`,
+          description: 'Better luck next time',
+          variant: 'destructive'
+        });
+      }
+    });
+
+    return () => {
+      engine.destroy();
+    };
+  }, [engine, cashedOut]);
 
   const selectGame = useCallback((game: BurstGame) => {
     setActiveGame(game);
@@ -44,50 +65,34 @@ export const useBurstGames = () => {
       return;
     }
 
-    setIsPlaying(true);
     setBalance(prev => prev - stake);
-    setCountdown(activeGame.duration);
-    setMultiplier(1.00);
+    setCashedOut(false);
+    setWinAmount(0);
+    setResult(null);
+    
+    const state = engine.simulateCrash();
+    setGameState(state);
+    
+    toast({
+      title: '🚀 Game Started!',
+      description: `Bet: ₦${stake.toLocaleString()}`
+    });
+  }, [activeGame, stake, balance, engine]);
 
-    // Simulate burst game with increasing multiplier
-    const interval = setInterval(() => {
-      setMultiplier(prev => {
-        const increase = Math.random() * 0.5;
-        return parseFloat((prev + increase).toFixed(2));
-      });
-      
-      setCountdown(prev => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          
-          // Determine outcome
-          const won = Math.random() < (activeGame.rtp / 100);
-          const finalMultiplier = multiplier;
-          const winAmount = won ? stake * finalMultiplier : 0;
-
-          if (won) {
-            setBalance(prevBalance => prevBalance + winAmount);
-            toast({
-              title: '🎉 Burst Win!',
-              description: `Won ₦${winAmount.toLocaleString()} at ${finalMultiplier.toFixed(2)}x`
-            });
-          } else {
-            toast({
-              title: 'Burst!',
-              description: 'Better luck next time',
-              variant: 'destructive'
-            });
-          }
-
-          setResult({ won, amount: winAmount });
-          setIsPlaying(false);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-  }, [activeGame, stake, balance, multiplier]);
+  const cashOut = useCallback(() => {
+    if (!gameState || cashedOut || gameState.crashed) return;
+    
+    setCashedOut(true);
+    const win = stake * gameState.multiplier;
+    setWinAmount(win);
+    setBalance(prev => prev + win);
+    setResult({ won: true, amount: win });
+    
+    toast({
+      title: `Cashed out at ${gameState.multiplier.toFixed(2)}x!`,
+      description: `Won ₦${win.toLocaleString()}`
+    });
+  }, [gameState, stake, cashedOut]);
 
   return {
     games: BURST_GAMES,
@@ -96,11 +101,12 @@ export const useBurstGames = () => {
     setActiveGame,
     stake,
     setStake,
-    isPlaying,
-    multiplier,
-    countdown,
+    gameState,
+    cashedOut,
+    winAmount,
     result,
     selectGame,
-    playGame
+    playGame,
+    cashOut
   };
 };

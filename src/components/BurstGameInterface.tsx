@@ -13,12 +13,13 @@ export const BurstGameInterface = () => {
     setActiveGame,
     stake,
     setStake,
-    isPlaying,
-    multiplier,
-    countdown,
+    gameState,
+    cashedOut,
+    winAmount,
     result,
     selectGame,
-    playGame
+    playGame,
+    cashOut
   } = useBurstGames();
 
   return (
@@ -86,7 +87,7 @@ export const BurstGameInterface = () => {
                   <h2 className="text-3xl font-bold mt-4">{activeGame.name}</h2>
                 </div>
 
-                {!isPlaying && !result && (
+                {!gameState && !result && (
                   <div className="space-y-4 max-w-md mx-auto">
                     <div>
                       <label className="text-sm text-muted-foreground">Stake Amount</label>
@@ -109,17 +110,22 @@ export const BurstGameInterface = () => {
                   </div>
                 )}
 
-                {isPlaying && (
+                {gameState && gameState.isRunning && !cashedOut && (
                   <div className="space-y-4">
                     <div className="text-8xl font-bold text-primary animate-scale-in">
-                      {multiplier.toFixed(2)}x
+                      {gameState.multiplier.toFixed(2)}x
                     </div>
                     <div className="text-2xl text-muted-foreground">
-                      Potential Win: ₦{(stake * multiplier).toLocaleString()}
+                      Potential Win: ₦{(stake * gameState.multiplier).toLocaleString()}
                     </div>
-                    <Badge variant="destructive" className="text-2xl px-6 py-3">
-                      {countdown}s
-                    </Badge>
+                    <Button
+                      size="lg"
+                      className="w-full h-16 text-xl"
+                      onClick={cashOut}
+                      disabled={gameState.crashed}
+                    >
+                      💰 Cash Out
+                    </Button>
                   </div>
                 )}
 
