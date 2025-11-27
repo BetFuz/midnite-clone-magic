@@ -1,6 +1,34 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClientWithAuth } from "../_shared/supabase-client.ts";
+import { createClientWithAuth, createServiceClient } from "../_shared/supabase-client.ts";
 import { corsHeaders, jsonResponse } from "../_shared/cors.ts";
+
+/**
+ * Withdrawal Function - Ready for Payment Provider Integration
+ * 
+ * TODO: Add API keys as secrets:
+ * - FLUTTERWAVE_SECRET_KEY (for bank transfers)
+ * - GO_WITHDRAWAL_SERVICE_URL (for KYC/fraud checks)
+ */
+
+interface WithdrawalRequest {
+  amount: number;
+  method: 'bank_transfer' | 'mobile_money' | 'crypto';
+  account_details: {
+    account_number?: string;
+    account_name?: string;
+    bank_code?: string;
+    phone_number?: string;
+    wallet_address?: string;
+  };
+  currency?: string;
+}
+
+interface WithdrawalValidation {
+  isValid: boolean;
+  error?: string;
+  fees?: number;
+  netAmount?: number;
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -14,6 +42,7 @@ serve(async (req) => {
     }
 
     const supabase = createClientWithAuth(authHeader);
+    const serviceClient = createServiceClient();
 
     // Get authenticated user
     const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -21,8 +50,10 @@ serve(async (req) => {
       return jsonResponse({ error: 'Unauthorized' }, 401);
     }
 
-    const { amount, method } = await req.json();
+    const body: WithdrawalRequest = await req.json();
+    const { amount, method, account_details, currency = 'NGN' } = body;
 
+    // Validation
     if (!amount || amount <= 0) {
       return jsonResponse({ error: 'Invalid amount' }, 400);
     }
@@ -31,10 +62,14 @@ serve(async (req) => {
       return jsonResponse({ error: 'Withdrawal method required' }, 400);
     }
 
+    if (!account_details || Object.keys(account_details).length === 0) {
+      return jsonResponse({ error: 'Account details required' }, 400);
+    }
+
     // Get user's current balance
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('balance')
+      .select('balance, email, full_name')
       .eq('id', user.id)
       .single();
 
@@ -42,27 +77,272 @@ serve(async (req) => {
       return jsonResponse({ error: 'Profile not found' }, 404);
     }
 
-    // Check if user has sufficient balance
-    if (profile.balance < amount) {
-      return jsonResponse({ error: 'Insufficient balance' }, 400);
+    // Validate withdrawal
+    const validation = validateWithdrawal(amount, profile.balance, method);
+    if (!validation.isValid) {
+      return jsonResponse({ error: validation.error }, 400);
     }
 
-    // TODO: DEV – call Go withdrawal service
-    // Insert withdrawal request (stub - no actual money movement)
-    // In production, this would trigger Go service for KYC, limits, fraud checks
-    
     const requestId = crypto.randomUUID();
+    const reference = `WDW-${Date.now()}-${user.id.slice(0, 8)}`;
 
-    console.log(`Withdrawal request ${requestId} for user ${user.id}, amount: ${amount}, method: ${method}`);
-
-    return jsonResponse({ 
-      requestId,
+    // Log withdrawal attempt
+    await serviceClient.from('admin_audit_log').insert({
+      admin_id: user.id,
+      action: 'withdrawal_requested',
+      resource_type: 'transaction',
+      resource_id: reference,
       status: 'pending',
-      message: 'STUB: Withdrawal will be processed by Go service'
+      payload_hash: JSON.stringify({ 
+        amount, 
+        method, 
+        fees: validation.fees,
+        netAmount: validation.netAmount 
+      })
     });
+
+    // TODO: Call Go service for KYC/fraud checks
+    /*
+    const goServiceUrl = Deno.env.get('GO_WITHDRAWAL_SERVICE_URL');
+    if (goServiceUrl) {
+      const kycCheck = await fetch(`${goServiceUrl}/kyc/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: user.id,
+          amount: amount,
+          method: method
+        })
+      });
+      
+      const kycResult = await kycCheck.json();
+      if (!kycResult.approved) {
+        return jsonResponse({ 
+          error: 'Withdrawal requires verification',
+          kyc_required: true 
+        }, 403);
+      }
+    }
+    */
+
+    // Process withdrawal based on method
+    if (method === 'bank_transfer') {
+      return await processBankTransfer(
+        user.id,
+        reference,
+        amount,
+        validation.netAmount!,
+        account_details,
+        profile.email
+      );
+    } else if (method === 'mobile_money') {
+      return await processMobileMoneyTransfer(
+        user.id,
+        reference,
+        amount,
+        validation.netAmount!,
+        account_details
+      );
+    } else if (method === 'crypto') {
+      return await processCryptoTransfer(
+        user.id,
+        reference,
+        amount,
+        validation.netAmount!,
+        account_details
+      );
+    } else {
+      return jsonResponse({ error: 'Invalid withdrawal method' }, 400);
+    }
 
   } catch (error) {
     console.error('Error in withdraw function:', error);
-    return jsonResponse({ error: 'Internal server error' }, 500);
+    return jsonResponse({ 
+      error: 'Internal server error',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, 500);
   }
 });
+
+/**
+ * Validate withdrawal request
+ */
+function validateWithdrawal(
+  amount: number, 
+  balance: number, 
+  method: string
+): WithdrawalValidation {
+  
+  const MIN_WITHDRAWAL = 1000; // ₦1,000
+  const MAX_WITHDRAWAL = 5000000; // ₦5,000,000
+
+  if (amount < MIN_WITHDRAWAL) {
+    return { 
+      isValid: false, 
+      error: `Minimum withdrawal is ₦${MIN_WITHDRAWAL.toLocaleString()}` 
+    };
+  }
+
+  if (amount > MAX_WITHDRAWAL) {
+    return { 
+      isValid: false, 
+      error: `Maximum withdrawal is ₦${MAX_WITHDRAWAL.toLocaleString()}` 
+    };
+  }
+
+  // Calculate fees based on method
+  let fees = 0;
+  if (method === 'bank_transfer') {
+    fees = amount > 50000 ? 100 : 50; // ₦50 for <₦50k, ₦100 for ≥₦50k
+  } else if (method === 'mobile_money') {
+    fees = amount * 0.015; // 1.5% fee
+  } else if (method === 'crypto') {
+    fees = 0; // No platform fee, only network gas
+  }
+
+  const totalRequired = amount + fees;
+  const netAmount = amount - fees;
+
+  if (balance < totalRequired) {
+    return { 
+      isValid: false, 
+      error: `Insufficient balance. Required: ₦${totalRequired.toLocaleString()} (including ₦${fees.toFixed(2)} fee)` 
+    };
+  }
+
+  return { 
+    isValid: true, 
+    fees, 
+    netAmount 
+  };
+}
+
+/**
+ * Process Bank Transfer
+ * TODO: Uncomment when FLUTTERWAVE_SECRET_KEY is added
+ */
+async function processBankTransfer(
+  userId: string,
+  reference: string,
+  amount: number,
+  netAmount: number,
+  accountDetails: any,
+  email: string
+): Promise<Response> {
+  
+  // TODO: Uncomment when ready
+  /*
+  const flutterwaveKey = Deno.env.get('FLUTTERWAVE_SECRET_KEY');
+  if (!flutterwaveKey) {
+    return jsonResponse({ error: 'Bank transfer not configured' }, 500);
+  }
+
+  const response = await fetch('https://api.flutterwave.com/v3/transfers', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${flutterwaveKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      account_bank: accountDetails.bank_code,
+      account_number: accountDetails.account_number,
+      amount: netAmount,
+      narration: `Betfuz Withdrawal - ${reference}`,
+      currency: 'NGN',
+      reference: reference,
+      callback_url: `${Deno.env.get('APP_URL')}/webhooks/withdrawal`,
+      debit_currency: 'NGN',
+      meta: {
+        user_id: userId,
+        email: email
+      }
+    })
+  });
+
+  const data = await response.json();
+
+  if (data.status === 'success') {
+    return jsonResponse({
+      requestId: reference,
+      status: 'processing',
+      method: 'bank_transfer',
+      amount: amount,
+      netAmount: netAmount,
+      fees: amount - netAmount,
+      account: accountDetails.account_number,
+      reference: data.data.reference,
+      message: 'Withdrawal is being processed'
+    });
+  } else {
+    return jsonResponse({ 
+      error: data.message || 'Transfer failed' 
+    }, 400);
+  }
+  */
+
+  // STUB RESPONSE
+  console.log(`[STUB] Bank transfer initiated: ${reference} for user ${userId}, net amount: ₦${netAmount}`);
+  return jsonResponse({
+    requestId: reference,
+    status: 'pending',
+    method: 'bank_transfer',
+    amount: amount,
+    netAmount: netAmount,
+    fees: amount - netAmount,
+    account: accountDetails.account_number,
+    message: 'STUB: Add FLUTTERWAVE_SECRET_KEY to complete integration',
+    estimatedTime: '2-4 hours'
+  });
+}
+
+/**
+ * Process Mobile Money Transfer
+ */
+async function processMobileMoneyTransfer(
+  userId: string,
+  reference: string,
+  amount: number,
+  netAmount: number,
+  accountDetails: any
+): Promise<Response> {
+  
+  // STUB RESPONSE
+  console.log(`[STUB] Mobile money transfer: ${reference} to ${accountDetails.phone_number}`);
+  return jsonResponse({
+    requestId: reference,
+    status: 'pending',
+    method: 'mobile_money',
+    amount: amount,
+    netAmount: netAmount,
+    fees: amount - netAmount,
+    phone: accountDetails.phone_number,
+    message: 'STUB: Mobile money integration pending',
+    estimatedTime: '1-2 hours'
+  });
+}
+
+/**
+ * Process Crypto Transfer
+ */
+async function processCryptoTransfer(
+  userId: string,
+  reference: string,
+  amount: number,
+  netAmount: number,
+  accountDetails: any
+): Promise<Response> {
+  
+  // STUB RESPONSE
+  console.log(`[STUB] Crypto transfer: ${reference} to ${accountDetails.wallet_address}`);
+  return jsonResponse({
+    requestId: reference,
+    status: 'pending',
+    method: 'crypto',
+    amount: amount,
+    netAmount: netAmount,
+    fees: 0,
+    wallet: accountDetails.wallet_address,
+    message: 'STUB: Crypto integration pending',
+    estimatedTime: '15-30 minutes'
+  });
+}

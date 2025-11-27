@@ -40,17 +40,45 @@ serve(async (req) => {
 
     const supabase = createServiceClient();
 
-    // TODO: DEV – Call Go settlement service here
-    // const goServiceUrl = Deno.env.get('GO_SETTLEMENT_SERVICE_URL');
-    // const settlementResult = await fetch(`${goServiceUrl}/settle`, {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(body)
-    // });
-    // const settlementData = await settlementResult.json();
+    // TODO: Uncomment when GO_SETTLEMENT_SERVICE_URL is configured
+    /*
+    const goServiceUrl = Deno.env.get('GO_SETTLEMENT_SERVICE_URL');
+    if (goServiceUrl) {
+      const settlementResult = await fetch(`${goServiceUrl}/settle`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Deno.env.get('GO_SERVICE_AUTH_TOKEN')}`
+        },
+        body: JSON.stringify({
+          bet_id: body.bet_id,
+          result: body.result,
+          winnings: body.winnings,
+          timestamp: new Date().toISOString()
+        })
+      });
+      
+      if (!settlementResult.ok) {
+        throw new Error('Go settlement service failed');
+      }
+      
+      const settlementData = await settlementResult.json();
+      console.log('Settlement processed by Go service:', settlementData);
+      
+      return jsonResponse({
+        success: true,
+        message: 'Settlement processed',
+        bet_id: body.bet_id,
+        result: body.result,
+        data: settlementData
+      });
+    }
+    */
 
-    // Start transaction (stub implementation)
-    // In production, this would be handled by the Go service
+    // STUB IMPLEMENTATION - Remove when Go service is ready
+    console.log('[STUB] Settlement processing without Go service:', body);
+
+    // Start transaction
     const { data: bet, error: betError } = await supabase
       .from('bet_slips')
       .select('user_id, total_stake')
@@ -78,18 +106,40 @@ serve(async (req) => {
 
     // Update user balance if won
     if (body.result === 'won' && body.winnings) {
-      const { error: balanceError } = await supabase.rpc(
-        'increment_balance',
-        { 
-          user_id: bet.user_id,
-          amount: body.winnings 
-        }
-      );
+      const { data: currentProfile, error: profileError } = await supabase
+        .from('profiles')
+        .select('balance')
+        .eq('id', bet.user_id)
+        .single();
+
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+        return jsonResponse({ error: 'Failed to update balance' }, 500);
+      }
+
+      const newBalance = (currentProfile?.balance || 0) + body.winnings;
+
+      const { error: balanceError } = await supabase
+        .from('profiles')
+        .update({ balance: newBalance })
+        .eq('id', bet.user_id);
 
       if (balanceError) {
         console.error('Error updating balance:', balanceError);
+        return jsonResponse({ error: 'Failed to update balance' }, 500);
       }
+
+      console.log(`Balance updated for user ${bet.user_id}: +₦${body.winnings}`);
     }
+
+    // Update user statistics
+    await supabase.from('user_statistics').upsert({
+      user_id: bet.user_id,
+      [`total_${body.result === 'won' ? 'wins' : body.result === 'lost' ? 'losses' : 'pending'}`]: 1
+    }, {
+      onConflict: 'user_id',
+      ignoreDuplicates: false
+    });
 
     // Broadcast balance change to realtime channel
     const channel = supabase.channel(`user:${bet.user_id}`);
@@ -106,13 +156,28 @@ serve(async (req) => {
 
     console.log('Settlement processed successfully');
 
+    // Log settlement to audit trail
+    await supabase.from('admin_audit_log').insert({
+      admin_id: bet.user_id,
+      action: 'bet_settled',
+      resource_type: 'bet',
+      resource_id: body.bet_id,
+      status: 'success',
+      payload_hash: JSON.stringify({
+        result: body.result,
+        winnings: body.winnings || 0,
+        settled_at: new Date().toISOString()
+      })
+    });
+
     return jsonResponse({
       success: true,
-      message: 'Settlement processed',
+      message: 'Settlement processed successfully',
       bet_id: body.bet_id,
       result: body.result,
-      // TODO: DEV – Return actual settlement data from Go service
-      note: 'STUB: Replace with Go settlement service call'
+      winnings: body.winnings || 0,
+      settled_at: new Date().toISOString(),
+      note: 'STUB: Add GO_SETTLEMENT_SERVICE_URL for production settlement logic'
     });
 
   } catch (error) {
