@@ -36,6 +36,9 @@ verify_jwt = false
 [functions.ai-slot-theme]
 verify_jwt = false
 
+[functions.ai-blackjack]
+verify_jwt = false
+
 [functions.bet-recommendations]
 verify_jwt = false
 
