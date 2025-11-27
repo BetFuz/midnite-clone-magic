@@ -75,17 +75,21 @@ const F1Racing = () => {
           <p className="text-muted-foreground mb-6">AI-Powered Grand Prix Simulation - {circuit}</p>
 
           <div className="mb-6">
-            {isF1Loading && !heroImage ? (
-              <div className="h-[400px] flex items-center justify-center bg-card border border-border rounded-lg">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              </div>
-            ) : heroImage ? (
-              <img 
-                src={heroImage} 
-                alt="F1 Racing" 
-                className="w-full h-[400px] object-cover rounded-lg"
-              />
-            ) : null}
+            <div 
+              className="h-[400px] flex items-center justify-center bg-gradient-hero border border-border rounded-lg relative overflow-hidden"
+              style={{
+                backgroundImage: heroImage ? `url(${heroImage})` : undefined,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center'
+              }}
+            >
+              {!heroImage && (
+                <div className="text-center z-10">
+                  <h2 className="text-4xl font-bold text-white mb-4">🏎️ {circuit} Grand Prix</h2>
+                  <p className="text-white/90">Formula 1 Racing - Place Your Bets Now</p>
+                </div>
+              )}
+            </div>
           </div>
 
           {raceVideo && (

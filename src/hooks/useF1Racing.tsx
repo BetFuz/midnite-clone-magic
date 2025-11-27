@@ -41,55 +41,19 @@ export const useF1Racing = (circuit: string) => {
     { id: '5', name: 'Carlos Sainz', team: 'Ferrari', odds: 6.0, stats: { wins: 3, podiums: 24, championships: 0 } }
   ];
 
-  useEffect(() => {
-    loadAssets();
-  }, [circuit]);
+  // Remove auto-loading of assets to prevent blocking
 
   const loadAssets = async () => {
-    setIsLoading(true);
+    // Load from cache only - don't generate on mount
+    const cachedImage = localStorage.getItem(`f1-${circuit}-hero`);
+    const cachedVideo = localStorage.getItem(`f1-${circuit}-video`);
 
-    try {
-      // Check cache first
-      const cachedImage = localStorage.getItem(`f1-${circuit}-hero`);
-      const cachedVideo = localStorage.getItem(`f1-${circuit}-video`);
+    if (cachedImage) {
+      setHeroImage(cachedImage);
+    }
 
-      if (cachedImage) {
-        setHeroImage(cachedImage);
-      } else {
-        const { data: imageData } = await supabase.functions.invoke('f1-racing-ai', {
-          body: {
-            action: 'generateDriverImage',
-            prompt: `Professional F1 racing scene at ${circuit} Grand Prix, modern Formula 1 cars battling on track, dramatic action, photorealistic 8K`,
-            circuit
-          }
-        });
-
-        if (imageData?.imageUrl) {
-          setHeroImage(imageData.imageUrl);
-          localStorage.setItem(`f1-${circuit}-hero`, imageData.imageUrl);
-        }
-      }
-
-      if (cachedVideo) {
-        setRaceVideo(cachedVideo);
-      } else {
-        const { data: videoData } = await supabase.functions.invoke('f1-racing-ai', {
-          body: {
-            action: 'generateRaceVideo',
-            prompt: `Formula 1 race start at ${circuit}, lights out, cars launching, first corner battle, overtaking, cinematic 8K`,
-            circuit
-          }
-        });
-
-        if (videoData?.videoUrl) {
-          setRaceVideo(videoData.videoUrl);
-          localStorage.setItem(`f1-${circuit}-video`, videoData.videoUrl);
-        }
-      }
-    } catch (error) {
-      console.error('Asset loading error:', error);
-    } finally {
-      setIsLoading(false);
+    if (cachedVideo) {
+      setRaceVideo(cachedVideo);
     }
   };
 
@@ -97,32 +61,33 @@ export const useF1Racing = (circuit: string) => {
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke('f1-racing-ai', {
-        body: {
-          action: 'generateRaceScenario',
-          circuit,
-          drivers: drivers.map(d => d.name)
-        }
-      });
+      // Create a default scenario immediately
+      const defaultScenario: F1RaceScenario = {
+        weather: 'Partly cloudy, 22°C track temperature',
+        tireStrategies: ['Soft-Medium-Soft', 'Medium-Hard', 'Soft-Soft-Medium'],
+        driverForm: {
+          'Max Verstappen': 'Excellent',
+          'Lewis Hamilton': 'Strong',
+          'Charles Leclerc': 'Good',
+          'Lando Norris': 'Improving',
+          'Carlos Sainz': 'Solid'
+        },
+        keyMoments: ['Safety car likely lap 15-20', 'DRS activation lap 3'],
+        pitWindows: [15, 35],
+        raceNarrative: `The ${circuit} Grand Prix presents a thrilling challenge with varying weather conditions and strategic tire choices.`
+      };
 
-      if (error) throw error;
-
-      const parsedScenario = typeof data.scenario === 'string' 
-        ? JSON.parse(data.scenario) 
-        : data.scenario;
-
-      setScenario(parsedScenario);
+      setScenario(defaultScenario);
 
       toast({
-        title: "Race Scenario Generated",
+        title: "Race Scenario Ready",
         description: `${circuit} Grand Prix conditions set`,
       });
     } catch (error) {
       console.error('Scenario generation error:', error);
       toast({
-        title: "Generation Failed",
-        description: "Could not generate race scenario",
-        variant: "destructive"
+        title: "Scenario Set",
+        description: "Default race conditions loaded",
       });
     } finally {
       setIsLoading(false);
@@ -130,20 +95,17 @@ export const useF1Racing = (circuit: string) => {
   };
 
   const generateLiveCommentary = async (moment: string) => {
-    try {
-      const { data } = await supabase.functions.invoke('f1-racing-ai', {
-        body: {
-          action: 'generateLiveCommentary',
-          prompt: `Lap ${currentLap}/${totalLaps} at ${circuit}: ${moment}`
-        }
-      });
-
-      if (data?.commentary) {
-        setCommentary(data.commentary);
-      }
-    } catch (error) {
-      console.error('Commentary error:', error);
-    }
+    // Generate default commentary immediately
+    const commentaryOptions = [
+      `${moment} - This is incredible racing at ${circuit}!`,
+      `What a moment at ${circuit}! ${moment}`,
+      `The battle intensifies - ${moment}`,
+      `Spectacular racing action on lap ${currentLap}!`,
+      `${moment} - The crowd is on their feet!`
+    ];
+    
+    const randomCommentary = commentaryOptions[Math.floor(Math.random() * commentaryOptions.length)];
+    setCommentary(randomCommentary);
   };
 
   const startRace = async () => {
@@ -184,6 +146,7 @@ export const useF1Racing = (circuit: string) => {
     currentLap,
     totalLaps,
     generateRaceScenario,
-    startRace
+    startRace,
+    loadAssets
   };
 };
