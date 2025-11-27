@@ -3,24 +3,42 @@ import { BoardState, GameMove } from '@/components/games/AfricanDraftBoard';
 import { AfricanDraftEngine } from '@/lib/games/africanDraftEngine';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { useBettingEngine } from '@/hooks/useBettingEngine';
 
 export type GameMode = 'p2p' | 'human-ai' | 'ai-ai' | 'cultural';
 
 interface UseAfricanDraftGameProps {
+  gameId?: string;
+  userId?: string;
   mode: GameMode;
-  sessionId?: string;
+  stakeAmount?: number;
   aiDifficulty?: 'beginner' | 'intermediate' | 'advanced' | 'master';
+  culturalMode?: boolean;
 }
 
 export const useAfricanDraftGame = ({ 
-  mode, 
-  sessionId,
-  aiDifficulty = 'intermediate' 
+  gameId,
+  userId,
+  mode,
+  stakeAmount = 1000,
+  aiDifficulty = 'intermediate',
+  culturalMode = false
 }: UseAfricanDraftGameProps) => {
   const [boardState, setBoardState] = useState<BoardState>(
     AfricanDraftEngine.createInitialState()
   );
   const [isProcessing, setIsProcessing] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+
+  // Initialize betting engine
+  const betting = useBettingEngine({
+    gameId: gameId || '',
+    gameType: 'african_draft',
+    mode: mode,
+    stakeAmount: stakeAmount,
+    userId: userId || '',
+    culturalMode: culturalMode
+  });
 
   // Get AI difficulty depth
   const getAIDepth = () => {
@@ -141,22 +159,25 @@ export const useAfricanDraftGame = ({
       });
     }
 
-    if (gameStatus.gameOver) {
-      toast({
-        title: 'Game Over!',
-        description: `${gameStatus.winner} wins!`,
-      });
-
-      // Save game result if session exists
-      if (sessionId) {
-        await supabase.rpc('update_game_state', {
-          p_session_id: sessionId,
-          p_game_state: { board: newBoard },
-          p_current_player: nextPlayer,
-          p_winner: gameStatus.winner
+      if (gameStatus.gameOver) {
+        toast({
+          title: 'Game Over!',
+          description: `${gameStatus.winner} wins!`,
         });
+
+        // Save game result and settle bets if session exists
+        if (sessionId) {
+          await supabase.rpc('update_game_state', {
+            p_session_id: sessionId,
+            p_game_state: { board: newBoard },
+            p_current_player: nextPlayer,
+            p_winner: gameStatus.winner
+          });
+
+          // Settle bets
+          await betting.settleBets(sessionId, { winner: gameStatus.winner });
+        }
       }
-    }
 
     // If human vs AI mode and it's AI's turn
     if (mode === 'human-ai' && !gameStatus.gameOver && nextPlayer === 'black') {
@@ -206,12 +227,55 @@ export const useAfricanDraftGame = ({
 
   const resetGame = () => {
     setBoardState(AfricanDraftEngine.createInitialState());
+    setSessionId(null);
+  };
+
+  const createGameSession = async () => {
+    if (!userId) {
+      toast({
+        title: 'Authentication Required',
+        description: 'Please log in to play',
+        variant: 'destructive'
+      });
+      return null;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('game_sessions')
+        .insert({
+          game_type: 'african-draft',
+          mode: mode,
+          stake_amount: stakeAmount,
+          player1_id: userId,
+          game_state: { board: boardState.pieces },
+          current_player: boardState.currentPlayer
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setSessionId(data.id);
+      return data.id;
+    } catch (error) {
+      console.error('Error creating game session:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to create game session',
+        variant: 'destructive'
+      });
+      return null;
+    }
   };
 
   return {
     boardState,
     handleMove,
     resetGame,
-    isProcessing
+    isProcessing,
+    sessionId,
+    createGameSession,
+    betting
   };
 };
