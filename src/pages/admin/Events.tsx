@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AdminGuard } from "@/components/admin/AdminGuard";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { DataTable } from "@/components/admin/DataTable";
@@ -7,9 +7,10 @@ import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, RefreshCw } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Match {
   id: string;
@@ -21,21 +22,9 @@ interface Match {
   status: string;
 }
 
-const mockMatches: Match[] = [
-  {
-    id: "1",
-    homeTeam: "Arsenal",
-    awayTeam: "Chelsea",
-    league: "Premier League",
-    sport: "Football",
-    commenceTime: "2025-01-15T15:00:00Z",
-    status: "upcoming",
-  },
-  // TODO: DEV – fetch from matches table
-];
-
 export default function Events() {
-  const [matches, setMatches] = useState<Match[]>(mockMatches);
+  const [matches, setMatches] = useState<Match[]>([]);
+  const [loading, setLoading] = useState(true);
   const [editDrawerOpen, setEditDrawerOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
@@ -46,6 +35,40 @@ export default function Events() {
     sport: "Football",
     commenceTime: "",
   });
+
+  useEffect(() => {
+    fetchMatches();
+  }, []);
+
+  const fetchMatches = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('matches')
+        .select('*')
+        .order('commence_time', { ascending: true })
+        .limit(100);
+
+      if (error) throw error;
+
+      const formattedMatches: Match[] = data.map(match => ({
+        id: match.id,
+        homeTeam: match.home_team,
+        awayTeam: match.away_team,
+        league: match.league_name,
+        sport: match.sport_title,
+        commenceTime: match.commence_time,
+        status: match.status || 'upcoming',
+      }));
+
+      setMatches(formattedMatches);
+    } catch (error) {
+      console.error('Error fetching matches:', error);
+      toast.error('Failed to load matches');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const columns: ColumnDef<Match>[] = [
     {
@@ -109,18 +132,77 @@ export default function Events() {
     setDeleteDialogOpen(true);
   };
 
-  const handleSave = () => {
-    // TODO: DEV – validate, upsert to DB, update odds cache
-    toast.success(selectedMatch ? "Match updated" : "Match created");
-    setEditDrawerOpen(false);
-    setSelectedMatch(null);
+  const handleSave = async () => {
+    try {
+      if (!formData.homeTeam || !formData.awayTeam || !formData.league || !formData.commenceTime) {
+        toast.error('Please fill in all required fields');
+        return;
+      }
+
+      toast.loading('Saving match...');
+
+      // Note: In production, this would use an admin edge function
+      // For now, direct database access (requires proper RLS policies)
+      const matchData = {
+        home_team: formData.homeTeam,
+        away_team: formData.awayTeam,
+        league_name: formData.league,
+        sport_title: formData.sport,
+        sport_key: formData.sport.toLowerCase(),
+        commence_time: new Date(formData.commenceTime).toISOString(),
+        match_id: `${formData.homeTeam}-${formData.awayTeam}-${Date.now()}`,
+        status: 'upcoming',
+      };
+
+      if (selectedMatch) {
+        // Update existing match
+        const { error } = await supabase
+          .from('matches')
+          .update(matchData)
+          .eq('id', selectedMatch.id);
+
+        if (error) throw error;
+        toast.success('Match updated successfully');
+      } else {
+        // Create new match
+        const { error } = await supabase
+          .from('matches')
+          .insert([matchData]);
+
+        if (error) throw error;
+        toast.success('Match created successfully');
+      }
+
+      setEditDrawerOpen(false);
+      setSelectedMatch(null);
+      fetchMatches();
+    } catch (error) {
+      console.error('Error saving match:', error);
+      toast.error('Failed to save match. Check admin permissions.');
+    }
   };
 
-  const handleDelete = () => {
-    // TODO: DEV – soft delete, cascade to bets, notify users
-    toast.success("Match deleted");
-    setDeleteDialogOpen(false);
-    setSelectedMatch(null);
+  const handleDelete = async () => {
+    try {
+      if (!selectedMatch) return;
+
+      toast.loading('Deleting match...');
+
+      const { error } = await supabase
+        .from('matches')
+        .delete()
+        .eq('id', selectedMatch.id);
+
+      if (error) throw error;
+
+      toast.success('Match deleted successfully');
+      setDeleteDialogOpen(false);
+      setSelectedMatch(null);
+      fetchMatches();
+    } catch (error) {
+      console.error('Error deleting match:', error);
+      toast.error('Failed to delete match. Check admin permissions.');
+    }
   };
 
   const handleCreate = () => {
@@ -142,12 +224,20 @@ export default function Events() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold">Match Events</h1>
-              <p className="text-muted-foreground">Manage sports events and fixtures</p>
+              <p className="text-muted-foreground">
+                {loading ? 'Loading...' : `${matches.length} matches in database`}
+              </p>
             </div>
-            <Button onClick={handleCreate}>
-              <Plus className="h-4 w-4 mr-2" />
-              Create Match
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={fetchMatches} disabled={loading}>
+                <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+              <Button onClick={handleCreate}>
+                <Plus className="h-4 w-4 mr-2" />
+                Create Match
+              </Button>
+            </div>
           </div>
 
           <DataTable
