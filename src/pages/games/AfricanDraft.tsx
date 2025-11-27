@@ -7,16 +7,37 @@ import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Users, Bot, Globe, Shield, Zap, Crown } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Users, Bot, Globe, Shield, Zap, Crown, Play, RotateCcw } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import AfricanDraftBoard from '@/components/games/AfricanDraftBoard';
+import { useAfricanDraftGame, GameMode } from '@/hooks/useAfricanDraftGame';
 
 export default function AfricanDraft() {
-  const [activeMode, setActiveMode] = useState('p2p');
+  const [activeMode, setActiveMode] = useState<GameMode>('p2p');
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [stakeAmount, setStakeAmount] = useState('1000');
+  const [aiDifficulty, setAiDifficulty] = useState<'beginner' | 'intermediate' | 'advanced' | 'master'>('intermediate');
 
-  const handlePlaceBet = (mode: string, difficulty?: string) => {
+  const { boardState, handleMove, resetGame, isProcessing } = useAfricanDraftGame({
+    mode: activeMode,
+    aiDifficulty: aiDifficulty
+  });
+
+  const startGame = () => {
+    setIsPlaying(true);
     toast({
-      title: 'Bet Placed',
-      description: `African Draft ${mode} bet placed${difficulty ? ` at ${difficulty} level` : ''}`,
+      title: 'Game Started!',
+      description: `African Draft ${activeMode} game started with ₦${stakeAmount} stake`,
+    });
+  };
+
+  const handleReset = () => {
+    resetGame();
+    setIsPlaying(false);
+    toast({
+      title: 'Game Reset',
+      description: 'Starting new game',
     });
   };
 
@@ -51,7 +72,7 @@ export default function AfricanDraft() {
             </Card>
 
             {/* Game Modes */}
-            <Tabs value={activeMode} onValueChange={setActiveMode}>
+            <Tabs value={activeMode} onValueChange={(value) => setActiveMode(value as GameMode)}>
               <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="p2p" className="gap-2">
                   <Users className="h-4 w-4" />
@@ -73,166 +94,224 @@ export default function AfricanDraft() {
 
               {/* P2P Mode */}
               <TabsContent value="p2p" className="space-y-4">
-                <Card className="p-6">
-                  <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                    <Users className="h-5 w-5 text-primary" />
-                    Player vs Player Betting
-                  </h3>
-                  <div className="space-y-3">
-                    <div className="flex items-start gap-3">
-                      <Zap className="h-5 w-5 text-primary mt-0.5" />
-                      <div>
-                        <p className="font-medium">Direct Player Matching</p>
-                        <p className="text-sm text-muted-foreground">Bet against other players in real-time matches</p>
+                {!isPlaying ? (
+                  <Card className="p-6">
+                    <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                      <Users className="h-5 w-5 text-primary" />
+                      Player vs Player Betting
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex items-start gap-3">
+                        <Zap className="h-5 w-5 text-primary mt-0.5" />
+                        <div>
+                          <p className="font-medium">Direct Player Matching</p>
+                          <p className="text-sm text-muted-foreground">Bet against other players in real-time matches</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <Zap className="h-5 w-5 text-primary mt-0.5" />
+                        <div>
+                          <p className="font-medium">Shared Betting Pools</p>
+                          <p className="text-sm text-muted-foreground">Join community pools for larger wins</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <Zap className="h-5 w-5 text-primary mt-0.5" />
+                        <div>
+                          <p className="font-medium">Real-time Odds</p>
+                          <p className="text-sm text-muted-foreground">Odds adjust based on player performance</p>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex items-start gap-3">
-                      <Zap className="h-5 w-5 text-primary mt-0.5" />
-                      <div>
-                        <p className="font-medium">Shared Betting Pools</p>
-                        <p className="text-sm text-muted-foreground">Join community pools for larger wins</p>
-                      </div>
+                    <div className="mt-6 space-y-3">
+                      <label className="text-sm font-medium">Stake Amount (₦)</label>
+                      <Input
+                        type="number"
+                        value={stakeAmount}
+                        onChange={(e) => setStakeAmount(e.target.value)}
+                        min="500"
+                        max="100000"
+                      />
                     </div>
-                    <div className="flex items-start gap-3">
-                      <Zap className="h-5 w-5 text-primary mt-0.5" />
-                      <div>
-                        <p className="font-medium">Real-time Odds</p>
-                        <p className="text-sm text-muted-foreground">Odds adjust based on player performance</p>
+                    <Button 
+                      className="w-full mt-4" 
+                      size="lg"
+                      onClick={startGame}
+                    >
+                      <Play className="h-4 w-4 mr-2" />
+                      Start P2P Match
+                    </Button>
+                  </Card>
+                ) : (
+                  <div className="space-y-4">
+                    <Card className="p-6">
+                      <div className="flex justify-between items-center mb-4">
+                        <div>
+                          <h3 className="text-lg font-semibold">P2P Match</h3>
+                          <p className="text-sm text-muted-foreground">Stake: ₦{stakeAmount}</p>
+                        </div>
+                        <Button variant="outline" size="sm" onClick={handleReset}>
+                          <RotateCcw className="h-4 w-4 mr-2" />
+                          New Game
+                        </Button>
                       </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <Zap className="h-5 w-5 text-primary mt-0.5" />
-                      <div>
-                        <p className="font-medium">Peer Matching</p>
-                        <p className="text-sm text-muted-foreground">Automatic matchmaking by skill level</p>
-                      </div>
-                    </div>
+                      <AfricanDraftBoard
+                        boardState={boardState}
+                        onMove={handleMove}
+                        disabled={isProcessing}
+                      />
+                    </Card>
                   </div>
-                  <div className="mt-6 p-4 bg-muted/50 rounded-lg">
-                    <div className="flex justify-between text-sm mb-2">
-                      <span className="text-muted-foreground">Min Bet</span>
-                      <span className="font-medium">₦500</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Max Bet</span>
-                      <span className="font-medium">₦100,000</span>
-                    </div>
-                  </div>
-                  <Button 
-                    className="w-full mt-4" 
-                    size="lg"
-                    onClick={() => handlePlaceBet('P2P')}
-                  >
-                    Find Match & Place Bet
-                  </Button>
-                </Card>
+                )}
               </TabsContent>
 
               {/* Human vs AI Mode */}
               <TabsContent value="human-ai" className="space-y-4">
-                <Card className="p-6">
-                  <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                    <Bot className="h-5 w-5 text-primary" />
-                    Beat the AI
-                  </h3>
-                  <div className="space-y-3 mb-6">
-                    <div className="flex items-start gap-3">
-                      <Zap className="h-5 w-5 text-primary mt-0.5" />
-                      <div>
-                        <p className="font-medium">Challenge AI Opponents</p>
-                        <p className="text-sm text-muted-foreground">Test your skills against intelligent AI</p>
+                {!isPlaying ? (
+                  <Card className="p-6">
+                    <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                      <Bot className="h-5 w-5 text-primary" />
+                      Beat the AI
+                    </h3>
+                    <div className="space-y-3 mb-6">
+                      <div className="flex items-start gap-3">
+                        <Zap className="h-5 w-5 text-primary mt-0.5" />
+                        <div>
+                          <p className="font-medium">Challenge AI Opponents</p>
+                          <p className="text-sm text-muted-foreground">Test your skills against intelligent AI</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <Zap className="h-5 w-5 text-primary mt-0.5" />
+                        <div>
+                          <p className="font-medium">Performance Challenges</p>
+                          <p className="text-sm text-muted-foreground">Earn bonuses for winning streaks</p>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex items-start gap-3">
-                      <Zap className="h-5 w-5 text-primary mt-0.5" />
-                      <div>
-                        <p className="font-medium">Performance Challenges</p>
-                        <p className="text-sm text-muted-foreground">Earn bonuses for winning streaks</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <Zap className="h-5 w-5 text-primary mt-0.5" />
-                      <div>
-                        <p className="font-medium">Skill Achievements</p>
-                        <p className="text-sm text-muted-foreground">Unlock achievements and higher multipliers</p>
-                      </div>
-                    </div>
-                  </div>
 
-                  <div className="space-y-3">
-                    <h4 className="font-semibold">Select Difficulty:</h4>
-                    {['Beginner', 'Intermediate', 'Advanced', 'Master'].map((level) => (
-                      <Button
-                        key={level}
-                        variant="outline"
-                        className="w-full justify-between"
-                        onClick={() => handlePlaceBet('Human vs AI', level)}
-                      >
-                        <span>{level}</span>
-                        <Badge variant="secondary">
-                          {level === 'Beginner' ? '1.5x' : level === 'Intermediate' ? '3x' : level === 'Advanced' ? '6x' : '12x'}
-                        </Badge>
-                      </Button>
-                    ))}
+                    <div className="space-y-3 mb-4">
+                      <label className="text-sm font-medium">Stake Amount (₦)</label>
+                      <Input
+                        type="number"
+                        value={stakeAmount}
+                        onChange={(e) => setStakeAmount(e.target.value)}
+                        min="500"
+                        max="100000"
+                      />
+                    </div>
+
+                    <div className="space-y-3">
+                      <h4 className="font-semibold">Select Difficulty:</h4>
+                      {[
+                        { level: 'beginner', label: 'Beginner', multiplier: '1.5x' },
+                        { level: 'intermediate', label: 'Intermediate', multiplier: '3x' },
+                        { level: 'advanced', label: 'Advanced', multiplier: '6x' },
+                        { level: 'master', label: 'Master', multiplier: '12x' }
+                      ].map(({ level, label, multiplier }) => (
+                        <Button
+                          key={level}
+                          variant={aiDifficulty === level ? "default" : "outline"}
+                          className="w-full justify-between"
+                          onClick={() => {
+                            setAiDifficulty(level as any);
+                            setActiveMode('human-ai');
+                            startGame();
+                          }}
+                        >
+                          <span>{label}</span>
+                          <Badge variant="secondary">{multiplier}</Badge>
+                        </Button>
+                      ))}
+                    </div>
+                  </Card>
+                ) : (
+                  <div className="space-y-4">
+                    <Card className="p-6">
+                      <div className="flex justify-between items-center mb-4">
+                        <div>
+                          <h3 className="text-lg font-semibold">vs AI ({aiDifficulty})</h3>
+                          <p className="text-sm text-muted-foreground">Stake: ₦{stakeAmount}</p>
+                        </div>
+                        <Button variant="outline" size="sm" onClick={handleReset}>
+                          <RotateCcw className="h-4 w-4 mr-2" />
+                          New Game
+                        </Button>
+                      </div>
+                      <AfricanDraftBoard
+                        boardState={boardState}
+                        onMove={handleMove}
+                        disabled={isProcessing || boardState.currentPlayer === 'black'}
+                      />
+                    </Card>
                   </div>
-                </Card>
+                )}
               </TabsContent>
 
               {/* AI vs AI Mode */}
               <TabsContent value="ai-ai" className="space-y-4">
-                <Card className="p-6">
-                  <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                    <Bot className="h-5 w-5 text-primary" />
-                    AI Tournament
-                  </h3>
-                  <div className="space-y-3">
-                    <div className="flex items-start gap-3">
-                      <Zap className="h-5 w-5 text-primary mt-0.5" />
-                      <div>
-                        <p className="font-medium">AI Personality Matchups</p>
-                        <p className="text-sm text-muted-foreground">Watch different AI strategies compete</p>
+                {!isPlaying ? (
+                  <Card className="p-6">
+                    <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                      <Bot className="h-5 w-5 text-primary" />
+                      AI Tournament
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex items-start gap-3">
+                        <Zap className="h-5 w-5 text-primary mt-0.5" />
+                        <div>
+                          <p className="font-medium">AI Personality Matchups</p>
+                          <p className="text-sm text-muted-foreground">Watch different AI strategies compete</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <Zap className="h-5 w-5 text-primary mt-0.5" />
+                        <div>
+                          <p className="font-medium">Performance History</p>
+                          <p className="text-sm text-muted-foreground">Analyze AI win rates and patterns</p>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex items-start gap-3">
-                      <Zap className="h-5 w-5 text-primary mt-0.5" />
-                      <div>
-                        <p className="font-medium">Performance History</p>
-                        <p className="text-sm text-muted-foreground">Analyze AI win rates and patterns</p>
-                      </div>
+                    <div className="mt-6 space-y-3">
+                      <label className="text-sm font-medium">Stake Amount (₦)</label>
+                      <Input
+                        type="number"
+                        value={stakeAmount}
+                        onChange={(e) => setStakeAmount(e.target.value)}
+                        min="500"
+                        max="100000"
+                      />
                     </div>
-                    <div className="flex items-start gap-3">
-                      <Zap className="h-5 w-5 text-primary mt-0.5" />
-                      <div>
-                        <p className="font-medium">Live Tournaments</p>
-                        <p className="text-sm text-muted-foreground">24/7 automated AI competitions</p>
+                    <Button 
+                      className="w-full mt-4" 
+                      size="lg"
+                      onClick={startGame}
+                    >
+                      <Play className="h-4 w-4 mr-2" />
+                      Watch AI Tournament
+                    </Button>
+                  </Card>
+                ) : (
+                  <div className="space-y-4">
+                    <Card className="p-6">
+                      <div className="flex justify-between items-center mb-4">
+                        <div>
+                          <h3 className="text-lg font-semibold">AI vs AI Match</h3>
+                          <p className="text-sm text-muted-foreground">Stake: ₦{stakeAmount}</p>
+                        </div>
+                        <Button variant="outline" size="sm" onClick={handleReset}>
+                          <RotateCcw className="h-4 w-4 mr-2" />
+                          New Match
+                        </Button>
                       </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <Zap className="h-5 w-5 text-primary mt-0.5" />
-                      <div>
-                        <p className="font-medium">Dynamic Odds</p>
-                        <p className="text-sm text-muted-foreground">Odds based on AI performance data</p>
-                      </div>
-                    </div>
+                      <AfricanDraftBoard
+                        boardState={boardState}
+                        onMove={handleMove}
+                        disabled={true}
+                      />
+                    </Card>
                   </div>
-                  <div className="mt-6 p-4 bg-muted/50 rounded-lg">
-                    <div className="flex justify-between text-sm mb-2">
-                      <span className="text-muted-foreground">Next Tournament</span>
-                      <span className="font-medium">15m 30s</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Current Bets</span>
-                      <span className="font-medium">2,451</span>
-                    </div>
-                  </div>
-                  <Button 
-                    className="w-full mt-4" 
-                    size="lg"
-                    onClick={() => handlePlaceBet('AI Tournament')}
-                  >
-                    Place Tournament Bet
-                  </Button>
-                </Card>
+                )}
               </TabsContent>
 
               {/* Cultural Mode */}
@@ -273,7 +352,10 @@ export default function AfricanDraft() {
                   <Button 
                     className="w-full mt-4 bg-amber-600 hover:bg-amber-700" 
                     size="lg"
-                    onClick={() => handlePlaceBet('Traditional')}
+                    onClick={() => {
+                      setActiveMode('cultural');
+                      startGame();
+                    }}
                   >
                     Play Traditional Mode
                   </Button>
