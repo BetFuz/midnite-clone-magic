@@ -1,107 +1,203 @@
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Sparkles, RefreshCw } from "lucide-react";
-import { formatCurrency } from "@/lib/currency";
-import { toast } from "sonner";
+import { useEffect, useRef, useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Sparkles, RefreshCw } from 'lucide-react';
 
 interface ScratchCardProps {
-  name: string;
-  cost: number;
-  maxWin: number;
+  symbols: string[];
+  prize: number;
+  isRevealed: boolean;
+  onReveal: () => void;
+  onReset: () => void;
+  color: string;
 }
 
-const ScratchCard = ({ name, cost, maxWin }: ScratchCardProps) => {
-  const [isScratched, setIsScratched] = useState(false);
-  const [revealed, setRevealed] = useState<number[]>([]);
-  const [winAmount, setWinAmount] = useState<number | null>(null);
+export const ScratchCard = ({
+  symbols,
+  prize,
+  isRevealed,
+  onReveal,
+  onReset,
+  color
+}: ScratchCardProps) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [scratchPercentage, setScratchPercentage] = useState(0);
+  const [isScratching, setIsScratching] = useState(false);
 
-  const handleScratch = (index: number) => {
-    if (revealed.includes(index)) return;
-    
-    const newRevealed = [...revealed, index];
-    setRevealed(newRevealed);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-    if (newRevealed.length === 9) {
-      // TODO: DEV – wire to backend when ready
-      const won = Math.random() > 0.7;
-      const amount = won ? Math.floor(Math.random() * maxWin) + cost : 0;
-      setWinAmount(amount);
-      setIsScratched(true);
-      
-      if (amount > 0) {
-        toast.success(`You won ${formatCurrency(amount)}! 🎉`);
-      } else {
-        toast.info("Better luck next time!");
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Set canvas size
+    canvas.width = 400;
+    canvas.height = 400;
+
+    // Draw scratch-off layer
+    if (!isRevealed) {
+      const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      gradient.addColorStop(0, '#94a3b8');
+      gradient.addColorStop(1, '#64748b');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Add texture pattern
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+      for (let i = 0; i < 100; i++) {
+        ctx.fillRect(
+          Math.random() * canvas.width,
+          Math.random() * canvas.height,
+          Math.random() * 20,
+          Math.random() * 20
+        );
       }
+
+      // Add "Scratch Here" text
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+      ctx.font = 'bold 32px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('SCRATCH HERE', canvas.width / 2, canvas.height / 2);
+    } else {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }, [isRevealed]);
+
+  const scratch = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    if (isRevealed) return;
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const rect = canvas.getBoundingClientRect();
+    let x: number, y: number;
+
+    if ('touches' in e) {
+      x = e.touches[0].clientX - rect.left;
+      y = e.touches[0].clientY - rect.top;
+    } else {
+      x = e.clientX - rect.left;
+      y = e.clientY - rect.top;
+    }
+
+    // Scale coordinates
+    x = (x / rect.width) * canvas.width;
+    y = (y / rect.height) * canvas.height;
+
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.arc(x, y, 30, 0, 2 * Math.PI);
+    ctx.fill();
+
+    // Calculate scratch percentage
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const pixels = imageData.data;
+    let transparent = 0;
+
+    for (let i = 3; i < pixels.length; i += 4) {
+      if (pixels[i] === 0) transparent++;
+    }
+
+    const percentage = (transparent / (pixels.length / 4)) * 100;
+    setScratchPercentage(percentage);
+
+    // Auto-reveal if 60% scratched
+    if (percentage > 60 && !isRevealed) {
+      onReveal();
     }
   };
 
-  const handleReset = () => {
-    // TODO: DEV – wire to backend when ready
-    setIsScratched(false);
-    setRevealed([]);
-    setWinAmount(null);
-  };
-
-  const symbols = ["🎰", "💎", "⭐", "🍀", "🎲", "💰", "🏆", "🎯", "👑"];
-
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="bg-gradient-to-r from-purple-500 to-pink-500">
-        <CardTitle className="flex items-center justify-between text-white">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5" />
-            {name}
-          </div>
-          <Badge variant="secondary">{formatCurrency(cost)}</Badge>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-6">
-        <div className="grid grid-cols-3 gap-2 mb-4">
-          {[...Array(9)].map((_, i) => (
-            <button
-              key={i}
-              onClick={() => handleScratch(i)}
-              disabled={revealed.includes(i)}
-              className={`aspect-square rounded-lg text-3xl flex items-center justify-center transition-all ${
-                revealed.includes(i)
-                  ? "bg-gradient-to-br from-yellow-400 to-orange-400 scale-105"
-                  : "bg-gradient-to-br from-slate-700 to-slate-800 hover:scale-105 cursor-pointer"
-              }`}
+    <div className="relative">
+      {/* Prize Grid Background */}
+      <div className="absolute inset-0 rounded-lg overflow-hidden">
+        <div className="grid grid-cols-3 gap-4 p-8 h-full">
+          {symbols.map((symbol, idx) => (
+            <div
+              key={idx}
+              className={`flex items-center justify-center text-6xl bg-gradient-to-br ${color} rounded-lg shadow-lg`}
             >
-              {revealed.includes(i) ? symbols[i] : "?"}
-            </button>
+              {symbol}
+            </div>
           ))}
         </div>
+      </div>
 
-        {isScratched && (
-          <div className="space-y-3">
-            <div className={`p-4 rounded-lg text-center ${winAmount && winAmount > 0 ? "bg-green-500/20 border-2 border-green-500" : "bg-red-500/20 border-2 border-red-500"}`}>
-              <p className="text-sm font-semibold mb-1">
-                {winAmount && winAmount > 0 ? "🎉 Winner!" : "Try Again"}
-              </p>
-              {winAmount && winAmount > 0 && (
-                <p className="text-2xl font-bold">{formatCurrency(winAmount)}</p>
+      {/* Scratch Layer */}
+      {!isRevealed && (
+        <canvas
+          ref={canvasRef}
+          className="absolute inset-0 w-full h-full cursor-crosshair rounded-lg"
+          onMouseDown={() => setIsScratching(true)}
+          onMouseUp={() => setIsScratching(false)}
+          onMouseMove={(e) => isScratching && scratch(e)}
+          onMouseLeave={() => setIsScratching(false)}
+          onTouchStart={() => setIsScratching(true)}
+          onTouchEnd={() => setIsScratching(false)}
+          onTouchMove={(e) => isScratching && scratch(e)}
+        />
+      )}
+
+      {/* Card Frame */}
+      <div className="relative w-full h-[400px] rounded-lg border-4 border-border shadow-2xl" />
+
+      {/* Progress */}
+      {!isRevealed && scratchPercentage > 0 && (
+        <div className="absolute top-4 left-4 right-4">
+          <Badge variant="secondary" className="w-full justify-center">
+            {Math.round(scratchPercentage)}% Revealed
+          </Badge>
+        </div>
+      )}
+
+      {/* Result */}
+      {isRevealed && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Card className="bg-background/95 backdrop-blur m-8">
+            <CardContent className="p-6 text-center space-y-4">
+              {prize > 0 ? (
+                <>
+                  <div className="text-6xl">🎉</div>
+                  <h3 className="text-2xl font-bold text-green-500">Winner!</h3>
+                  <p className="text-4xl font-bold text-primary">
+                    ₦{prize.toLocaleString()}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div className="text-6xl">😔</div>
+                  <h3 className="text-2xl font-bold text-muted-foreground">No Prize</h3>
+                  <p className="text-sm text-muted-foreground">Better luck next time!</p>
+                </>
               )}
-            </div>
-            <Button onClick={handleReset} variant="outline" className="w-full gap-2">
-              <RefreshCw className="h-4 w-4" />
-              Play Again ({formatCurrency(cost)})
-            </Button>
-          </div>
-        )}
+              <Button onClick={onReset} className="w-full">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Try Another Card
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
-        {!isScratched && (
-          <div className="text-center text-sm text-muted-foreground">
-            <p>Scratch all 9 panels to reveal your prize!</p>
-            <p className="mt-1 font-semibold">Max Win: {formatCurrency(maxWin)}</p>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+      {/* Quick Reveal */}
+      {!isRevealed && scratchPercentage > 20 && (
+        <div className="absolute bottom-4 right-4">
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={onReveal}
+          >
+            <Sparkles className="h-4 w-4 mr-2" />
+            Quick Reveal
+          </Button>
+        </div>
+      )}
+    </div>
   );
 };
-
-export default ScratchCard;
