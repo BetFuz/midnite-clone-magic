@@ -23,35 +23,35 @@ const FantasySports = () => {
   const [generating, setGenerating] = useState(false);
   const { leagues, isLoading, joinLeague, refreshLeagues } = useFantasySports();
 
-  // Auto-generate fantasy leagues for upcoming matches on component mount
-  useEffect(() => {
-    const generateLeagues = async () => {
-      try {
-        console.log('Starting fantasy league generation...');
-        const { data, error } = await supabase.functions.invoke('generate-fantasy-leagues', {
-          body: {},
-        });
-        
-        if (error) {
-          console.error('Edge function error:', error);
-          return;
-        }
-        
-        console.log('Generation result:', data);
-        
-        if (data?.created > 0) {
-          console.log(`Created ${data.created} new leagues`);
-          refreshLeagues();
-        }
-      } catch (error) {
-        console.error('Error auto-generating leagues:', error);
-        // Don't block the UI if generation fails
-      }
-    };
-    
-    // Run generation in background without blocking UI
-    generateLeagues();
-  }, []);
+  // Remove auto-generation on mount to keep page fast; use manual button instead
+  // useEffect(() => {
+  //   const generateLeagues = async () => {
+  //     try {
+  //       console.log('Starting fantasy league generation...');
+  //       const { data, error } = await supabase.functions.invoke('generate-fantasy-leagues', {
+  //         body: {},
+  //       });
+  //       
+  //       if (error) {
+  //         console.error('Edge function error:', error);
+  //         return;
+  //       }
+  //       
+  //       console.log('Generation result:', data);
+  //       
+  //       if (data?.created > 0) {
+  //         console.log(`Created ${data.created} new leagues`);
+  //         refreshLeagues();
+  //       }
+  //     } catch (error) {
+  //       console.error('Error auto-generating leagues:', error);
+  //       // Don't block the UI if generation fails
+  //     }
+  //   };
+  //   
+  //   // Run generation in background without blocking UI
+  //   generateLeagues();
+  // }, []);
 
   const handleGenerateLeagues = async () => {
     setGenerating(true);
