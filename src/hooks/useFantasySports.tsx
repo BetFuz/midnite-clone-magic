@@ -32,11 +32,12 @@ export const useFantasySports = () => {
 
   const loadLeagues = async () => {
     try {
+      setIsLoading(true);
       console.log('Loading fantasy leagues...');
       const { data: { user } } = await supabase.auth.getUser();
       console.log('User:', user?.id || 'Not logged in');
 
-      // Fetch all leagues
+      // Fetch all leagues in a single query
       const { data: leaguesData, error: leaguesError } = await supabase
         .from("fantasy_leagues")
         .select("*")
@@ -47,46 +48,56 @@ export const useFantasySports = () => {
         throw leaguesError;
       }
 
-      console.log(`Fetched ${leaguesData?.length || 0} leagues`);
+      const leagueIds = (leaguesData || []).map((league) => league.id);
 
-      // Enrich with participant counts and user teams
-      const enrichedLeagues = await Promise.all(
-        (leaguesData || []).map(async (league) => {
-          const { count } = await supabase
-            .from("fantasy_teams")
-            .select("*", { count: "exact", head: true })
-            .eq("league_id", league.id);
+      // If there are no leagues yet, we can short‑circuit
+      if (leagueIds.length === 0) {
+        setLeagues([]);
+        setMyTeams([]);
+        setIsLoading(false);
+        return;
+      }
 
-          let myTeam = null;
-          if (user) {
-            const { data: teamData } = await supabase
-              .from("fantasy_teams")
-              .select("*")
-              .eq("league_id", league.id)
-              .eq("user_id", user.id)
-              .maybeSingle();
-            
-            myTeam = teamData;
-          }
+      // Fetch all teams for these leagues in a single batched query
+      const { data: teamsData, error: teamsError } = await supabase
+        .from("fantasy_teams")
+        .select("*")
+        .in("league_id", leagueIds);
 
-          return {
-            ...league,
-            participants: count || 0,
-            my_team: myTeam
-          };
-        })
-      );
+      if (teamsError) {
+        console.error('Error fetching fantasy teams:', teamsError);
+        throw teamsError;
+      }
+
+      const allTeams = teamsData || [];
+
+      const enrichedLeagues = (leaguesData || []).map((league) => {
+        const leagueTeams = allTeams.filter((team) => team.league_id === league.id);
+        const participants = leagueTeams.length;
+
+        let myTeam: FantasyTeam | null = null;
+        if (user) {
+          myTeam = leagueTeams.find((team) => team.user_id === user.id) || null;
+        }
+
+        return {
+          ...league,
+          participants,
+          my_team: myTeam,
+        } as FantasyLeague;
+      });
 
       console.log('Leagues enriched successfully');
       setLeagues(enrichedLeagues);
 
-      // Filter my teams
       if (user) {
         const userTeams = enrichedLeagues
-          .filter(l => l.my_team)
-          .map(l => l.my_team!) as FantasyTeam[];
+          .filter((l) => l.my_team)
+          .map((l) => l.my_team!) as FantasyTeam[];
         setMyTeams(userTeams);
         console.log(`User has ${userTeams.length} teams`);
+      } else {
+        setMyTeams([]);
       }
 
       setIsLoading(false);
