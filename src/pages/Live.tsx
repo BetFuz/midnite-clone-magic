@@ -4,8 +4,9 @@ import Sidebar from "@/components/Sidebar";
 import BetSlip from "@/components/BetSlip";
 import LiveMatchCard from "@/components/LiveMatchCard";
 import LiveScoreRibbon from "@/components/LiveScoreRibbon";
+import VirtualHorseRace from "@/components/VirtualHorseRace";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp } from "lucide-react";
+import { TrendingUp, Zap } from "lucide-react";
 
 // Inline horse racing data
 const LIVE_HORSE_RACES = [
@@ -120,6 +121,18 @@ const Live = () => {
           </p>
 
           <LiveScoreRibbon />
+
+          {/* Virtual Horse Race Simulation */}
+          <section className="mt-8 mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <Zap className="h-5 w-5 text-primary animate-pulse" />
+              <h2 className="text-xl font-bold text-foreground">Virtual Race - Live Now</h2>
+              <Badge className="bg-primary/10 text-primary hover:bg-primary/20">
+                SIMULATION
+              </Badge>
+            </div>
+            <VirtualHorseRace />
+          </section>
 
           {/* Live Horse Races */}
           <section className="mt-8">
