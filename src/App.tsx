@@ -116,6 +116,7 @@ const BetTicketDetail = lazy(() => import("./pages/account/BetTicketDetail"));
 const AccountSettings = lazy(() => import("./pages/account/AccountSettings"));
 const Leaderboard = lazy(() => import("./pages/account/Leaderboard"));
 const ResponsibleGamingLimits = lazy(() => import("./pages/account/ResponsibleGaming"));
+const LiveBets = lazy(() => import("./pages/account/LiveBets"));
 
 // Account Tiers
 const DiamondTier = lazy(() => import("./pages/account/tiers/DiamondTier"));
@@ -380,6 +381,7 @@ const App = () => (
           <Route path="/bet-ticket/:ticketId" element={<BetTicketDetail />} />
           <Route path="/account/settings" element={<AccountSettings />} />
           <Route path="/account/limits" element={<ResponsibleGamingLimits />} />
+          <Route path="/account/live-bets" element={<LiveBets />} />
           
           {/* Account Tiers */}
           <Route path="/account/tiers/diamond" element={<DiamondTier />} />
