@@ -1,5 +1,5 @@
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, PerspectiveCamera, Text } from '@react-three/drei';
+import { PerspectiveCamera, Text } from '@react-three/drei';
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 
@@ -19,173 +19,221 @@ interface HorseRaceVisualsProps {
 
 const HorseModel = ({ horse, trackPosition, isRacing }: { horse: Horse; trackPosition: number; isRacing: boolean }) => {
   const groupRef = useRef<THREE.Group>(null);
+  const bodyRef = useRef<THREE.Group>(null);
   const [gallop, setGallop] = useState(0);
-  const dustParticles = useRef<THREE.Points[]>([]);
+  const [stride, setStride] = useState(0);
 
-  useFrame((state) => {
-    if (isRacing && groupRef.current) {
-      // Galloping animation - bob up and down
-      const speed = 8;
-      setGallop((prev) => prev + 0.1 * speed);
-      groupRef.current.position.y = Math.sin(gallop) * 0.3;
+  useFrame((state, delta) => {
+    if (isRacing && groupRef.current && bodyRef.current) {
+      // Fast galloping animation
+      const speed = 15;
+      setGallop((prev) => prev + delta * speed);
+      setStride((prev) => prev + delta * speed * 0.5);
       
-      // Slight rotation for dynamic feel
-      groupRef.current.rotation.z = Math.sin(gallop * 2) * 0.05;
+      // Realistic horse body bob
+      const verticalBob = Math.sin(gallop * 2) * 0.15;
+      bodyRef.current.position.y = verticalBob;
       
-      // Create dust particles
-      if (Math.random() > 0.7) {
-        // Dust effect behind horse
-      }
+      // Forward lean during gallop
+      bodyRef.current.rotation.x = Math.sin(gallop * 2) * 0.08;
+      
+      // Slight side-to-side motion
+      bodyRef.current.rotation.z = Math.sin(stride) * 0.03;
     }
   });
 
-  const legAnimation = (offset: number) => {
-    return Math.sin(gallop + offset) * 0.4;
+  const legAnimation = (offset: number, front: boolean) => {
+    const cycle = gallop + offset;
+    const extension = Math.sin(cycle) * (front ? 0.6 : 0.5);
+    return extension;
   };
 
   return (
-    <group ref={groupRef} position={[trackPosition * 20 - 40, 1, horse.progress * 40 - 20]}>
-      {/* Horse Body - More realistic shape */}
-      <mesh position={[0, 0.5, 0]} castShadow>
-        <capsuleGeometry args={[0.6, 1.8, 8, 16]} />
-        <meshStandardMaterial 
-          color={horse.color} 
-          roughness={0.6}
-          metalness={0.1}
-        />
-      </mesh>
-      
-      {/* Horse Neck */}
-      <mesh position={[0, 1.2, 1]} rotation={[0.5, 0, 0]} castShadow>
-        <capsuleGeometry args={[0.35, 0.8, 8, 16]} />
-        <meshStandardMaterial color={horse.color} roughness={0.6} />
-      </mesh>
-      
-      {/* Horse Head */}
-      <mesh position={[0, 1.8, 1.6]} castShadow>
-        <boxGeometry args={[0.5, 0.6, 0.9]} />
-        <meshStandardMaterial color={horse.color} roughness={0.6} />
-      </mesh>
-      
-      {/* Horse Ears */}
-      <mesh position={[-0.15, 2.3, 1.7]}>
-        <coneGeometry args={[0.1, 0.3, 8]} />
-        <meshStandardMaterial color={horse.color} />
-      </mesh>
-      <mesh position={[0.15, 2.3, 1.7]}>
-        <coneGeometry args={[0.1, 0.3, 8]} />
-        <meshStandardMaterial color={horse.color} />
-      </mesh>
-      
-      {/* Horse Mane */}
-      <mesh position={[0, 1.5, 0.5]} rotation={[0, 0, 0]}>
-        <boxGeometry args={[0.2, 0.8, 0.3]} />
-        <meshStandardMaterial color="#1a0000" roughness={0.9} />
-      </mesh>
-      
-      {/* Jockey */}
-      <mesh position={[0, 1.8, -0.2]} castShadow>
-        <capsuleGeometry args={[0.4, 0.6, 8, 16]} />
-        <meshStandardMaterial color="#ff3366" metalness={0.3} roughness={0.5} />
-      </mesh>
-      
-      {/* Jockey Helmet */}
-      <mesh position={[0, 2.5, -0.2]}>
-        <sphereGeometry args={[0.35, 16, 16]} />
-        <meshStandardMaterial color="#ffffff" metalness={0.7} roughness={0.2} />
-      </mesh>
-      
-      {/* Saddle */}
-      <mesh position={[0, 1.3, 0]}>
-        <cylinderGeometry args={[0.65, 0.55, 0.3, 16]} />
-        <meshStandardMaterial color="#654321" roughness={0.4} metalness={0.2} />
-      </mesh>
-      
-      {/* Animated Legs - Front Left */}
-      <group position={[-0.3, -0.3, 0.8]}>
-        <mesh position={[0, legAnimation(0), 0]} castShadow>
-          <cylinderGeometry args={[0.12, 0.08, 1.2]} />
-          <meshStandardMaterial color="#2c1810" />
+    <group ref={groupRef} position={[(trackPosition - 2) * 4, 1.5, horse.progress * 50 - 25]}>
+      <group ref={bodyRef}>
+        {/* Horse Body - Elongated realistic torso */}
+        <mesh position={[0, 0, 0]} rotation={[0, 0, 0]} castShadow>
+          <boxGeometry args={[0.8, 1.0, 2.2]} />
+          <meshStandardMaterial 
+            color={horse.color} 
+            roughness={0.7}
+            metalness={0.1}
+          />
         </mesh>
-        <mesh position={[0, legAnimation(0) - 0.6, 0]}>
-          <cylinderGeometry args={[0.08, 0.12, 0.3]} />
-          <meshStandardMaterial color="#1a1a1a" />
+        
+        {/* Horse Chest */}
+        <mesh position={[0, -0.2, 1.0]} castShadow>
+          <sphereGeometry args={[0.6, 16, 16]} />
+          <meshStandardMaterial color={horse.color} roughness={0.7} />
         </mesh>
+        
+        {/* Horse Hindquarters */}
+        <mesh position={[0, 0.1, -1.0]} castShadow>
+          <sphereGeometry args={[0.7, 16, 16]} />
+          <meshStandardMaterial color={horse.color} roughness={0.7} />
+        </mesh>
+        
+        {/* Horse Neck - curved upward */}
+        <mesh position={[0, 0.8, 1.4]} rotation={[0.4, 0, 0]} castShadow>
+          <cylinderGeometry args={[0.35, 0.4, 1.2, 16]} />
+          <meshStandardMaterial color={horse.color} roughness={0.7} />
+        </mesh>
+        
+        {/* Horse Head */}
+        <mesh position={[0, 1.6, 1.9]} rotation={[0.2, 0, 0]} castShadow>
+          <boxGeometry args={[0.4, 0.5, 0.8]} />
+          <meshStandardMaterial color={horse.color} roughness={0.7} />
+        </mesh>
+        
+        {/* Horse Snout */}
+        <mesh position={[0, 1.4, 2.4]} castShadow>
+          <boxGeometry args={[0.3, 0.3, 0.4]} />
+          <meshStandardMaterial color={horse.color} roughness={0.7} />
+        </mesh>
+        
+        {/* Horse Ears */}
+        <mesh position={[-0.15, 2.0, 1.8]} rotation={[0.3, 0, 0]}>
+          <coneGeometry args={[0.08, 0.25, 8]} />
+          <meshStandardMaterial color={horse.color} />
+        </mesh>
+        <mesh position={[0.15, 2.0, 1.8]} rotation={[0.3, 0, 0]}>
+          <coneGeometry args={[0.08, 0.25, 8]} />
+          <meshStandardMaterial color={horse.color} />
+        </mesh>
+        
+        {/* Horse Mane - flowing */}
+        {[0, 0.3, 0.6, 0.9].map((offset, i) => (
+          <mesh key={i} position={[0, 0.9 - offset * 0.3, 1.2 - offset]} rotation={[0.2, 0, 0]}>
+            <boxGeometry args={[0.15, 0.4, 0.1]} />
+            <meshStandardMaterial color="#1a0000" roughness={0.9} />
+          </mesh>
+        ))}
+        
+        {/* Horse Tail */}
+        <mesh position={[0, 0.3, -2.0]} rotation={[0.5, 0, 0]}>
+          <cylinderGeometry args={[0.08, 0.15, 1.0]} />
+          <meshStandardMaterial color="#1a0000" roughness={0.9} />
+        </mesh>
+        
+        {/* Saddle */}
+        <mesh position={[0, 0.6, -0.2]}>
+          <cylinderGeometry args={[0.55, 0.5, 0.25, 16]} />
+          <meshStandardMaterial color="#4a2511" roughness={0.5} metalness={0.2} />
+        </mesh>
+        
+        {/* Jockey Body - crouched racing position */}
+        <mesh position={[0, 1.0, -0.3]} rotation={[0.6, 0, 0]} castShadow>
+          <capsuleGeometry args={[0.35, 0.7, 8, 16]} />
+          <meshStandardMaterial color="#ff3366" metalness={0.3} roughness={0.5} />
+        </mesh>
+        
+        {/* Jockey Head */}
+        <mesh position={[0, 1.4, 0.3]} castShadow>
+          <sphereGeometry args={[0.25, 16, 16]} />
+          <meshStandardMaterial color="#ffdbac" />
+        </mesh>
+        
+        {/* Jockey Helmet */}
+        <mesh position={[0, 1.5, 0.3]}>
+          <sphereGeometry args={[0.28, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2]} />
+          <meshStandardMaterial color="#ffffff" metalness={0.7} roughness={0.2} />
+        </mesh>
+        
+        {/* Racing Silks Number */}
+        <Text
+          position={[0, 1.1, -0.7]}
+          fontSize={0.25}
+          color="white"
+          anchorX="center"
+          anchorY="middle"
+        >
+          {horse.position}
+        </Text>
+        
+        {/* Front Left Leg */}
+        <group position={[-0.35, -0.7, 0.9]}>
+          <mesh position={[0, legAnimation(0, true) - 0.2, 0]} rotation={[legAnimation(0, true) * 0.5, 0, 0]} castShadow>
+            <cylinderGeometry args={[0.11, 0.09, 0.8]} />
+            <meshStandardMaterial color="#3d2817" />
+          </mesh>
+          <mesh position={[0, legAnimation(0, true) - 0.7, legAnimation(0, true) * 0.2]}>
+            <cylinderGeometry args={[0.09, 0.11, 0.25]} />
+            <meshStandardMaterial color="#1a1a1a" />
+          </mesh>
+        </group>
+        
+        {/* Front Right Leg */}
+        <group position={[0.35, -0.7, 0.9]}>
+          <mesh position={[0, legAnimation(Math.PI, true) - 0.2, 0]} rotation={[legAnimation(Math.PI, true) * 0.5, 0, 0]} castShadow>
+            <cylinderGeometry args={[0.11, 0.09, 0.8]} />
+            <meshStandardMaterial color="#3d2817" />
+          </mesh>
+          <mesh position={[0, legAnimation(Math.PI, true) - 0.7, legAnimation(Math.PI, true) * 0.2]}>
+            <cylinderGeometry args={[0.09, 0.11, 0.25]} />
+            <meshStandardMaterial color="#1a1a1a" />
+          </mesh>
+        </group>
+        
+        {/* Back Left Leg */}
+        <group position={[-0.35, -0.7, -0.9]}>
+          <mesh position={[0, legAnimation(Math.PI / 1.8, false) - 0.2, 0]} rotation={[legAnimation(Math.PI / 1.8, false) * 0.4, 0, 0]} castShadow>
+            <cylinderGeometry args={[0.12, 0.1, 0.9]} />
+            <meshStandardMaterial color="#3d2817" />
+          </mesh>
+          <mesh position={[0, legAnimation(Math.PI / 1.8, false) - 0.75, legAnimation(Math.PI / 1.8, false) * 0.15]}>
+            <cylinderGeometry args={[0.1, 0.12, 0.25]} />
+            <meshStandardMaterial color="#1a1a1a" />
+          </mesh>
+        </group>
+        
+        {/* Back Right Leg */}
+        <group position={[0.35, -0.7, -0.9]}>
+          <mesh position={[0, legAnimation(Math.PI * 1.55, false) - 0.2, 0]} rotation={[legAnimation(Math.PI * 1.55, false) * 0.4, 0, 0]} castShadow>
+            <cylinderGeometry args={[0.12, 0.1, 0.9]} />
+            <meshStandardMaterial color="#3d2817" />
+          </mesh>
+          <mesh position={[0, legAnimation(Math.PI * 1.55, false) - 0.75, legAnimation(Math.PI * 1.55, false) * 0.15]}>
+            <cylinderGeometry args={[0.1, 0.12, 0.25]} />
+            <meshStandardMaterial color="#1a1a1a" />
+          </mesh>
+        </group>
       </group>
       
-      {/* Animated Legs - Front Right */}
-      <group position={[0.3, -0.3, 0.8]}>
-        <mesh position={[0, legAnimation(Math.PI), 0]} castShadow>
-          <cylinderGeometry args={[0.12, 0.08, 1.2]} />
-          <meshStandardMaterial color="#2c1810" />
-        </mesh>
-        <mesh position={[0, legAnimation(Math.PI) - 0.6, 0]}>
-          <cylinderGeometry args={[0.08, 0.12, 0.3]} />
-          <meshStandardMaterial color="#1a1a1a" />
-        </mesh>
-      </group>
-      
-      {/* Animated Legs - Back Left */}
-      <group position={[-0.3, -0.3, -0.8]}>
-        <mesh position={[0, legAnimation(Math.PI / 2), 0]} castShadow>
-          <cylinderGeometry args={[0.13, 0.09, 1.2]} />
-          <meshStandardMaterial color="#2c1810" />
-        </mesh>
-        <mesh position={[0, legAnimation(Math.PI / 2) - 0.6, 0]}>
-          <cylinderGeometry args={[0.09, 0.13, 0.3]} />
-          <meshStandardMaterial color="#1a1a1a" />
-        </mesh>
-      </group>
-      
-      {/* Animated Legs - Back Right */}
-      <group position={[0.3, -0.3, -0.8]}>
-        <mesh position={[0, legAnimation(Math.PI * 1.5), 0]} castShadow>
-          <cylinderGeometry args={[0.13, 0.09, 1.2]} />
-          <meshStandardMaterial color="#2c1810" />
-        </mesh>
-        <mesh position={[0, legAnimation(Math.PI * 1.5) - 0.6, 0]}>
-          <cylinderGeometry args={[0.09, 0.13, 0.3]} />
-          <meshStandardMaterial color="#1a1a1a" />
-        </mesh>
-      </group>
-      
-      {/* Position Number Display */}
+      {/* Horse Name Label above */}
       <Text
-        position={[0, 3.2, 0]}
-        fontSize={0.5}
+        position={[0, 3.0, 0]}
+        fontSize={0.35}
         color="white"
         anchorX="center"
         anchorY="middle"
-        outlineWidth={0.05}
-        outlineColor="black"
-      >
-        {horse.position}
-      </Text>
-      
-      {/* Horse Name Label */}
-      <Text
-        position={[0, 3.8, 0]}
-        fontSize={0.3}
-        color="yellow"
-        anchorX="center"
-        anchorY="middle"
-        outlineWidth={0.03}
+        outlineWidth={0.04}
         outlineColor="black"
       >
         {horse.name}
       </Text>
       
-      {/* Dust cloud effect when running */}
+      {/* Dust trail when running */}
       {isRacing && (
-        <mesh position={[0, -0.5, -1.5]}>
-          <sphereGeometry args={[0.4, 8, 8]} />
-          <meshStandardMaterial 
-            color="#8b7355" 
-            transparent 
-            opacity={0.3}
-            roughness={1}
-          />
-        </mesh>
+        <>
+          <mesh position={[0, -1.2, -0.5]}>
+            <sphereGeometry args={[0.3, 8, 8]} />
+            <meshStandardMaterial 
+              color="#8b7355" 
+              transparent 
+              opacity={0.4}
+              roughness={1}
+            />
+          </mesh>
+          <mesh position={[0, -1.3, -1.2]}>
+            <sphereGeometry args={[0.25, 8, 8]} />
+            <meshStandardMaterial 
+              color="#a0826d" 
+              transparent 
+              opacity={0.25}
+              roughness={1}
+            />
+          </mesh>
+        </>
       )}
     </group>
   );
@@ -378,16 +426,9 @@ export const HorseRaceVisuals = ({ horses, isRacing, raceState }: HorseRaceVisua
         </div>
       </div>
 
-      {/* 3D Race View */}
-      <Canvas>
-        <PerspectiveCamera makeDefault position={[0, 25, 30]} />
-        <OrbitControls 
-          enableZoom={true}
-          enablePan={true}
-          maxPolarAngle={Math.PI / 2.5}
-          minDistance={20}
-          maxDistance={100}
-        />
+      {/* 3D Race View - Behind horses camera angle */}
+      <Canvas shadows>
+        <PerspectiveCamera makeDefault position={[0, 6, -15]} fov={75} />
         
         {/* Lighting */}
         <ambientLight intensity={0.6} />
