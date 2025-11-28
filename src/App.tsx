@@ -149,6 +149,7 @@ const AdminAuth = lazy(() => import("./pages/admin/AdminAuth"));
 const WebhookSettings = lazy(() => import("./pages/admin/WebhookSettings"));
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const Ledger = lazy(() => import("./pages/admin/Ledger"));
+const DisasterRecovery = lazy(() => import("./pages/admin/DisasterRecovery"));
 const AdminSetup = lazy(() => import("./pages/admin/AdminSetup"));
 const AdminAssets = lazy(() => import("./pages/admin/AIAssets"));
 const SeedData = lazy(() => import("./pages/admin/SeedData"));
@@ -418,6 +419,7 @@ const App = () => (
           <Route path="/admin/ai-assets" element={<AdminAssets />} />
           <Route path="/admin/setup" element={<AdminSetup />} />
           <Route path="/admin/ledger" element={<Ledger />} />
+          <Route path="/admin/disaster-recovery" element={<DisasterRecovery />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/events" element={<AdminEvents />} />
           <Route path="/admin/odds" element={<AdminOdds />} />

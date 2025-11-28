@@ -132,6 +132,12 @@ verify_jwt = false
 [functions.f1-racing-ai]
 verify_jwt = false
 
+[functions.backup-database]
+verify_jwt = false
+
+[functions.restore-database]
+verify_jwt = false
+
 [functions.withdraw]
 verify_jwt = true
 
