@@ -5,7 +5,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { BetSlipProvider } from "@/contexts/BetSlipContext";
 import { lazy, Suspense } from "react";
 import { Loader2 } from "lucide-react";
-import { LiveChatWidget } from "@/components/LiveChatWidget";
 
 // Critical pages - loaded immediately
 import Index from "./pages/Index";
@@ -229,7 +228,6 @@ const App = () => (
     <BetSlipProvider>
       <Toaster />
       <Sonner />
-      <LiveChatWidget />
       <BrowserRouter>
         <Suspense fallback={<PageLoader />}>
           <NetworkStatus />
