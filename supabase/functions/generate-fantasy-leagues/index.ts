@@ -115,6 +115,16 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Also generate players for this sport if they don't exist
+    try {
+      await supabaseClient.functions.invoke('fantasy-player-projections', {
+        body: { sport: sportName, leagueId: data[0]?.id }
+      });
+    } catch (playerError) {
+      console.error('Error generating players:', playerError);
+      // Don't fail the whole request if player generation fails
+    }
+
     return new Response(
       JSON.stringify({ success: true, leagues: data, count: data.length }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

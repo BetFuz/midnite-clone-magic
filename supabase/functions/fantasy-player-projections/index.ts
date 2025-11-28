@@ -43,6 +43,7 @@ Deno.serve(async (req) => {
     // Otherwise generate realistic players for this sport
     const generatedPlayers = generateRealisticPlayers(sport);
 
+    // Normalize sport name for storage (use the original passed sport value)
     const playersToInsert = generatedPlayers.map((p: any) => ({
       external_player_id: `${p.full_name.replace(/\s+/g, '_').toLowerCase()}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       full_name: p.full_name,
@@ -51,7 +52,7 @@ Deno.serve(async (req) => {
       salary: p.salary,
       projected_points: p.projected_points,
       average_points: p.average_points || p.projected_points,
-      sport: sport,
+      sport: sport, // Use the exact sport name passed from the league
       injury_status: p.injury_status || 'healthy',
       metadata: {},
     }));
