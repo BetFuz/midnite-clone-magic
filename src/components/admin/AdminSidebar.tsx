@@ -60,6 +60,7 @@ const menuItems = [
       { title: "AI Assets", url: "/admin/ai-assets", icon: Sparkles },
       { title: "Settings", url: "/admin/settings", icon: Settings },
       { title: "Security", url: "/admin/security", icon: Shield },
+      { title: "Escrow", url: "/admin/escrow", icon: Shield },
       { title: "Notifications", url: "/admin/notifications", icon: Bell },
     ],
   },
