@@ -218,3 +218,9 @@ verify_jwt = false
 
 [functions.generate-fantasy-leagues]
 verify_jwt = false
+
+[functions.fantasy-player-projections]
+verify_jwt = false
+
+[functions.fantasy-optimize-lineup]
+verify_jwt = false
