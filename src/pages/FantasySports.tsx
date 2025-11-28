@@ -63,9 +63,15 @@ const FantasySports = () => {
     }
   };
 
-  const footballLeagues = leagues.filter(l => l.sport === "Football");
+  const footballLeagues = leagues.filter(l => l.sport === "Football" || l.sport === "Soccer");
   const basketballLeagues = leagues.filter(l => l.sport === "Basketball");
   const cricketLeagues = leagues.filter(l => l.sport === "Cricket");
+  const tennisLeagues = leagues.filter(l => l.sport === "Tennis");
+  const rugbyLeagues = leagues.filter(l => l.sport === "Rugby");
+  const iceHockeyLeagues = leagues.filter(l => l.sport === "Ice Hockey");
+  const baseballLeagues = leagues.filter(l => l.sport === "Baseball");
+  const americanFootballLeagues = leagues.filter(l => l.sport === "American Football");
+  const volleyballLeagues = leagues.filter(l => l.sport === "Volleyball");
 
   const topManagers = [
     { rank: 1, name: "Alex Thompson", team: "Thunder Strikers", points: 3456, profit: 12500000 },
@@ -129,28 +135,40 @@ const FantasySports = () => {
               <Card className="p-4">
                 <p className="text-xs text-muted-foreground mb-1">Active Leagues</p>
                 <p className="text-2xl font-bold">{leagues.length}</p>
+                <p className="text-xs text-green-500 mt-1">All sports covered</p>
               </Card>
               <Card className="p-4">
                 <p className="text-xs text-muted-foreground mb-1">Total Players</p>
                 <p className="text-2xl font-bold">{leagues.reduce((sum, l) => sum + (l.participants || 0), 0).toLocaleString()}</p>
+                <p className="text-xs text-muted-foreground mt-1">Across all sports</p>
               </Card>
               <Card className="p-4">
                 <p className="text-xs text-muted-foreground mb-1">My Teams</p>
                 <p className="text-2xl font-bold text-primary">{leagues.filter(l => l.my_team).length}</p>
+                <p className="text-xs text-muted-foreground mt-1">Active entries</p>
               </Card>
               <Card className="p-4">
-                <p className="text-xs text-muted-foreground mb-1">Prize Pool</p>
+                <p className="text-xs text-muted-foreground mb-1">Total Prize Pool</p>
                 <p className="text-2xl font-bold text-green-500">{formatCurrency(leagues.reduce((sum, l) => sum + Number(l.prize_pool), 0))}</p>
+                <p className="text-xs text-muted-foreground mt-1">Up for grabs</p>
               </Card>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-6">
                 <Tabs value={activeTab} onValueChange={setActiveTab}>
-                  <TabsList className="grid w-full grid-cols-3 mb-6">
+                  <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 mb-6 h-auto">
                     <TabsTrigger value="football">Football</TabsTrigger>
                     <TabsTrigger value="basketball">Basketball</TabsTrigger>
                     <TabsTrigger value="cricket">Cricket</TabsTrigger>
+                    <TabsTrigger value="tennis">Tennis</TabsTrigger>
+                    <TabsTrigger value="rugby">Rugby</TabsTrigger>
+                    <TabsTrigger value="ice-hockey">Ice Hockey</TabsTrigger>
+                  </TabsList>
+                  <TabsList className="grid w-full grid-cols-3 mb-6 h-auto">
+                    <TabsTrigger value="baseball">Baseball</TabsTrigger>
+                    <TabsTrigger value="american-football">Am. Football</TabsTrigger>
+                    <TabsTrigger value="volleyball">Volleyball</TabsTrigger>
                   </TabsList>
 
                   <TabsContent value="football" className="space-y-4">
@@ -266,7 +284,7 @@ const FantasySports = () => {
                       </Card>
                     ) : (
                       cricketLeagues.map(league => (
-                        <Card key={league.id} className="p-6">
+                        <Card key={league.id} className={`p-6 ${league.my_team ? 'border-primary/50 bg-primary/5' : ''}`}>
                           <Badge variant="outline" className="mb-2">{league.sport}</Badge>
                           <h3 className="text-xl font-bold mb-3">{league.name}</h3>
                           <div className="grid grid-cols-2 gap-4 mb-4">
@@ -274,9 +292,193 @@ const FantasySports = () => {
                               <p className="text-xs text-muted-foreground">Prize Pool</p>
                               <p className="font-bold text-green-500">{formatCurrency(league.prize_pool)}</p>
                             </div>
+                            <div>
+                              <p className="text-xs text-muted-foreground">Entry Fee</p>
+                              <p className="font-bold">{formatCurrency(league.entry_fee)}</p>
+                            </div>
                           </div>
                           <Button className="w-full" onClick={() => navigate(`/fantasy-sports/${league.id}`)}>
-                            Join League
+                            {league.my_team ? 'Manage Team' : 'Join League'}
+                          </Button>
+                        </Card>
+                      ))
+                    )}
+                  </TabsContent>
+
+                  <TabsContent value="tennis" className="space-y-4">
+                    {tennisLeagues.length === 0 ? (
+                      <Card className="p-12 text-center">
+                        <Trophy className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                        <h3 className="text-xl font-semibold mb-2">No Tennis Leagues</h3>
+                        <p className="text-muted-foreground">Check back soon</p>
+                      </Card>
+                    ) : (
+                      tennisLeagues.map(league => (
+                        <Card key={league.id} className={`p-6 ${league.my_team ? 'border-primary/50 bg-primary/5' : ''}`}>
+                          <Badge variant="outline" className="mb-2">{league.sport}</Badge>
+                          <h3 className="text-xl font-bold mb-3">{league.name}</h3>
+                          <div className="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                              <p className="text-xs text-muted-foreground">Prize Pool</p>
+                              <p className="font-bold text-green-500">{formatCurrency(league.prize_pool)}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-muted-foreground">Entry Fee</p>
+                              <p className="font-bold">{formatCurrency(league.entry_fee)}</p>
+                            </div>
+                          </div>
+                          <Button className="w-full" onClick={() => navigate(`/fantasy-sports/${league.id}`)}>
+                            {league.my_team ? 'Manage Team' : 'Join League'}
+                          </Button>
+                        </Card>
+                      ))
+                    )}
+                  </TabsContent>
+
+                  <TabsContent value="rugby" className="space-y-4">
+                    {rugbyLeagues.length === 0 ? (
+                      <Card className="p-12 text-center">
+                        <Trophy className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                        <h3 className="text-xl font-semibold mb-2">No Rugby Leagues</h3>
+                        <p className="text-muted-foreground">Check back soon</p>
+                      </Card>
+                    ) : (
+                      rugbyLeagues.map(league => (
+                        <Card key={league.id} className={`p-6 ${league.my_team ? 'border-primary/50 bg-primary/5' : ''}`}>
+                          <Badge variant="outline" className="mb-2">{league.sport}</Badge>
+                          <h3 className="text-xl font-bold mb-3">{league.name}</h3>
+                          <div className="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                              <p className="text-xs text-muted-foreground">Prize Pool</p>
+                              <p className="font-bold text-green-500">{formatCurrency(league.prize_pool)}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-muted-foreground">Entry Fee</p>
+                              <p className="font-bold">{formatCurrency(league.entry_fee)}</p>
+                            </div>
+                          </div>
+                          <Button className="w-full" onClick={() => navigate(`/fantasy-sports/${league.id}`)}>
+                            {league.my_team ? 'Manage Team' : 'Join League'}
+                          </Button>
+                        </Card>
+                      ))
+                    )}
+                  </TabsContent>
+
+                  <TabsContent value="ice-hockey" className="space-y-4">
+                    {iceHockeyLeagues.length === 0 ? (
+                      <Card className="p-12 text-center">
+                        <Trophy className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                        <h3 className="text-xl font-semibold mb-2">No Ice Hockey Leagues</h3>
+                        <p className="text-muted-foreground">Check back soon</p>
+                      </Card>
+                    ) : (
+                      iceHockeyLeagues.map(league => (
+                        <Card key={league.id} className={`p-6 ${league.my_team ? 'border-primary/50 bg-primary/5' : ''}`}>
+                          <Badge variant="outline" className="mb-2">{league.sport}</Badge>
+                          <h3 className="text-xl font-bold mb-3">{league.name}</h3>
+                          <div className="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                              <p className="text-xs text-muted-foreground">Prize Pool</p>
+                              <p className="font-bold text-green-500">{formatCurrency(league.prize_pool)}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-muted-foreground">Entry Fee</p>
+                              <p className="font-bold">{formatCurrency(league.entry_fee)}</p>
+                            </div>
+                          </div>
+                          <Button className="w-full" onClick={() => navigate(`/fantasy-sports/${league.id}`)}>
+                            {league.my_team ? 'Manage Team' : 'Join League'}
+                          </Button>
+                        </Card>
+                      ))
+                    )}
+                  </TabsContent>
+
+                  <TabsContent value="baseball" className="space-y-4">
+                    {baseballLeagues.length === 0 ? (
+                      <Card className="p-12 text-center">
+                        <Trophy className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                        <h3 className="text-xl font-semibold mb-2">No Baseball Leagues</h3>
+                        <p className="text-muted-foreground">Check back soon</p>
+                      </Card>
+                    ) : (
+                      baseballLeagues.map(league => (
+                        <Card key={league.id} className={`p-6 ${league.my_team ? 'border-primary/50 bg-primary/5' : ''}`}>
+                          <Badge variant="outline" className="mb-2">{league.sport}</Badge>
+                          <h3 className="text-xl font-bold mb-3">{league.name}</h3>
+                          <div className="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                              <p className="text-xs text-muted-foreground">Prize Pool</p>
+                              <p className="font-bold text-green-500">{formatCurrency(league.prize_pool)}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-muted-foreground">Entry Fee</p>
+                              <p className="font-bold">{formatCurrency(league.entry_fee)}</p>
+                            </div>
+                          </div>
+                          <Button className="w-full" onClick={() => navigate(`/fantasy-sports/${league.id}`)}>
+                            {league.my_team ? 'Manage Team' : 'Join League'}
+                          </Button>
+                        </Card>
+                      ))
+                    )}
+                  </TabsContent>
+
+                  <TabsContent value="american-football" className="space-y-4">
+                    {americanFootballLeagues.length === 0 ? (
+                      <Card className="p-12 text-center">
+                        <Trophy className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                        <h3 className="text-xl font-semibold mb-2">No American Football Leagues</h3>
+                        <p className="text-muted-foreground">Check back soon</p>
+                      </Card>
+                    ) : (
+                      americanFootballLeagues.map(league => (
+                        <Card key={league.id} className={`p-6 ${league.my_team ? 'border-primary/50 bg-primary/5' : ''}`}>
+                          <Badge variant="outline" className="mb-2">{league.sport}</Badge>
+                          <h3 className="text-xl font-bold mb-3">{league.name}</h3>
+                          <div className="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                              <p className="text-xs text-muted-foreground">Prize Pool</p>
+                              <p className="font-bold text-green-500">{formatCurrency(league.prize_pool)}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-muted-foreground">Entry Fee</p>
+                              <p className="font-bold">{formatCurrency(league.entry_fee)}</p>
+                            </div>
+                          </div>
+                          <Button className="w-full" onClick={() => navigate(`/fantasy-sports/${league.id}`)}>
+                            {league.my_team ? 'Manage Team' : 'Join League'}
+                          </Button>
+                        </Card>
+                      ))
+                    )}
+                  </TabsContent>
+
+                  <TabsContent value="volleyball" className="space-y-4">
+                    {volleyballLeagues.length === 0 ? (
+                      <Card className="p-12 text-center">
+                        <Trophy className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+                        <h3 className="text-xl font-semibold mb-2">No Volleyball Leagues</h3>
+                        <p className="text-muted-foreground">Check back soon</p>
+                      </Card>
+                    ) : (
+                      volleyballLeagues.map(league => (
+                        <Card key={league.id} className={`p-6 ${league.my_team ? 'border-primary/50 bg-primary/5' : ''}`}>
+                          <Badge variant="outline" className="mb-2">{league.sport}</Badge>
+                          <h3 className="text-xl font-bold mb-3">{league.name}</h3>
+                          <div className="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                              <p className="text-xs text-muted-foreground">Prize Pool</p>
+                              <p className="font-bold text-green-500">{formatCurrency(league.prize_pool)}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-muted-foreground">Entry Fee</p>
+                              <p className="font-bold">{formatCurrency(league.entry_fee)}</p>
+                            </div>
+                          </div>
+                          <Button className="w-full" onClick={() => navigate(`/fantasy-sports/${league.id}`)}>
+                            {league.my_team ? 'Manage Team' : 'Join League'}
                           </Button>
                         </Card>
                       ))
