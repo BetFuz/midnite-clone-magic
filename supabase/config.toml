@@ -215,3 +215,6 @@ verify_jwt = true
 
 [functions.check-escrow-trigger]
 verify_jwt = false
+
+[functions.generate-fantasy-leagues]
+verify_jwt = false

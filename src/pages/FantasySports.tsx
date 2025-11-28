@@ -1,20 +1,65 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import MobileNav from "@/components/MobileNav";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Trophy, Users, TrendingUp, Crown, Plus, Star } from "lucide-react";
+import { Trophy, Users, TrendingUp, Crown, Plus, Star, RefreshCw } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatCurrency } from "@/lib/currency";
 import { useFantasySports } from "@/hooks/useFantasySports";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNow } from "date-fns";
+import { CreateLeagueDialog } from "@/components/fantasy/CreateLeagueDialog";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
 const FantasySports = () => {
   const [activeTab, setActiveTab] = useState("football");
-  const { leagues, isLoading, joinLeague } = useFantasySports();
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const { leagues, isLoading, joinLeague, refreshLeagues } = useFantasySports();
+
+  // Auto-generate fantasy leagues for upcoming matches on component mount
+  useEffect(() => {
+    const generateLeagues = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke('generate-fantasy-leagues');
+        if (error) throw error;
+        if (data?.created > 0) {
+          refreshLeagues();
+        }
+      } catch (error) {
+        console.error('Error auto-generating leagues:', error);
+      }
+    };
+    generateLeagues();
+  }, []);
+
+  const handleGenerateLeagues = async () => {
+    setGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-fantasy-leagues');
+      if (error) throw error;
+      
+      toast({
+        title: "Leagues Generated",
+        description: `${data.created} new fantasy leagues created for upcoming matches`,
+      });
+      
+      refreshLeagues();
+    } catch (error) {
+      console.error('Error generating leagues:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate leagues. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setGenerating(false);
+    }
+  };
 
   const footballLeagues = leagues.filter(l => l.sport === "Football");
   const basketballLeagues = leagues.filter(l => l.sport === "Basketball");
@@ -66,10 +111,16 @@ const FantasySports = () => {
                   <p className="text-muted-foreground">Build your dream team and compete</p>
                 </div>
               </div>
-              <Button className="gap-2">
-                <Plus className="w-4 h-4" />
-                Create League
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={handleGenerateLeagues} disabled={generating} className="gap-2">
+                  <RefreshCw className={`w-4 h-4 ${generating ? 'animate-spin' : ''}`} />
+                  Generate Leagues
+                </Button>
+                <Button className="gap-2" onClick={() => setCreateDialogOpen(true)}>
+                  <Plus className="w-4 h-4" />
+                  Create League
+                </Button>
+              </div>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -245,6 +296,12 @@ const FantasySports = () => {
           </div>
         </main>
       </div>
+
+      <CreateLeagueDialog 
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        onLeagueCreated={refreshLeagues}
+      />
     </div>
   );
 };
