@@ -1408,6 +1408,8 @@ export type Database = {
           average_points: number | null
           club_id: string | null
           created_at: string | null
+          cross_sport_tags: string[] | null
+          dual_sport_eligible: boolean | null
           external_player_id: string
           form_rating: number | null
           full_name: string
@@ -1419,6 +1421,7 @@ export type Database = {
           price_change: number | null
           projected_points: number | null
           salary: number
+          secondary_position: string | null
           sport: string
           team: string
           updated_at: string | null
@@ -1427,6 +1430,8 @@ export type Database = {
           average_points?: number | null
           club_id?: string | null
           created_at?: string | null
+          cross_sport_tags?: string[] | null
+          dual_sport_eligible?: boolean | null
           external_player_id: string
           form_rating?: number | null
           full_name: string
@@ -1438,6 +1443,7 @@ export type Database = {
           price_change?: number | null
           projected_points?: number | null
           salary?: number
+          secondary_position?: string | null
           sport: string
           team: string
           updated_at?: string | null
@@ -1446,6 +1452,8 @@ export type Database = {
           average_points?: number | null
           club_id?: string | null
           created_at?: string | null
+          cross_sport_tags?: string[] | null
+          dual_sport_eligible?: boolean | null
           external_player_id?: string
           form_rating?: number | null
           full_name?: string
@@ -1457,6 +1465,7 @@ export type Database = {
           price_change?: number | null
           projected_points?: number | null
           salary?: number
+          secondary_position?: string | null
           sport?: string
           team?: string
           updated_at?: string | null

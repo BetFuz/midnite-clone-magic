@@ -236,3 +236,9 @@ verify_jwt = false
 
 [functions.fantasy-generate-contests]
 verify_jwt = false
+
+[functions.universal-fantasy-scoring]
+verify_jwt = false
+
+[functions.fantasy-live-websocket]
+verify_jwt = false
