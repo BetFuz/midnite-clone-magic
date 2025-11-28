@@ -153,6 +153,7 @@ const DisasterRecovery = lazy(() => import("./pages/admin/DisasterRecovery"));
 const Treasury = lazy(() => import("./pages/admin/Treasury"));
 const Compliance = lazy(() => import("./pages/admin/Compliance"));
 const Operations = lazy(() => import("./pages/admin/Operations"));
+const GrowthTools = lazy(() => import("./pages/admin/GrowthTools"));
 const Status = lazy(() => import("./pages/Status"));
 const PlayerProtection = lazy(() => import("./pages/account/PlayerProtection"));
 const AdminSetup = lazy(() => import("./pages/admin/AdminSetup"));
@@ -444,6 +445,8 @@ const App = () => (
           <Route path="/admin/settings" element={<AdminSettings />} />
           <Route path="/admin/security" element={<AdminSecurity />} />
           <Route path="/admin/seed" element={<SeedData />} />
+          <Route path="/admin/operations" element={<Operations />} />
+          <Route path="/admin/growth" element={<GrowthTools />} />
           
           {/* Status Page */}
           <Route path="/status" element={<Status />} />

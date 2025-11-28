@@ -72,6 +72,7 @@ const Sidebar = ({ className, showOnMobile = false }: SidebarProps) => {
     { icon: DollarSign, label: "Treasury & Float", url: "/admin/treasury", badge: "MONEY" },
     { icon: Shield, label: "Compliance & AML", url: "/admin/compliance", badge: "NLRC" },
     { icon: Users, label: "Operations", url: "/admin/operations", badge: "OPS" },
+    { icon: TrendingUp, label: "Growth Tools", url: "/admin/growth", badge: "GROWTH" },
     { icon: Lock, label: "Webhook Settings", url: "/admin/webhooks", badge: "SUPER" },
   ];
 

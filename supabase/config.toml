@@ -176,3 +176,12 @@ verify_jwt = true
 
 [functions.float-health-metrics]
 verify_jwt = true
+
+[functions.affiliate-boost-check]
+verify_jwt = false
+
+[functions.retention-flow]
+verify_jwt = false
+
+[functions.payment-waitlist-notify]
+verify_jwt = false
