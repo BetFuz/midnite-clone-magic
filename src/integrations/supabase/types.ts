@@ -2301,6 +2301,10 @@ export type Database = {
         }
         Returns: string
       }
+      log_slow_query: {
+        Args: { p_duration_ms: number; p_query: string; p_user_id?: string }
+        Returns: undefined
+      }
       settle_game_bets: {
         Args: { p_session_id: string; p_winner: string }
         Returns: undefined
