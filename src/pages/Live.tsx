@@ -3,139 +3,98 @@ import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import BetSlip from "@/components/BetSlip";
 import LiveMatchCard from "@/components/LiveMatchCard";
-import PersonalizedSuggestions from "@/components/PersonalizedSuggestions";
-import AIRecommendations from "@/components/AIRecommendations";
 import LiveScoreRibbon from "@/components/LiveScoreRibbon";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, Flame } from "lucide-react";
+import { TrendingUp } from "lucide-react";
+
+// Inline horse racing data
+const LIVE_HORSE_RACES = [
+  {
+    id: "hr_001",
+    match_id: "hr_001",
+    sport_key: "horse_racing",
+    sport_title: "Horse Racing",
+    league_name: "Kentucky Derby",
+    home_team: "Mystic Flight",
+    away_team: "Thunder Bolt",
+    commence_time: "2025-06-15T18:45:00Z",
+    home_odds: 4.2,
+    draw_odds: null,
+    away_odds: 5.1,
+    status: "live",
+    updated_at: "2025-06-15T18:40:00Z"
+  },
+  {
+    id: "hr_002",
+    match_id: "hr_002",
+    sport_key: "horse_racing",
+    sport_title: "Horse Racing",
+    league_name: "Royal Ascot",
+    home_team: "Golden Mane",
+    away_team: "Silver Stirrup",
+    commence_time: "2025-06-15T19:15:00Z",
+    home_odds: 3.8,
+    draw_odds: null,
+    away_odds: 6.0,
+    status: "live",
+    updated_at: "2025-06-15T19:10:00Z"
+  },
+  {
+    id: "hr_003",
+    match_id: "hr_003",
+    sport_key: "horse_racing",
+    sport_title: "Horse Racing",
+    league_name: "Dubai World Cup",
+    home_team: "Desert Storm",
+    away_team: "Sand Phoenix",
+    commence_time: "2025-06-15T19:45:00Z",
+    home_odds: 2.9,
+    draw_odds: null,
+    away_odds: 7.2,
+    status: "live",
+    updated_at: "2025-06-15T19:40:00Z"
+  }
+];
 
 const Live = () => {
-  const [liveMatches, setLiveMatches] = useState([
-    {
-      id: "live-1",
-      sport: "Football",
-      league: "Premier League",
-      homeTeam: "Manchester City",
-      awayTeam: "Arsenal",
-      homeScore: 2,
-      awayScore: 1,
-      minute: "67'",
-      homeOdds: 1.45,
-      drawOdds: 4.20,
-      awayOdds: 7.50,
-      possession: { home: 58, away: 42 },
-      shots: { home: 12, away: 8 },
-      corners: { home: 5, away: 3 },
-      trending: true,
-    },
-    {
-      id: "live-2",
-      sport: "Basketball",
-      league: "NBA",
-      homeTeam: "LA Lakers",
-      awayTeam: "Boston Celtics",
-      homeScore: 89,
-      awayScore: 92,
-      minute: "Q3 8:23",
-      homeOdds: 2.10,
-      drawOdds: null,
-      awayOdds: 1.75,
-      possession: null,
-      shots: null,
-      corners: null,
-      trending: true,
-    },
-    {
-      id: "live-3",
-      sport: "Football",
-      league: "La Liga",
-      homeTeam: "Real Madrid",
-      awayTeam: "Barcelona",
-      homeScore: 1,
-      awayScore: 1,
-      minute: "82'",
-      homeOdds: 2.80,
-      drawOdds: 3.10,
-      awayOdds: 2.90,
-      possession: { home: 52, away: 48 },
-      shots: { home: 14, away: 11 },
-      corners: { home: 7, away: 6 },
-      trending: false,
-    },
-    {
-      id: "live-4",
-      sport: "Tennis",
-      league: "ATP Masters",
-      homeTeam: "Novak Djokovic",
-      awayTeam: "Carlos Alcaraz",
-      homeScore: 2,
-      awayScore: 1,
-      minute: "Set 4",
-      homeOdds: 1.65,
-      drawOdds: null,
-      awayOdds: 2.30,
-      possession: null,
-      shots: null,
-      corners: null,
-      trending: false,
-    },
-    {
-      id: "live-5",
-      sport: "Football",
-      league: "Serie A",
-      homeTeam: "AC Milan",
-      awayTeam: "Inter Milan",
+  // State for live races with minute counter
+  const [liveRaces, setLiveRaces] = useState(
+    LIVE_HORSE_RACES.map(race => ({
+      ...race,
+      minute: 0,
       homeScore: 0,
-      awayScore: 0,
-      minute: "34'",
-      homeOdds: 2.20,
-      drawOdds: 3.00,
-      awayOdds: 3.40,
-      possession: { home: 45, away: 55 },
-      shots: { home: 4, away: 6 },
-      corners: { home: 2, away: 4 },
-      trending: false,
-    },
-    {
-      id: "live-6",
-      sport: "American Football",
-      league: "NFL",
-      homeTeam: "Kansas City Chiefs",
-      awayTeam: "Buffalo Bills",
-      homeScore: 21,
-      awayScore: 17,
-      minute: "Q3 5:12",
-      homeOdds: 1.55,
-      drawOdds: null,
-      awayOdds: 2.50,
-      possession: null,
-      shots: null,
-      corners: null,
-      trending: true,
-    },
-  ]);
+      awayScore: 0
+    }))
+  );
 
-  // Simulate real-time odds updates
+  // Increment minute counter every 60 seconds
   useEffect(() => {
-    const interval = setInterval(() => {
-      setLiveMatches((prev) =>
-        prev.map((match) => ({
-          ...match,
-          homeOdds: Math.max(1.01, match.homeOdds + (Math.random() - 0.5) * 0.1),
-          drawOdds: match.drawOdds ? Math.max(1.01, match.drawOdds + (Math.random() - 0.5) * 0.15) : null,
-          awayOdds: Math.max(1.01, match.awayOdds + (Math.random() - 0.5) * 0.1),
+    const minuteInterval = setInterval(() => {
+      setLiveRaces(prev =>
+        prev.map(race => ({
+          ...race,
+          minute: race.minute + 1
+        }))
+      );
+    }, 60000); // 60 seconds
+
+    return () => clearInterval(minuteInterval);
+  }, []);
+
+  // Simulate real-time odds updates every 3 seconds
+  useEffect(() => {
+    const oddsInterval = setInterval(() => {
+      setLiveRaces(prev =>
+        prev.map(race => ({
+          ...race,
+          home_odds: Math.max(1.5, race.home_odds + (Math.random() - 0.5) * 0.3),
+          away_odds: Math.max(1.5, race.away_odds + (Math.random() - 0.5) * 0.3)
         }))
       );
     }, 3000);
 
-    return () => clearInterval(interval);
+    return () => clearInterval(oddsInterval);
   }, []);
-
-  const trendingMatches = liveMatches.filter((m) => m.trending);
-  const footballMatches = liveMatches.filter((m) => m.sport === "Football");
-  const basketballMatches = liveMatches.filter((m) => m.sport === "Basketball");
-  const otherMatches = liveMatches.filter((m) => m.sport !== "Football" && m.sport !== "Basketball");
 
   return (
     <div className="min-h-screen bg-background">
@@ -150,86 +109,50 @@ const Live = () => {
               <div className="absolute -inset-1 bg-red-500 rounded-full animate-ping opacity-75"></div>
               <div className="relative w-3 h-3 bg-red-500 rounded-full"></div>
             </div>
-            <h1 className="text-3xl font-bold text-foreground">Live Betting</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">Live Horse Racing</h1>
             <Badge variant="destructive" className="animate-pulse">
               LIVE
             </Badge>
           </div>
 
           <p className="text-muted-foreground mb-6">
-            Watch and bet on live matches with real-time odds updates
+            Watch and bet on live horse races with real-time odds updates
           </p>
 
           <LiveScoreRibbon />
 
-          {/* Personalized Suggestions */}
-          <section className="mb-8">
-            <PersonalizedSuggestions />
-          </section>
-
-          {/* AI Recommendations Section */}
-          <section className="mb-8">
-            <AIRecommendations />
-          </section>
-
-          {/* Trending Now Section */}
-          <section className="mb-8">
+          {/* Live Horse Races */}
+          <section className="mt-8">
             <div className="flex items-center gap-2 mb-4">
-              <Flame className="h-5 w-5 text-orange-500" />
-              <h2 className="text-xl font-bold text-foreground">Trending Now</h2>
-              <Badge className="bg-orange-500/10 text-orange-500 hover:bg-orange-500/20">
-                Hot 🔥
+              <TrendingUp className="h-5 w-5 text-primary" />
+              <h2 className="text-xl font-bold text-foreground">Racing Now</h2>
+              <Badge className="bg-primary/10 text-primary hover:bg-primary/20">
+                {liveRaces.length} Races
               </Badge>
             </div>
-            <div className="grid gap-4">
-              {trendingMatches.map((match) => (
-                <LiveMatchCard key={match.id} {...match} />
+            
+            <div className="grid gap-4 md:gap-6">
+              {liveRaces.map((race) => (
+                <LiveMatchCard
+                  key={race.id}
+                  id={race.id}
+                  sport={race.sport_title}
+                  league={race.league_name}
+                  homeTeam={race.home_team}
+                  awayTeam={race.away_team}
+                  homeScore={race.homeScore}
+                  awayScore={race.awayScore}
+                  minute={`${race.minute}'`}
+                  homeOdds={race.home_odds}
+                  drawOdds={race.draw_odds}
+                  awayOdds={race.away_odds}
+                  possession={null}
+                  shots={null}
+                  corners={null}
+                  trending={race.minute < 5}
+                />
               ))}
             </div>
-          </section>
-
-          {/* Live Matches by Sport */}
-          <section>
-            <Tabs defaultValue="all" className="w-full">
-              <TabsList className="mb-4">
-                <TabsTrigger value="all">
-                  All Live ({liveMatches.length})
-                </TabsTrigger>
-                <TabsTrigger value="football">
-                  ⚽ Football ({footballMatches.length})
-                </TabsTrigger>
-                <TabsTrigger value="basketball">
-                  🏀 Basketball ({basketballMatches.length})
-                </TabsTrigger>
-                <TabsTrigger value="other">
-                  🎾 Other ({otherMatches.length})
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="all" className="space-y-4">
-                {liveMatches.map((match) => (
-                  <LiveMatchCard key={match.id} {...match} />
-                ))}
-              </TabsContent>
-
-              <TabsContent value="football" className="space-y-4">
-                {footballMatches.map((match) => (
-                  <LiveMatchCard key={match.id} {...match} />
-                ))}
-              </TabsContent>
-
-              <TabsContent value="basketball" className="space-y-4">
-                {basketballMatches.map((match) => (
-                  <LiveMatchCard key={match.id} {...match} />
-                ))}
-              </TabsContent>
-
-              <TabsContent value="other" className="space-y-4">
-                {otherMatches.map((match) => (
-                  <LiveMatchCard key={match.id} {...match} />
-                ))}
-              </TabsContent>
-            </Tabs>
           </section>
         </main>
 
