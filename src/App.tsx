@@ -193,7 +193,13 @@ const CasinoLobby = lazy(() => import("./pages/casino/CasinoLobby"));
 const Analytics = lazy(() => import("./pages/Analytics"));
 const FuzInsurance = lazy(() => import("./pages/promotions/FuzInsurance"));
 
-// Traditional African Games
+// Layout components for route grouping
+const GamesLayout = lazy(() => import("./pages/games/GamesLayout"));
+const CasinoLayout = lazy(() => import("./pages/casino/CasinoLayout"));
+const RacingLayout = lazy(() => import("./pages/racing/RacingLayout"));
+const LiveCasinoLayout = lazy(() => import("./pages/live-casino/LiveCasinoLayout"));
+
+// Traditional African Games - loaded only when games route is accessed
 const AfricanDraft = lazy(() => import("./pages/games/AfricanDraft"));
 const Morabaraba = lazy(() => import("./pages/games/Morabaraba"));
 const Mancala = lazy(() => import("./pages/games/Mancala"));
@@ -223,9 +229,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/live" element={<Live />} />
-          <Route path="/racing" element={<Racing />} />
-          <Route path="/games" element={<Games />} />
-          <Route path="/live-casino" element={<LiveCasino />} />
+          <Route path="/games" element={<Games />} /> {/* Games lobby/overview */}
           <Route path="/virtuals" element={<Virtuals />} />
           <Route path="/bet-features" element={<BetFeatures />} />
           <Route path="/politics" element={<Politics />} />
@@ -322,16 +326,46 @@ const App = () => (
           <Route path="/racing/space" element={<SpaceRacing />} />
           <Route path="/racing/dragon-boat" element={<DragonBoatRacing />} />
           
-          {/* Casino */}
-          <Route path="/casino/slots" element={<Slots />} />
-          <Route path="/casino/roulette" element={<Roulette />} />
-          <Route path="/casino/blackjack" element={<Blackjack />} />
+          {/* Casino - Grouped for better code splitting */}
+          <Route path="/casino" element={<CasinoLayout />}>
+            <Route path="slots" element={<Slots />} />
+            <Route path="roulette" element={<Roulette />} />
+            <Route path="blackjack" element={<Blackjack />} />
+            <Route path="keno" element={<Keno />} />
+            <Route path="scratch-cards" element={<ScratchCards />} />
+            <Route path="craps" element={<Craps />} />
+            <Route path="rock-paper-scissors" element={<RockPaperScissors />} />
+            <Route path="coin-flip" element={<CoinFlip />} />
+            <Route path="game-show" element={<GameShow />} />
+            <Route path="bingo" element={<Bingo />} />
+            <Route path="burst" element={<BurstGames />} />
+          </Route>
           
-          {/* Traditional African Games */}
-          <Route path="/games/african-draft" element={<AfricanDraft />} />
-          <Route path="/games/morabaraba" element={<Morabaraba />} />
-          <Route path="/games/mancala" element={<Mancala />} />
-          <Route path="/games/tournament" element={<Tournament />} />
+          {/* Traditional African Games - Grouped for better code splitting */}
+          <Route path="/games" element={<GamesLayout />}>
+            <Route path="african-draft" element={<AfricanDraft />} />
+            <Route path="morabaraba" element={<Morabaraba />} />
+            <Route path="mancala" element={<Mancala />} />
+            <Route path="tournament" element={<Tournament />} />
+          </Route>
+          
+          {/* Racing - Grouped for better code splitting */}
+          <Route path="/racing" element={<RacingLayout />}>
+            <Route index element={<Racing />} />
+            <Route path="ascot" element={<Ascot />} />
+            <Route path="cheltenham" element={<Cheltenham />} />
+            <Route path="kempton" element={<Kempton />} />
+            <Route path="horse" element={<HorseRacing />} />
+            <Route path="dog" element={<DogRacing />} />
+            <Route path="f1" element={<F1Racing />} />
+            <Route path="street" element={<StreetRacing />} />
+            <Route path="motogp" element={<MotoGPRacing />} />
+            <Route path="powerboat" element={<PowerboatRacing />} />
+            <Route path="cycling" element={<CyclingRacing />} />
+            <Route path="robot" element={<RobotRacing />} />
+            <Route path="space" element={<SpaceRacing />} />
+            <Route path="dragon-boat" element={<DragonBoatRacing />} />
+          </Route>
           
           {/* Account */}
           <Route path="/account/profile" element={<Profile />} />
@@ -395,26 +429,22 @@ const App = () => (
           <Route path="/admin/security" element={<AdminSecurity />} />
           <Route path="/admin/seed" element={<SeedData />} />
           
-          {/* Match & Live Tables */}
+          {/* Match Details */}
           <Route path="/match/:id" element={<MatchDetail />} />
-          <Route path="/live-table/lightning-roulette" element={<LightningRoulette />} />
-          <Route path="/live-table/poker" element={<LiveCasinoPoker />} />
-          <Route path="/live-table/baccarat" element={<LiveCasinoBaccarat />} />
-          <Route path="/casino/keno" element={<Keno />} />
-          <Route path="/casino/scratch-cards" element={<ScratchCards />} />
-          <Route path="/casino/craps" element={<Craps />} />
-          <Route path="/casino/rps" element={<RockPaperScissors />} />
-          <Route path="/casino/coin-flip" element={<CoinFlip />} />
-          <Route path="/live-casino" element={<LiveCasino />} />
-          <Route path="/casino/game-show" element={<GameShow />} />
-          <Route path="/casino/bingo" element={<Bingo />} />
-          <Route path="/casino/burst-games" element={<BurstGames />} />
           
-          {/* Live Casino Routes */}
-          <Route path="/live-casino/lightning-roulette" element={<LightningRoulette />} />
-          <Route path="/live-casino/poker" element={<LiveCasinoPoker />} />
-          <Route path="/live-casino/baccarat" element={<LiveCasinoBaccarat />} />
-          <Route path="/live-casino/blackjack" element={<LiveCasinoBlackjack />} />
+          {/* Live Casino - Grouped for better code splitting */}
+          <Route path="/live-casino" element={<LiveCasinoLayout />}>
+            <Route index element={<LiveCasino />} />
+            <Route path="lightning-roulette" element={<LightningRoulette />} />
+            <Route path="poker" element={<LiveCasinoPoker />} />
+            <Route path="baccarat" element={<LiveCasinoBaccarat />} />
+            <Route path="blackjack" element={<LiveCasinoBlackjack />} />
+          </Route>
+          
+          {/* Legacy live-table routes - redirect to live-casino */}
+          <Route path="/live-table/lightning-roulette" element={<Navigate to="/live-casino/lightning-roulette" replace />} />
+          <Route path="/live-table/poker" element={<Navigate to="/live-casino/poker" replace />} />
+          <Route path="/live-table/baccarat" element={<Navigate to="/live-casino/baccarat" replace />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
