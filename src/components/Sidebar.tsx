@@ -1,4 +1,4 @@
-import { Home, Trophy, CircleDot, Flame, Hammer, Target, TrendingUp, Dumbbell, Volleyball, Table2, TicketCheck, BarChart3, History, CreditCard, Vote, LayoutGrid, DollarSign, Users, Sparkles, Globe, Bot, ShoppingCart, Brain, Wallet, Glasses, Play, Film, Gamepad2, Shield, Lock, Hexagon, Puzzle, Shapes, Coins } from "lucide-react";
+import { Home, Trophy, CircleDot, Flame, Hammer, Target, TrendingUp, Dumbbell, Volleyball, Table2, TicketCheck, BarChart3, History, CreditCard, Vote, LayoutGrid, DollarSign, Users, Sparkles, Globe, Bot, ShoppingCart, Brain, Wallet, Glasses, Play, Film, Gamepad2, Shield, Lock, Hexagon, Puzzle, Shapes, Coins, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NavLink } from "@/components/NavLink";
 import { useAdminAuth } from "@/hooks/useAdminAuth";
@@ -66,6 +66,7 @@ const Sidebar = ({ className, showOnMobile = false }: SidebarProps) => {
   const adminFeatures = [
     { icon: Shield, label: "Admin Setup", url: "/admin/setup", badge: "START" },
     { icon: Shield, label: "Admin Dashboard", url: "/admin/dashboard", badge: "ADMIN" },
+    { icon: FileText, label: "Immutable Ledger", url: "/admin/ledger", badge: "AUDIT" },
     { icon: Lock, label: "Webhook Settings", url: "/admin/webhooks", badge: "SUPER" },
   ];
 

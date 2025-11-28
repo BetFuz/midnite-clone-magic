@@ -117,7 +117,7 @@ serve(async (req) => {
     const requestId = crypto.randomUUID();
     const reference = `WDW-${Date.now()}-${user.id.slice(0, 8)}`;
 
-    // Log withdrawal attempt
+    // Log withdrawal attempt to admin audit
     await serviceClient.from('admin_audit_log').insert({
       admin_id: user.id,
       action: 'withdrawal_requested',
@@ -130,6 +130,27 @@ serve(async (req) => {
         fees: validation.fees,
         netAmount: validation.netAmount 
       })
+    });
+
+    // Log to immutable ledger (financial audit trail)
+    await serviceClient.rpc('log_ledger_entry', {
+      p_user_id: user.id,
+      p_transaction_type: 'withdrawal',
+      p_amount: -amount,
+      p_currency: currency,
+      p_balance_before: profile.balance,
+      p_balance_after: profile.balance - amount,
+      p_reference_id: null,
+      p_reference_type: 'withdrawal_request',
+      p_description: `Withdrawal via ${method} - ${reference} (Net: ₦${validation.netAmount})`,
+      p_metadata: {
+        method,
+        reference,
+        grossAmount: amount,
+        fees: validation.fees,
+        netAmount: validation.netAmount,
+        accountDetails: account_details
+      }
     });
 
     // TODO: Call Go service for KYC/fraud checks

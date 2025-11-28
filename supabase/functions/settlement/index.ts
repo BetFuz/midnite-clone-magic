@@ -117,7 +117,8 @@ serve(async (req) => {
         return jsonResponse({ error: 'Failed to update balance' }, 500);
       }
 
-      const newBalance = (currentProfile?.balance || 0) + body.winnings;
+      const currentBalance = currentProfile?.balance || 0;
+      const newBalance = currentBalance + body.winnings;
 
       const { error: balanceError } = await supabase
         .from('profiles')
@@ -129,7 +130,48 @@ serve(async (req) => {
         return jsonResponse({ error: 'Failed to update balance' }, 500);
       }
 
+      // Log win to immutable ledger (financial audit trail)
+      await supabase.rpc('log_ledger_entry', {
+        p_user_id: bet.user_id,
+        p_transaction_type: 'bet_win',
+        p_amount: body.winnings,
+        p_currency: 'NGN',
+        p_balance_before: currentBalance,
+        p_balance_after: newBalance,
+        p_reference_id: body.bet_id,
+        p_reference_type: 'bet_slip',
+        p_description: `Bet won - Stake: ₦${bet.total_stake}, Winnings: ₦${body.winnings}`,
+        p_metadata: {
+          stake: bet.total_stake,
+          winnings: body.winnings,
+          profit: body.winnings - bet.total_stake
+        }
+      });
+
       console.log(`Balance updated for user ${bet.user_id}: +₦${body.winnings}`);
+    } else if (body.result === 'lost') {
+      // Log loss to immutable ledger (financial audit trail)
+      const { data: currentProfile } = await supabase
+        .from('profiles')
+        .select('balance')
+        .eq('id', bet.user_id)
+        .single();
+
+      await supabase.rpc('log_ledger_entry', {
+        p_user_id: bet.user_id,
+        p_transaction_type: 'bet_loss',
+        p_amount: 0,
+        p_currency: 'NGN',
+        p_balance_before: currentProfile?.balance || 0,
+        p_balance_after: currentProfile?.balance || 0,
+        p_reference_id: body.bet_id,
+        p_reference_type: 'bet_slip',
+        p_description: `Bet lost - Stake: ₦${bet.total_stake}`,
+        p_metadata: {
+          stake: bet.total_stake,
+          loss: bet.total_stake
+        }
+      });
     }
 
     // Update user statistics
