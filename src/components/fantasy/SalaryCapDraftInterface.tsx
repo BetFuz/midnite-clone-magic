@@ -357,6 +357,11 @@ export const SalaryCapDraftInterface = ({ leagueId, sport, onLineupComplete }: S
                             <Info className="w-4 h-4" />
                           </Button>
 
+                          {/* Team Logo */}
+                          <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-md">
+                            <span className="text-white font-bold text-xs">{player.team.substring(0, 3).toUpperCase()}</span>
+                          </div>
+
                           {/* Player Info */}
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-2">
@@ -372,7 +377,9 @@ export const SalaryCapDraftInterface = ({ leagueId, sport, onLineupComplete }: S
                             <h4 className="font-bold text-lg mb-1 group-hover:text-primary transition-colors truncate">
                               {player.full_name}
                             </h4>
-                            <p className="text-sm text-muted-foreground font-medium">{player.team}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm text-muted-foreground font-medium">{player.team}</p>
+                            </div>
                             
                             {/* Value Indicator */}
                             <div className="mt-3 flex items-center gap-2">
@@ -450,11 +457,17 @@ export const SalaryCapDraftInterface = ({ leagueId, sport, onLineupComplete }: S
                       </div>
 
                       <div className="pl-6 flex justify-between items-center gap-3">
-                        <div className="flex-1 min-w-0">
-                          <div className="font-bold text-sm mb-1 truncate group-hover:text-primary transition-colors">
-                            {player.full_name}
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          {/* Team Logo */}
+                          <div className="w-8 h-8 rounded-md bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-sm">
+                            <span className="text-white font-bold text-[10px]">{player.team.substring(0, 2).toUpperCase()}</span>
                           </div>
-                          <div className="text-xs text-muted-foreground">{player.team}</div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-bold text-sm mb-1 truncate group-hover:text-primary transition-colors">
+                              {player.full_name}
+                            </div>
+                            <div className="text-xs text-muted-foreground truncate">{player.team}</div>
+                          </div>
                         </div>
                         <div className="text-right space-y-1">
                           <div className="text-sm font-bold bg-primary/10 px-2 py-1 rounded">
