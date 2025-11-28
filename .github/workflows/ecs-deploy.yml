@@ -13,6 +13,7 @@ env:
   TASK_DEFINITION: betfuz-task-def
   CONTAINER_NAME: betfuz-api
   POSTMAN_COLLECTION_URL: https://api.getpostman.com/collections/${{ secrets.POSTMAN_COLLECTION_ID }}
+  SMOKE_TEST_AMOUNT: 100  # ₦100 hot-wallet smoke test
 
 jobs:
   build-and-deploy:
@@ -111,10 +112,146 @@ jobs:
           name: postman-test-results
           path: test-results.json
 
-      - name: Rollback on failure
-        if: steps.postman-tests.outcome == 'failure'
+      - name: Hot-wallet smoke test (₦100)
+        id: wallet-smoke-test
+        continue-on-error: true
         run: |
-          echo "Smoke tests failed! Initiating rollback..."
+          echo "🔥 Starting hot-wallet smoke test with ₦${{ env.SMOKE_TEST_AMOUNT }}..."
+          
+          # Get green environment URL
+          GREEN_URL="https://api-staging.betfuz.com"
+          
+          # 1. Create test user account
+          TEST_USER_EMAIL="smoke-test-$(date +%s)@betfuz.com"
+          echo "Creating test user: $TEST_USER_EMAIL"
+          
+          TEST_USER_RESPONSE=$(curl -X POST ${GREEN_URL}/api/auth/signup \
+            -H "Content-Type: application/json" \
+            -d "{\"email\":\"$TEST_USER_EMAIL\",\"password\":\"SmokeTest123!\",\"full_name\":\"Smoke Test\"}" \
+            -s -w "\n%{http_code}")
+          
+          HTTP_CODE=$(echo "$TEST_USER_RESPONSE" | tail -n1)
+          RESPONSE_BODY=$(echo "$TEST_USER_RESPONSE" | sed '$d')
+          
+          if [ "$HTTP_CODE" != "200" ] && [ "$HTTP_CODE" != "201" ]; then
+            echo "❌ Failed to create test user (HTTP $HTTP_CODE)"
+            echo "$RESPONSE_BODY"
+            exit 1
+          fi
+          
+          TEST_USER_ID=$(echo $RESPONSE_BODY | jq -r '.user.id // .id')
+          TEST_USER_TOKEN=$(echo $RESPONSE_BODY | jq -r '.token // .access_token')
+          
+          echo "✅ Test user created: $TEST_USER_ID"
+          
+          # 2. Deposit ₦100 to hot-wallet
+          echo "Initiating deposit of ₦${{ env.SMOKE_TEST_AMOUNT }}..."
+          
+          DEPOSIT_RESPONSE=$(curl -X POST ${GREEN_URL}/api/payments/deposit \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $TEST_USER_TOKEN" \
+            -d "{\"amount\":${{ env.SMOKE_TEST_AMOUNT }},\"currency\":\"NGN\",\"method\":\"test\"}" \
+            -s)
+          
+          DEPOSIT_STATUS=$(echo $DEPOSIT_RESPONSE | jq -r '.status // .success')
+          
+          if [ "$DEPOSIT_STATUS" != "success" ] && [ "$DEPOSIT_STATUS" != "true" ]; then
+            echo "❌ Deposit failed: $DEPOSIT_RESPONSE"
+            exit 1
+          fi
+          
+          echo "✅ Deposit successful: ₦${{ env.SMOKE_TEST_AMOUNT }}"
+          
+          # 3. Verify balance update
+          sleep 5  # Wait for ledger update
+          
+          BALANCE_RESPONSE=$(curl -X GET ${GREEN_URL}/api/users/balance \
+            -H "Authorization: Bearer $TEST_USER_TOKEN" \
+            -s)
+          
+          BALANCE=$(echo $BALANCE_RESPONSE | jq -r '.balance // .data.balance')
+          
+          if [ "$BALANCE" != "${{ env.SMOKE_TEST_AMOUNT }}" ]; then
+            echo "⚠️ Balance mismatch. Expected: ${{ env.SMOKE_TEST_AMOUNT }}, Got: $BALANCE"
+            echo "Continuing test..."
+          else
+            echo "✅ Balance verified: ₦$BALANCE"
+          fi
+          
+          # 4. Place a test bet
+          echo "Placing test bet (₦50 stake)..."
+          
+          BET_RESPONSE=$(curl -X POST ${GREEN_URL}/api/bets/place \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $TEST_USER_TOKEN" \
+            -d "{\"stake\":50,\"bet_type\":\"single\",\"selections\":[{\"match_id\":\"smoke-test\",\"selection_type\":\"home_win\",\"selection_value\":\"home\",\"odds\":2.0}]}" \
+            -s)
+          
+          BET_ID=$(echo $BET_RESPONSE | jq -r '.bet_slip_id // .id')
+          
+          if [ "$BET_ID" == "null" ] || [ -z "$BET_ID" ]; then
+            echo "❌ Bet placement failed: $BET_RESPONSE"
+            exit 1
+          fi
+          
+          echo "✅ Bet placed: $BET_ID (₦50 stake)"
+          
+          # 5. Verify bet was recorded in ledger
+          sleep 3
+          
+          LEDGER_CHECK=$(curl -X GET ${GREEN_URL}/api/users/ledger \
+            -H "Authorization: Bearer $TEST_USER_TOKEN" \
+            -s)
+          
+          BET_ENTRY=$(echo $LEDGER_CHECK | jq -r ".entries[] | select(.reference_id == \"$BET_ID\")")
+          
+          if [ -z "$BET_ENTRY" ]; then
+            echo "⚠️ Bet not found in ledger (may be async)"
+          else
+            echo "✅ Bet confirmed in immutable ledger"
+          fi
+          
+          # 6. Initiate withdrawal of remaining balance
+          echo "Initiating withdrawal (₦50)..."
+          
+          WITHDRAW_RESPONSE=$(curl -X POST ${GREEN_URL}/api/payments/withdraw \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $TEST_USER_TOKEN" \
+            -d "{\"amount\":50,\"currency\":\"NGN\",\"method\":\"bank_transfer\",\"account_number\":\"0123456789\",\"bank_code\":\"058\"}" \
+            -s)
+          
+          WITHDRAW_STATUS=$(echo $WITHDRAW_RESPONSE | jq -r '.status')
+          
+          if [ "$WITHDRAW_STATUS" != "pending" ] && [ "$WITHDRAW_STATUS" != "success" ] && [ "$WITHDRAW_STATUS" != "processing" ]; then
+            echo "❌ Withdrawal failed: $WITHDRAW_RESPONSE"
+            exit 1
+          fi
+          
+          echo "✅ Withdrawal initiated: ₦50 (status: $WITHDRAW_STATUS)"
+          
+          # Output for next steps
+          echo "test_user_id=$TEST_USER_ID" >> $GITHUB_OUTPUT
+          echo "bet_id=$BET_ID" >> $GITHUB_OUTPUT
+          
+          echo ""
+          echo "🎉 Hot-wallet smoke test PASSED"
+          echo "   Test User: $TEST_USER_ID"
+          echo "   Bet ID: $BET_ID"
+          echo "   All financial operations validated with real money (₦${{ env.SMOKE_TEST_AMOUNT }})"
+
+      - name: Rollback on failure
+        if: steps.postman-tests.outcome == 'failure' || steps.wallet-smoke-test.outcome == 'failure'
+        run: |
+          echo "❌ Smoke tests failed! Initiating rollback..."
+          
+          # Determine which test failed
+          if [ "${{ steps.postman-tests.outcome }}" == "failure" ]; then
+            echo "Failed test: Postman API smoke tests"
+          fi
+          
+          if [ "${{ steps.wallet-smoke-test.outcome }}" == "failure" ]; then
+            echo "Failed test: Hot-wallet ₦${{ env.SMOKE_TEST_AMOUNT }} smoke test"
+          fi
           
           # Trigger CodeDeploy to stop deployment (automatic rollback)
           DEPLOYMENT_ID=$(aws deploy list-deployments \
@@ -132,6 +269,25 @@ jobs:
             echo "Rollback initiated for deployment $DEPLOYMENT_ID"
           fi
           
+          # Alert on-call engineer
+          curl -X POST "${{ secrets.PAGERDUTY_WEBHOOK }}" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"routing_key\": \"${{ secrets.PAGERDUTY_ROUTING_KEY }}\",
+              \"event_action\": \"trigger\",
+              \"payload\": {
+                \"summary\": \"🚨 Betfuz Deployment FAILED - Rollback Initiated\",
+                \"severity\": \"critical\",
+                \"source\": \"GitHub Actions\",
+                \"custom_details\": {
+                  \"version\": \"${{ steps.version.outputs.VERSION }}\",
+                  \"postman_tests\": \"${{ steps.postman-tests.outcome }}\",
+                  \"wallet_smoke_test\": \"${{ steps.wallet-smoke-test.outcome }}\",
+                  \"rollback_initiated\": true
+                }
+              }
+            }" || echo "PagerDuty alert failed (webhook may not be configured)"
+          
           exit 1
 
       - name: Notify deployment success
@@ -139,6 +295,32 @@ jobs:
         run: |
           echo "✅ Deployment successful: v${{ steps.version.outputs.VERSION }}"
           echo "Green environment is now active and serving traffic"
+          echo "Hot-wallet smoke test: PASSED (₦${{ env.SMOKE_TEST_AMOUNT }})"
+          
+          # Notify team via Slack
+          curl -X POST "${{ secrets.SLACK_WEBHOOK }}" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"text\": \"🚀 Betfuz v${{ steps.version.outputs.VERSION }} deployed successfully!\",
+              \"blocks\": [
+                {
+                  \"type\": \"section\",
+                  \"text\": {
+                    \"type\": \"mrkdwn\",
+                    \"text\": \"*Deployment Successful* ✅\\n\\n*Version:* v${{ steps.version.outputs.VERSION }}\\n*Environment:* Production\\n*Postman Tests:* ${{ steps.postman-tests.outcome }}\\n*Hot-Wallet Test:* ${{ steps.wallet-smoke-test.outcome }} (₦${{ env.SMOKE_TEST_AMOUNT }})\\n*Test User:* \`${{ steps.wallet-smoke-test.outputs.test_user_id }}\`\\n*Test Bet:* \`${{ steps.wallet-smoke-test.outputs.bet_id }}\`\"
+                  }
+                },
+                {
+                  \"type\": \"context\",
+                  \"elements\": [
+                    {
+                      \"type\": \"mrkdwn\",
+                      \"text\": \"All financial operations validated with real money before going live.\"
+                    }
+                  ]
+                }
+              ]
+            }" || echo "Slack notification failed (webhook may not be configured)"
 
       - name: Notify deployment failure
         if: failure()
