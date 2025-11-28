@@ -32,7 +32,9 @@ export const useFantasySports = () => {
 
   const loadLeagues = async () => {
     try {
+      console.log('Loading fantasy leagues...');
       const { data: { user } } = await supabase.auth.getUser();
+      console.log('User:', user?.id || 'Not logged in');
 
       // Fetch all leagues
       const { data: leaguesData, error: leaguesError } = await supabase
@@ -40,7 +42,12 @@ export const useFantasySports = () => {
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (leaguesError) throw leaguesError;
+      if (leaguesError) {
+        console.error('Error fetching leagues:', leaguesError);
+        throw leaguesError;
+      }
+
+      console.log(`Fetched ${leaguesData?.length || 0} leagues`);
 
       // Enrich with participant counts and user teams
       const enrichedLeagues = await Promise.all(
@@ -70,6 +77,7 @@ export const useFantasySports = () => {
         })
       );
 
+      console.log('Leagues enriched successfully');
       setLeagues(enrichedLeagues);
 
       // Filter my teams
@@ -78,6 +86,7 @@ export const useFantasySports = () => {
           .filter(l => l.my_team)
           .map(l => l.my_team!) as FantasyTeam[];
         setMyTeams(userTeams);
+        console.log(`User has ${userTeams.length} teams`);
       }
 
       setIsLoading(false);
