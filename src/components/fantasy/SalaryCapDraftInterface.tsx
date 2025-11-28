@@ -30,7 +30,7 @@ interface Player {
 interface SalaryCapDraftInterfaceProps {
   leagueId: string;
   sport: string;
-  onLineupComplete?: (lineup: any) => void;
+  onLineupComplete?: (payload: { players: Player[]; totalSalary: number; totalProjected: number }) => void;
 }
 
 export const SalaryCapDraftInterface = ({ leagueId, sport, onLineupComplete }: SalaryCapDraftInterfaceProps) => {
@@ -257,7 +257,7 @@ export const SalaryCapDraftInterface = ({ leagueId, sport, onLineupComplete }: S
           <Button 
             size="lg"
             className="ml-auto gap-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg"
-            onClick={() => onLineupComplete?.(selectedPlayers)}
+            onClick={() => onLineupComplete?.({ players: selectedPlayers, totalSalary, totalProjected })}
           >
             <Lock className="w-5 h-5" />
             Lock Lineup

@@ -79,7 +79,7 @@ export default function LeagueDetail() {
     }
   };
 
-  const handleTeamComplete = async (players: any[]) => {
+  const handleTeamComplete = async (payload: { players: any[]; totalSalary: number; totalProjected: number }) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -103,6 +103,31 @@ export default function LeagueDetail() {
         .single();
 
       if (teamError) throw teamError;
+
+      // Save lineup with all selected players
+      const { error: lineupError } = await supabase
+        .from('fantasy_lineups')
+        .insert({
+          league_id: leagueId,
+          team_id: team.id,
+          user_id: user.id,
+          lineup_name: `${team.team_name} Lineup 1`,
+          salary_cap: 60000,
+          total_salary: payload.totalSalary,
+          projected_points: payload.totalProjected,
+          roster: payload.players.map((p) => ({
+            id: p.id,
+            full_name: p.full_name,
+            team: p.team,
+            position: p.position,
+            salary: p.salary,
+            projected_points: p.projected_points,
+          })),
+        });
+
+      if (lineupError) {
+        console.error('Error saving lineup:', lineupError);
+      }
 
       toast({
         title: "Team Created!",
