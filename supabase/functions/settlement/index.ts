@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createServiceClient } from '../_shared/supabase-client.ts';
 import { corsHeaders, handleCorsOptions, jsonResponse } from '../_shared/cors.ts';
+import { DeadHeatService } from '../_shared/dead-heat-service.ts';
 
 // TODO: DEV – call Go settlement service before commit
 // This is a STUB function for bet settlement
@@ -10,6 +11,9 @@ interface SettlementRequest {
   bet_id: string;
   result: 'won' | 'lost' | 'void';
   winnings?: number;
+  dead_heat_positions?: number; // Number of winners in dead-heat (2-way, 3-way, etc.)
+  sport?: string; // Sport type for dead-heat eligibility check
+  rule4_withdrawn_odds?: number; // Odds of withdrawn runner for Rule-4 deduction
 }
 
 serve(async (req) => {
@@ -104,8 +108,46 @@ serve(async (req) => {
       return jsonResponse({ error: 'Failed to update bet' }, 500);
     }
 
+    // Track final winnings (may be adjusted for dead-heat/Rule-4)
+    let finalWinnings = body.winnings || 0;
+
     // Update user balance if won
     if (body.result === 'won' && body.winnings) {
+
+      // Apply dead-heat reduction if applicable
+      if (body.dead_heat_positions && body.dead_heat_positions > 1) {
+        const sport = body.sport || 'unknown';
+        
+        if (DeadHeatService.supportsDeadHeat(sport)) {
+          const deadHeatResult = DeadHeatService.applyReduction(
+            bet.total_stake,
+            body.winnings / bet.total_stake, // Calculate original odds
+            body.dead_heat_positions
+          );
+          
+          finalWinnings = deadHeatResult.reducedPayout;
+          
+          console.log(`🏇 Dead-heat applied: ${body.dead_heat_positions}-way tie`);
+          console.log(`   Original payout: ₦${body.winnings.toFixed(2)}`);
+          console.log(`   Reduced payout: ₦${finalWinnings.toFixed(2)}`);
+        }
+      }
+
+      // Apply Rule-4 deduction if applicable
+      if (body.rule4_withdrawn_odds && body.sport) {
+        if (DeadHeatService.supportsDeadHeat(body.sport)) {
+          const originalOdds = finalWinnings / bet.total_stake;
+          finalWinnings = DeadHeatService.applyRule4(
+            bet.total_stake,
+            originalOdds,
+            body.rule4_withdrawn_odds
+          );
+          
+          console.log(`📉 Rule-4 applied: Withdrawn runner at ${body.rule4_withdrawn_odds.toFixed(2)} odds`);
+          console.log(`   Adjusted payout: ₦${finalWinnings.toFixed(2)}`);
+        }
+      }
+
       const { data: currentProfile, error: profileError } = await supabase
         .from('profiles')
         .select('balance')
@@ -118,7 +160,7 @@ serve(async (req) => {
       }
 
       const currentBalance = currentProfile?.balance || 0;
-      const newBalance = currentBalance + body.winnings;
+      const newBalance = currentBalance + finalWinnings;
 
       const { error: balanceError } = await supabase
         .from('profiles')
@@ -134,21 +176,24 @@ serve(async (req) => {
       await supabase.rpc('log_ledger_entry', {
         p_user_id: bet.user_id,
         p_transaction_type: 'bet_win',
-        p_amount: body.winnings,
+        p_amount: finalWinnings,
         p_currency: 'NGN',
         p_balance_before: currentBalance,
         p_balance_after: newBalance,
         p_reference_id: body.bet_id,
         p_reference_type: 'bet_slip',
-        p_description: `Bet won - Stake: ₦${bet.total_stake}, Winnings: ₦${body.winnings}`,
+        p_description: `Bet won - Stake: ₦${bet.total_stake}, Winnings: ₦${finalWinnings}${body.dead_heat_positions ? ` (${body.dead_heat_positions}-way dead-heat)` : ''}${body.rule4_withdrawn_odds ? ' (Rule-4 applied)' : ''}`,
         p_metadata: {
           stake: bet.total_stake,
-          winnings: body.winnings,
-          profit: body.winnings - bet.total_stake
+          winnings: finalWinnings,
+          profit: finalWinnings - bet.total_stake,
+          dead_heat_positions: body.dead_heat_positions || null,
+          rule4_withdrawn_odds: body.rule4_withdrawn_odds || null,
+          original_winnings: body.winnings
         }
       });
 
-      console.log(`Balance updated for user ${bet.user_id}: +₦${body.winnings}`);
+      console.log(`Balance updated for user ${bet.user_id}: +₦${finalWinnings}`);
     } else if (body.result === 'lost') {
       // Log loss to immutable ledger (financial audit trail)
       const { data: currentProfile } = await supabase
@@ -217,7 +262,11 @@ serve(async (req) => {
       message: 'Settlement processed successfully',
       bet_id: body.bet_id,
       result: body.result,
-      winnings: body.winnings || 0,
+      winnings: body.result === 'won' ? finalWinnings : 0,
+      original_winnings: body.winnings || 0,
+      dead_heat_applied: body.dead_heat_positions ? true : false,
+      dead_heat_positions: body.dead_heat_positions || null,
+      rule4_applied: body.rule4_withdrawn_odds ? true : false,
       settled_at: new Date().toISOString(),
       note: 'STUB: Add GO_SETTLEMENT_SERVICE_URL for production settlement logic'
     });
