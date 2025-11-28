@@ -242,3 +242,18 @@ verify_jwt = false
 
 [functions.fantasy-live-websocket]
 verify_jwt = false
+
+[functions.state-tax-engine]
+verify_jwt = false
+
+[functions.sar-filing]
+verify_jwt = false
+
+[functions.age-verification]
+verify_jwt = false
+
+[functions.self-exclusion-sync]
+verify_jwt = false
+
+[functions.compliance-messaging]
+verify_jwt = false

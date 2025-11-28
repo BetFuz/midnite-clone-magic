@@ -98,6 +98,42 @@ export type Database = {
         }
         Relationships: []
       }
+      advertising_logs: {
+        Row: {
+          channel: string
+          compliance_footer: string
+          created_at: string | null
+          helpline_included: boolean
+          id: string
+          message_content: string
+          message_type: string
+          sent_at: string
+          user_id: string | null
+        }
+        Insert: {
+          channel: string
+          compliance_footer: string
+          created_at?: string | null
+          helpline_included?: boolean
+          id?: string
+          message_content: string
+          message_type: string
+          sent_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          channel?: string
+          compliance_footer?: string
+          created_at?: string | null
+          helpline_included?: boolean
+          id?: string
+          message_content?: string
+          message_type?: string
+          sent_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       affiliate_boost_periods: {
         Row: {
           commission_multiplier: number
@@ -2541,30 +2577,42 @@ export type Database = {
           balance: number | null
           created_at: string | null
           currency_code: string | null
+          date_of_birth: string | null
           email: string
           full_name: string | null
           id: string
+          is_age_verified: boolean | null
+          nin_verification_status: string | null
           phone: string | null
+          state_code: string | null
           updated_at: string | null
         }
         Insert: {
           balance?: number | null
           created_at?: string | null
           currency_code?: string | null
+          date_of_birth?: string | null
           email: string
           full_name?: string | null
           id: string
+          is_age_verified?: boolean | null
+          nin_verification_status?: string | null
           phone?: string | null
+          state_code?: string | null
           updated_at?: string | null
         }
         Update: {
           balance?: number | null
           created_at?: string | null
           currency_code?: string | null
+          date_of_birth?: string | null
           email?: string
           full_name?: string | null
           id?: string
+          is_age_verified?: boolean | null
+          nin_verification_status?: string | null
           phone?: string | null
+          state_code?: string | null
           updated_at?: string | null
         }
         Relationships: []
@@ -2695,6 +2743,51 @@ export type Database = {
         }
         Relationships: []
       }
+      sar_filings: {
+        Row: {
+          amount_24h: number
+          created_at: string | null
+          filed_at: string | null
+          id: string
+          pattern_details: Json | null
+          status: string
+          transaction_count: number
+          trigger_type: string
+          updated_at: string | null
+          user_id: string
+          xml_content: string | null
+          xml_path: string | null
+        }
+        Insert: {
+          amount_24h?: number
+          created_at?: string | null
+          filed_at?: string | null
+          id?: string
+          pattern_details?: Json | null
+          status?: string
+          transaction_count?: number
+          trigger_type: string
+          updated_at?: string | null
+          user_id: string
+          xml_content?: string | null
+          xml_path?: string | null
+        }
+        Update: {
+          amount_24h?: number
+          created_at?: string | null
+          filed_at?: string | null
+          id?: string
+          pattern_details?: Json | null
+          status?: string
+          transaction_count?: number
+          trigger_type?: string
+          updated_at?: string | null
+          user_id?: string
+          xml_content?: string | null
+          xml_path?: string | null
+        }
+        Relationships: []
+      }
       security_alerts: {
         Row: {
           alert_type: string
@@ -2734,6 +2827,48 @@ export type Database = {
           status?: string
           updated_at?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      self_exclusion_registry: {
+        Row: {
+          created_at: string | null
+          exclusion_type: string
+          expires_at: string | null
+          id: string
+          nlrc_reference_id: string | null
+          nlrc_sync_status: string | null
+          reason: string | null
+          requested_at: string
+          synced_to_nlrc_at: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          exclusion_type: string
+          expires_at?: string | null
+          id?: string
+          nlrc_reference_id?: string | null
+          nlrc_sync_status?: string | null
+          reason?: string | null
+          requested_at?: string
+          synced_to_nlrc_at?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          exclusion_type?: string
+          expires_at?: string | null
+          id?: string
+          nlrc_reference_id?: string | null
+          nlrc_sync_status?: string | null
+          reason?: string | null
+          requested_at?: string
+          synced_to_nlrc_at?: string | null
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -2910,6 +3045,81 @@ export type Database = {
           sport_key?: string
           sport_title?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      state_tax_rates: {
+        Row: {
+          created_at: string | null
+          effective_from: string
+          id: string
+          state_code: string
+          state_name: string
+          tax_rate: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          effective_from?: string
+          id?: string
+          state_code: string
+          state_name: string
+          tax_rate: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          effective_from?: string
+          id?: string
+          state_code?: string
+          state_name?: string
+          tax_rate?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      tax_accruals: {
+        Row: {
+          created_at: string | null
+          gross_gaming_revenue: number
+          id: string
+          period_end: string
+          period_start: string
+          remitted_at: string | null
+          state_code: string
+          status: string
+          tax_amount: number
+          tax_rate: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          gross_gaming_revenue?: number
+          id?: string
+          period_end: string
+          period_start: string
+          remitted_at?: string | null
+          state_code: string
+          status?: string
+          tax_amount: number
+          tax_rate: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          gross_gaming_revenue?: number
+          id?: string
+          period_end?: string
+          period_start?: string
+          remitted_at?: string | null
+          state_code?: string
+          status?: string
+          tax_amount?: number
+          tax_rate?: number
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
