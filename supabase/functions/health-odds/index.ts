@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { TimeService } from '../_shared/time-service.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -24,7 +25,7 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const now = new Date();
+    const now = TimeService.getDatabaseTimestamp();
     const STALE_THRESHOLD_SECONDS = 60;
     const FAILOVER_THRESHOLD_SECONDS = 30;
 
@@ -60,20 +61,18 @@ Deno.serve(async (req) => {
 
     // Calculate staleness for Betradar
     if (betradarMatches?.[0]?.updated_at) {
-      const lastUpdate = new Date(betradarMatches[0].updated_at);
-      const staleDuration = Math.floor((now.getTime() - lastUpdate.getTime()) / 1000);
+      const staleDuration = TimeService.getSecondsDifference(betradarMatches[0].updated_at);
       betradarHealth.staleDurationSeconds = staleDuration;
-      betradarHealth.isStale = staleDuration > STALE_THRESHOLD_SECONDS;
-      betradarHealth.status = staleDuration > STALE_THRESHOLD_SECONDS ? 'stale' : 'healthy';
+      betradarHealth.isStale = !TimeService.isFresh(betradarMatches[0].updated_at, STALE_THRESHOLD_SECONDS);
+      betradarHealth.status = betradarHealth.isStale ? 'stale' : 'healthy';
     }
 
     // Calculate staleness for Betgenius
     if (betgeniusMatches?.[0]?.updated_at) {
-      const lastUpdate = new Date(betgeniusMatches[0].updated_at);
-      const staleDuration = Math.floor((now.getTime() - lastUpdate.getTime()) / 1000);
+      const staleDuration = TimeService.getSecondsDifference(betgeniusMatches[0].updated_at);
       betgeniusHealth.staleDurationSeconds = staleDuration;
-      betgeniusHealth.isStale = staleDuration > STALE_THRESHOLD_SECONDS;
-      betgeniusHealth.status = staleDuration > STALE_THRESHOLD_SECONDS ? 'stale' : 'healthy';
+      betgeniusHealth.isStale = !TimeService.isFresh(betgeniusMatches[0].updated_at, STALE_THRESHOLD_SECONDS);
+      betgeniusHealth.status = betgeniusHealth.isStale ? 'stale' : 'healthy';
     }
 
     // Determine if failover is needed
@@ -89,7 +88,7 @@ Deno.serve(async (req) => {
         .from('admin_webhook_settings')
         .upsert({
           id: 1,
-          updated_at: new Date().toISOString(),
+          updated_at: TimeService.getDatabaseTimestamp(),
           updated_by: 'system',
         });
 
@@ -101,7 +100,7 @@ Deno.serve(async (req) => {
       const alertPayload = {
         severity: 'critical',
         message: `Odds feed failover: Betradar down for ${betradarHealth.staleDurationSeconds}s, switched to Betgenius`,
-        timestamp: now.toISOString(),
+        timestamp: TimeService.getDatabaseTimestamp(),
         betradar: betradarHealth,
         betgenius: betgeniusHealth,
       };
@@ -122,7 +121,8 @@ Deno.serve(async (req) => {
         status: shouldFailover ? 'failover_active' : 'healthy',
         currentProvider,
         shouldSuspendLiveEvents: shouldFailover && betgeniusHealth.status !== 'healthy',
-        timestamp: now.toISOString(),
+        timestamp: TimeService.getDatabaseTimestamp(),
+        timezone: 'Africa/Lagos (WAT)',
         feeds: {
           betradar: betradarHealth,
           betgenius: betgeniusHealth,
@@ -141,7 +141,7 @@ Deno.serve(async (req) => {
       JSON.stringify({
         status: 'error',
         error: (error as Error).message,
-        timestamp: new Date().toISOString(),
+        timestamp: TimeService.getDatabaseTimestamp(),
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
