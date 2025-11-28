@@ -68,13 +68,16 @@ serve(async (req) => {
     // Get user profile
     const { data: profile } = await supabase
       .from('profiles')
-      .select('email, full_name, phone')
+      .select('email, full_name, phone, balance')
       .eq('id', user.id)
       .single();
 
     const transactionRef = `DEP-${Date.now()}-${user.id.slice(0, 8)}`;
 
-    // Log transaction attempt
+    // Get current balance
+    const currentBalance = profile?.balance || 0;
+
+    // Log transaction attempt to admin audit
     await serviceClient.from('admin_audit_log').insert({
       admin_id: user.id,
       action: 'deposit_initiated',
@@ -82,6 +85,24 @@ serve(async (req) => {
       resource_id: transactionRef,
       status: 'pending',
       payload_hash: JSON.stringify({ amount, provider, currency })
+    });
+
+    // Log to immutable ledger (financial audit trail)
+    await serviceClient.rpc('log_ledger_entry', {
+      p_user_id: user.id,
+      p_transaction_type: 'deposit',
+      p_amount: amount,
+      p_currency: currency,
+      p_balance_before: currentBalance,
+      p_balance_after: currentBalance + amount,
+      p_reference_id: null,
+      p_reference_type: 'payment_provider',
+      p_description: `Deposit via ${provider} - ${transactionRef}`,
+      p_metadata: {
+        provider,
+        reference: transactionRef,
+        email: profile?.email
+      }
     });
 
     // PRODUCTION: Initialize payment with selected provider

@@ -743,6 +743,63 @@ export type Database = {
         }
         Relationships: []
       }
+      ledger_entries: {
+        Row: {
+          amount: number
+          balance_after: number
+          balance_before: number
+          created_at: string
+          currency: string
+          description: string
+          entry_hash: string | null
+          entry_number: number
+          id: string
+          ip_address: unknown
+          metadata: Json | null
+          reference_id: string | null
+          reference_type: string | null
+          transaction_type: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          balance_after: number
+          balance_before: number
+          created_at?: string
+          currency?: string
+          description: string
+          entry_hash?: string | null
+          entry_number?: number
+          id?: string
+          ip_address?: unknown
+          metadata?: Json | null
+          reference_id?: string | null
+          reference_type?: string | null
+          transaction_type: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          balance_after?: number
+          balance_before?: number
+          created_at?: string
+          currency?: string
+          description?: string
+          entry_hash?: string | null
+          entry_number?: number
+          id?: string
+          ip_address?: unknown
+          metadata?: Json | null
+          reference_id?: string | null
+          reference_type?: string | null
+          transaction_type?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       live_streams: {
         Row: {
           active_bets_count: number
@@ -1760,6 +1817,23 @@ export type Database = {
           _resource_type: string
           _status?: string
           _user_agent?: string
+        }
+        Returns: string
+      }
+      log_ledger_entry: {
+        Args: {
+          p_amount: number
+          p_balance_after: number
+          p_balance_before: number
+          p_currency: string
+          p_description?: string
+          p_ip_address?: unknown
+          p_metadata?: Json
+          p_reference_id?: string
+          p_reference_type?: string
+          p_transaction_type: string
+          p_user_agent?: string
+          p_user_id: string
         }
         Returns: string
       }

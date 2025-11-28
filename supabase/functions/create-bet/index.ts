@@ -148,9 +148,10 @@ serve(async (req) => {
     }
 
     // Deduct stake from user balance
+    const newBalance = profile.balance - stake;
     const { error: balanceError } = await supabase
       .from('profiles')
-      .update({ balance: profile.balance - stake })
+      .update({ balance: newBalance })
       .eq('id', user.id);
 
     if (balanceError) {
@@ -158,17 +159,36 @@ serve(async (req) => {
       return jsonResponse({ error: 'Failed to update balance' }, 500);
     }
 
+    // Log to immutable ledger (financial audit trail)
+    await supabase.rpc('log_ledger_entry', {
+      p_user_id: user.id,
+      p_transaction_type: 'bet_placement',
+      p_amount: -stake,
+      p_currency: 'NGN',
+      p_balance_before: profile.balance,
+      p_balance_after: newBalance,
+      p_reference_id: betSlip.id,
+      p_reference_type: 'bet_slip',
+      p_description: `Bet placed - ${selections.length} selection(s) @ ${totalOdds.toFixed(2)} odds`,
+      p_metadata: {
+        betType: betSlip.bet_type,
+        totalOdds,
+        potentialWin,
+        selectionsCount: selections.length
+      }
+    });
+
     // Broadcast balance change
     const channel = supabase.channel(`balance_change:${user.id}`);
     await channel.send({
       type: 'broadcast',
       event: 'balance_update',
-      payload: { newBalance: profile.balance - stake }
+      payload: { newBalance }
     });
 
     return jsonResponse({ 
       betSlipId: betSlip.id,
-      newBalance: profile.balance - stake 
+      newBalance 
     }, 201);
 
   } catch (error) {
