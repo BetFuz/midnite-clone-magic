@@ -35,6 +35,7 @@ export const SalaryCapDraftInterface = ({ leagueId, sport, onLineupComplete }: S
   const [optimizing, setOptimizing] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [positionFilter, setPositionFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<"projected" | "salary" | "value">("projected");
   
   const SALARY_CAP = 60000;
   const totalSalary = selectedPlayers.reduce((sum, p) => sum + p.salary, 0);
@@ -135,141 +136,244 @@ export const SalaryCapDraftInterface = ({ leagueId, sport, onLineupComplete }: S
     ([pos, req]) => (selectedByPosition[pos] || 0) === req
   );
 
-  const filteredPlayers = players.filter(p => {
-    const matchesSearch = p.full_name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesPosition = positionFilter === "all" || p.position === positionFilter;
-    return matchesSearch && matchesPosition;
-  });
+  const filteredPlayers = players
+    .filter(p => {
+      const matchesSearch = p.full_name.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesPosition = positionFilter === "all" || p.position === positionFilter;
+      return matchesSearch && matchesPosition;
+    })
+    .sort((a, b) => {
+      if (sortBy === "projected") return b.projected_points - a.projected_points;
+      if (sortBy === "salary") return b.salary - a.salary;
+      return (b.projected_points / b.salary) - (a.projected_points / a.salary); // value
+    });
 
   const positions = [...new Set(players.map(p => p.position))];
 
   return (
-    <div className="space-y-6">
-      {/* Salary Cap Progress */}
-      <Card className="p-6 bg-gradient-to-r from-primary/10 to-purple-500/10">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="text-2xl font-bold">
-              {formatCurrency(remainingSalary)} <span className="text-sm text-muted-foreground">/ {formatCurrency(SALARY_CAP)}</span>
-            </h3>
-            <p className="text-sm text-muted-foreground">Remaining Salary</p>
-          </div>
-          <div className="text-right">
-            <h3 className="text-2xl font-bold text-green-500">{totalProjected.toFixed(1)} pts</h3>
-            <p className="text-sm text-muted-foreground">Projected</p>
-          </div>
-        </div>
-        <Progress value={(totalSalary / SALARY_CAP) * 100} className="h-3" />
+    <div className="space-y-6 pb-20">
+      {/* Premium Header Banner */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary via-purple-600 to-pink-600 p-8 text-white shadow-2xl">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMC41IiBvcGFjaXR5PSIwLjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-20"></div>
         
-        {/* Position Requirements */}
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-2 mt-4">
-          {Object.entries(positionReqs).map(([pos, req]) => {
-            const current = selectedByPosition[pos] || 0;
-            const complete = current === req;
-            return (
-              <div key={pos} className={`p-2 rounded-lg text-center ${complete ? 'bg-green-500/20' : 'bg-muted'}`}>
-                <div className="text-xs font-semibold">{pos}</div>
-                <div className="text-sm">{current}/{req}</div>
-              </div>
-            );
-          })}
-        </div>
-      </Card>
+        <div className="relative z-10">
+          <div className="flex items-center justify-between mb-6">
+            <div className="space-y-2">
+              <h2 className="text-4xl font-bold tracking-tight">Build Your Squad</h2>
+              <p className="text-white/80 text-lg">Premium Fantasy Football Experience</p>
+            </div>
+            <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 border border-white/20">
+              <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+              <span className="font-semibold text-lg">{totalProjected.toFixed(1)} pts</span>
+            </div>
+          </div>
 
-      {/* Actions */}
-      <div className="flex gap-2">
+          {/* Salary Cap Visualization */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between text-sm">
+              <span className="font-medium">Salary Cap Usage</span>
+              <span className="font-bold text-lg">{formatCurrency(remainingSalary)} remaining</span>
+            </div>
+            <div className="relative h-4 bg-white/20 rounded-full overflow-hidden backdrop-blur-sm">
+              <div 
+                className="absolute inset-y-0 left-0 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full transition-all duration-500 shadow-lg"
+                style={{ width: `${Math.min((totalSalary / SALARY_CAP) * 100, 100)}%` }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse" />
+            </div>
+            <div className="flex justify-between text-xs text-white/70">
+              <span>{formatCurrency(totalSalary)} used</span>
+              <span>{formatCurrency(SALARY_CAP)} total</span>
+            </div>
+          </div>
+        
+          {/* Position Requirements - Premium Style */}
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-3 mt-6">
+            {Object.entries(positionReqs).map(([pos, req]) => {
+              const current = selectedByPosition[pos] || 0;
+              const complete = current === req;
+              return (
+                <div 
+                  key={pos} 
+                  className={`relative p-4 rounded-xl text-center transition-all duration-300 ${
+                    complete 
+                      ? 'bg-green-500/20 border-2 border-green-400 shadow-lg shadow-green-500/20' 
+                      : 'bg-white/10 backdrop-blur-sm border border-white/20'
+                  }`}
+                >
+                  <div className="text-xs font-bold uppercase tracking-wider mb-1">{pos}</div>
+                  <div className="text-2xl font-bold">{current}<span className="text-sm opacity-60">/{req}</span></div>
+                  {complete && (
+                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-400 rounded-full flex items-center justify-center">
+                      <span className="text-xs">✓</span>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Premium Action Bar */}
+      <div className="flex flex-wrap items-center gap-3 p-4 bg-card rounded-xl border shadow-sm">
         <Button 
           onClick={handleOptimizeLineup} 
           disabled={optimizing || loading}
-          className="gap-2"
+          size="lg"
+          className="gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg"
         >
-          <Sparkles className="w-4 h-4" />
-          {optimizing ? 'Optimizing...' : 'AI Optimize'}
+          <Sparkles className="w-5 h-5" />
+          {optimizing ? 'Optimizing...' : 'AI Optimize Squad'}
         </Button>
         <Button 
           variant="outline" 
           onClick={loadPlayers}
           disabled={loading}
+          size="lg"
+          className="gap-2"
         >
           Refresh Players
         </Button>
         {isLineupComplete && (
           <Button 
-            variant="default" 
-            className="ml-auto gap-2"
+            size="lg"
+            className="ml-auto gap-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg"
             onClick={() => onLineupComplete?.(selectedPlayers)}
           >
-            <Lock className="w-4 h-4" />
+            <Lock className="w-5 h-5" />
             Lock Lineup
           </Button>
         )}
       </div>
 
-      {/* Player Pool */}
+      {/* Player Pool - Premium Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <Card className="p-4">
-            <div className="flex gap-2 mb-4">
-              <Input
-                placeholder="Search players..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="flex-1"
-              />
-              <select
-                value={positionFilter}
-                onChange={(e) => setPositionFilter(e.target.value)}
-                className="px-3 rounded-md border bg-background"
-              >
-                <option value="all">All Positions</option>
-                {positions.map(pos => (
-                  <option key={pos} value={pos}>{pos}</option>
-                ))}
-              </select>
+          <Card className="border-0 shadow-xl bg-gradient-to-br from-card to-card/50 backdrop-blur">
+            <div className="p-6 border-b bg-gradient-to-r from-primary/5 to-purple-500/5">
+              <h3 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                <Users className="w-6 h-6 text-primary" />
+                Available Players
+              </h3>
+              
+              {/* Search & Filters */}
+              <div className="flex flex-wrap gap-3">
+                <Input
+                  placeholder="Search players..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="flex-1 min-w-[200px] h-11 bg-background/50 border-primary/20 focus:border-primary"
+                />
+                <select
+                  value={positionFilter}
+                  onChange={(e) => setPositionFilter(e.target.value)}
+                  className="px-4 h-11 rounded-md border border-primary/20 bg-background/50 font-medium"
+                >
+                  <option value="all">All Positions</option>
+                  {positions.map(pos => (
+                    <option key={pos} value={pos}>{pos}</option>
+                  ))}
+                </select>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as any)}
+                  className="px-4 h-11 rounded-md border border-primary/20 bg-background/50 font-medium"
+                >
+                  <option value="projected">Top Projected</option>
+                  <option value="salary">Highest Salary</option>
+                  <option value="value">Best Value</option>
+                </select>
+              </div>
             </div>
 
-            <div className="space-y-2 max-h-[600px] overflow-y-auto">
+            <div className="p-4 space-y-3 max-h-[700px] overflow-y-auto">
               {loading ? (
-                <div className="text-center py-8 text-muted-foreground">Loading players...</div>
+                <div className="text-center py-16">
+                  <div className="animate-spin w-12 h-12 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+                  <p className="text-muted-foreground font-medium">Loading elite players...</p>
+                </div>
               ) : filteredPlayers.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">No players found</div>
+                <div className="text-center py-16 text-muted-foreground">
+                  <Users className="w-16 h-16 mx-auto mb-4 opacity-20" />
+                  <p className="font-medium">No players found</p>
+                </div>
               ) : (
-                filteredPlayers.map(player => {
+                filteredPlayers.map((player, idx) => {
                   const isSelected = selectedPlayers.some(p => p.id === player.id);
+                  const value = (player.projected_points / player.salary * 1000).toFixed(1);
+                  
                   return (
                     <Card 
                       key={player.id}
-                      className={`p-4 cursor-pointer transition-all hover:scale-[1.02] ${
-                        isSelected ? 'border-primary bg-primary/5' : ''
+                      className={`group relative overflow-hidden cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl ${
+                        isSelected 
+                          ? 'border-2 border-primary bg-gradient-to-r from-primary/10 to-purple-500/10 shadow-lg shadow-primary/20' 
+                          : 'border hover:border-primary/50 bg-gradient-to-br from-card to-card/80'
                       }`}
                       onClick={() => togglePlayer(player)}
                     >
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <Badge variant="outline">{player.position}</Badge>
-                            <h4 className="font-semibold">{player.full_name}</h4>
-                            {player.injury_status !== 'healthy' && (
-                              <Badge variant="destructive" className="text-xs">
-                                {player.injury_status}
-                              </Badge>
-                            )}
-                          </div>
-                          <p className="text-sm text-muted-foreground">{player.team}</p>
+                      {/* Rank Badge */}
+                      <div className="absolute top-2 left-2 w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center font-bold text-xs text-white shadow-lg z-10">
+                        #{idx + 1}
+                      </div>
+
+                      {isSelected && (
+                        <div className="absolute top-2 right-2 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center z-10 animate-scale-in">
+                          <Star className="w-5 h-5 text-white fill-white" />
                         </div>
-                        <div className="text-right">
-                          <div className="text-lg font-bold">{formatCurrency(player.salary)}</div>
-                          <div className="flex items-center gap-2 text-sm">
-                            <TrendingUp className="w-3 h-3 text-green-500" />
-                            <span>{player.projected_points.toFixed(1)} pts</span>
-                            {player.ownership_percentage !== undefined && (
-                              <span className="text-muted-foreground">
-                                <Users className="w-3 h-3 inline" /> {player.ownership_percentage.toFixed(0)}%
-                              </span>
-                            )}
+                      )}
+
+                      <div className="p-5">
+                        <div className="flex items-start justify-between gap-4">
+                          {/* Player Info */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Badge variant="outline" className="font-bold text-xs px-2 py-1">
+                                {player.position}
+                              </Badge>
+                              {player.injury_status !== 'healthy' && (
+                                <Badge variant="destructive" className="text-xs animate-pulse">
+                                  {player.injury_status}
+                                </Badge>
+                              )}
+                            </div>
+                            <h4 className="font-bold text-lg mb-1 group-hover:text-primary transition-colors truncate">
+                              {player.full_name}
+                            </h4>
+                            <p className="text-sm text-muted-foreground font-medium">{player.team}</p>
+                            
+                            {/* Value Indicator */}
+                            <div className="mt-3 flex items-center gap-2">
+                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                <TrendingUp className="w-3 h-3" />
+                                <span>Value: {value}</span>
+                              </div>
+                              {player.ownership_percentage !== undefined && (
+                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                  <Users className="w-3 h-3" />
+                                  <span>{player.ownership_percentage.toFixed(0)}% owned</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Stats Column */}
+                          <div className="text-right space-y-2">
+                            <div className="bg-gradient-to-br from-primary to-purple-600 text-white px-4 py-2 rounded-lg shadow-lg">
+                              <div className="text-xs font-medium opacity-90">Salary</div>
+                              <div className="text-xl font-bold">{formatCurrency(player.salary)}</div>
+                            </div>
+                            <div className="bg-gradient-to-br from-green-500 to-emerald-600 text-white px-4 py-2 rounded-lg shadow-lg">
+                              <div className="text-xs font-medium opacity-90">Projected</div>
+                              <div className="text-xl font-bold">{player.projected_points.toFixed(1)} pts</div>
+                            </div>
                           </div>
                         </div>
                       </div>
+
+                      {/* Hover Overlay */}
+                      <div className={`absolute inset-0 bg-gradient-to-r from-primary/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none ${isSelected ? 'opacity-100' : ''}`} />
                     </Card>
                   );
                 })
@@ -278,34 +382,75 @@ export const SalaryCapDraftInterface = ({ leagueId, sport, onLineupComplete }: S
           </Card>
         </div>
 
-        {/* Selected Lineup */}
+        {/* Selected Lineup - Premium Design */}
         <div>
-          <Card className="p-4 sticky top-4">
-            <h3 className="font-bold mb-4 flex items-center gap-2">
-              <Star className="w-5 h-5 text-yellow-500" />
-              Your Lineup ({selectedPlayers.length})
-            </h3>
-            
-            {selectedPlayers.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                Select players to build your lineup
+          <Card className="border-0 shadow-2xl bg-gradient-to-br from-card to-card/50 backdrop-blur sticky top-4 overflow-hidden">
+            {/* Header */}
+            <div className="p-6 bg-gradient-to-r from-green-600 to-emerald-600 text-white">
+              <h3 className="font-bold text-2xl mb-2 flex items-center gap-2">
+                <Star className="w-6 h-6 fill-yellow-400 text-yellow-400" />
+                Your Squad
+              </h3>
+              <div className="flex items-center justify-between text-sm">
+                <span className="opacity-90">{selectedPlayers.length} / {Object.values(positionReqs).reduce((a, b) => a + b, 0)} players</span>
+                <span className="font-bold">{formatCurrency(totalSalary)}</span>
               </div>
-            ) : (
-              <div className="space-y-2">
-                {selectedPlayers.map(player => (
-                  <div key={player.id} className="p-3 rounded-lg bg-muted">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <div className="font-semibold text-sm">{player.full_name}</div>
-                        <div className="text-xs text-muted-foreground">{player.position}</div>
+            </div>
+            
+            {/* Lineup List */}
+            <div className="p-4">
+              {selectedPlayers.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary/20 to-purple-500/20 flex items-center justify-center">
+                    <Users className="w-10 h-10 text-primary" />
+                  </div>
+                  <p className="text-muted-foreground font-medium">Select players to build<br />your winning squad</p>
+                </div>
+              ) : (
+                <div className="space-y-3 max-h-[500px] overflow-y-auto">
+                  {selectedPlayers.map((player, idx) => (
+                    <div 
+                      key={player.id} 
+                      className="group relative p-4 rounded-xl bg-gradient-to-br from-card to-muted border border-border hover:border-primary/50 transition-all hover:shadow-lg"
+                    >
+                      {/* Position Badge */}
+                      <div className="absolute -left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-gradient-to-br from-primary to-purple-600 rounded-full flex items-center justify-center font-bold text-xs text-white shadow-lg z-10">
+                        {player.position}
                       </div>
-                      <div className="text-right">
-                        <div className="text-sm font-bold">{formatCurrency(player.salary)}</div>
-                        <div className="text-xs text-green-500">{player.projected_points.toFixed(1)} pts</div>
+
+                      <div className="pl-6 flex justify-between items-center gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="font-bold text-sm mb-1 truncate group-hover:text-primary transition-colors">
+                            {player.full_name}
+                          </div>
+                          <div className="text-xs text-muted-foreground">{player.team}</div>
+                        </div>
+                        <div className="text-right space-y-1">
+                          <div className="text-sm font-bold bg-primary/10 px-2 py-1 rounded">
+                            {formatCurrency(player.salary)}
+                          </div>
+                          <div className="text-xs font-semibold text-green-600 bg-green-500/10 px-2 py-1 rounded">
+                            {player.projected_points.toFixed(1)} pts
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Summary Footer */}
+            {selectedPlayers.length > 0 && (
+              <div className="p-4 border-t bg-gradient-to-r from-primary/5 to-purple-500/5">
+                <div className="flex justify-between items-center text-sm font-bold mb-2">
+                  <span>Total Salary:</span>
+                  <span className="text-lg">{formatCurrency(totalSalary)}</span>
+                </div>
+                <div className="flex justify-between items-center text-sm font-bold">
+                  <span>Total Projected:</span>
+                  <span className="text-lg text-green-600">{totalProjected.toFixed(1)} pts</span>
+                </div>
               </div>
             )}
           </Card>
