@@ -23,17 +23,19 @@ Deno.serve(async (req) => {
       const { data, error } = await supabaseAdmin
         .from('matches')
         .update({ status: 'suspended' })
-        .eq('status', 'live');
+        .eq('status', 'live')
+        .select();
 
       if (error) throw error;
 
-      console.log(`🚫 SUSPENDED ${data?.length || 0} live events due to odds feed failure`);
+      const eventsAffected = data?.length || 0;
+      console.log(`🚫 SUSPENDED ${eventsAffected} live events due to odds feed failure`);
 
       return new Response(
         JSON.stringify({
           success: true,
           message: 'All live events suspended',
-          eventsAffected: data?.length || 0,
+          eventsAffected,
           timestamp: new Date().toISOString(),
         }),
         {
@@ -46,17 +48,19 @@ Deno.serve(async (req) => {
       const { data, error } = await supabaseAdmin
         .from('matches')
         .update({ status: 'live' })
-        .eq('status', 'suspended');
+        .eq('status', 'suspended')
+        .select();
 
       if (error) throw error;
 
-      console.log(`✅ RESUMED ${data?.length || 0} live events after odds feed recovery`);
+      const eventsAffected = data?.length || 0;
+      console.log(`✅ RESUMED ${eventsAffected} live events after odds feed recovery`);
 
       return new Response(
         JSON.stringify({
           success: true,
           message: 'All suspended events resumed',
-          eventsAffected: data?.length || 0,
+          eventsAffected,
           timestamp: new Date().toISOString(),
         }),
         {
