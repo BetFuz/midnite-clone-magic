@@ -500,6 +500,65 @@ export type Database = {
         }
         Relationships: []
       }
+      bet_disputes: {
+        Row: {
+          bet_slip_id: string
+          created_at: string | null
+          dispute_details: string | null
+          dispute_reason: string
+          frozen_amount: number | null
+          id: string
+          resolution_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submitted_at: string
+          user_id: string
+          winnings_frozen: boolean | null
+          zendesk_ticket_id: string | null
+        }
+        Insert: {
+          bet_slip_id: string
+          created_at?: string | null
+          dispute_details?: string | null
+          dispute_reason: string
+          frozen_amount?: number | null
+          id?: string
+          resolution_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string
+          user_id: string
+          winnings_frozen?: boolean | null
+          zendesk_ticket_id?: string | null
+        }
+        Update: {
+          bet_slip_id?: string
+          created_at?: string | null
+          dispute_details?: string | null
+          dispute_reason?: string
+          frozen_amount?: number | null
+          id?: string
+          resolution_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string
+          user_id?: string
+          winnings_frozen?: boolean | null
+          zendesk_ticket_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bet_disputes_bet_slip_id_fkey"
+            columns: ["bet_slip_id"]
+            isOneToOne: false
+            referencedRelation: "bet_slips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bet_listings: {
         Row: {
           asking_price: number
@@ -2437,6 +2496,60 @@ export type Database = {
         }
         Relationships: []
       }
+      kyc_submissions: {
+        Row: {
+          created_at: string | null
+          document_type: string
+          document_url: string
+          escalated_at: string | null
+          id: string
+          nin: string | null
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          selfie_url: string | null
+          sla_deadline: string
+          status: string
+          submitted_at: string
+          tier: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          document_type: string
+          document_url: string
+          escalated_at?: string | null
+          id?: string
+          nin?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          selfie_url?: string | null
+          sla_deadline: string
+          status?: string
+          submitted_at?: string
+          tier: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          document_type?: string
+          document_url?: string
+          escalated_at?: string | null
+          id?: string
+          nin?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          selfie_url?: string | null
+          sla_deadline?: string
+          status?: string
+          submitted_at?: string
+          tier?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       kyc_verifications: {
         Row: {
           created_at: string | null
@@ -2608,6 +2721,51 @@ export type Database = {
           transaction_type?: string
           user_agent?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      live_chat_sessions: {
+        Row: {
+          agent_id: string | null
+          cobrowse_enabled: boolean | null
+          cobrowse_session_id: string | null
+          created_at: string | null
+          ended_at: string | null
+          id: string
+          resolution_summary: string | null
+          screen_share_url: string | null
+          started_at: string
+          status: string
+          user_id: string
+          user_satisfaction_rating: number | null
+        }
+        Insert: {
+          agent_id?: string | null
+          cobrowse_enabled?: boolean | null
+          cobrowse_session_id?: string | null
+          created_at?: string | null
+          ended_at?: string | null
+          id?: string
+          resolution_summary?: string | null
+          screen_share_url?: string | null
+          started_at?: string
+          status?: string
+          user_id: string
+          user_satisfaction_rating?: number | null
+        }
+        Update: {
+          agent_id?: string | null
+          cobrowse_enabled?: boolean | null
+          cobrowse_session_id?: string | null
+          created_at?: string | null
+          ended_at?: string | null
+          id?: string
+          resolution_summary?: string | null
+          screen_share_url?: string | null
+          started_at?: string
+          status?: string
+          user_id?: string
+          user_satisfaction_rating?: number | null
         }
         Relationships: []
       }
@@ -3553,6 +3711,48 @@ export type Database = {
           id?: string
           incentive_type?: string
           metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      rtp_calculations: {
+        Row: {
+          bet_count: number
+          calculation_date: string
+          created_at: string | null
+          game_name: string
+          game_type: string
+          id: string
+          rtp_percentage: number
+          total_wagered: number
+          total_won: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          bet_count?: number
+          calculation_date?: string
+          created_at?: string | null
+          game_name: string
+          game_type: string
+          id?: string
+          rtp_percentage?: number
+          total_wagered?: number
+          total_won?: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          bet_count?: number
+          calculation_date?: string
+          created_at?: string | null
+          game_name?: string
+          game_type?: string
+          id?: string
+          rtp_percentage?: number
+          total_wagered?: number
+          total_won?: number
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: []
