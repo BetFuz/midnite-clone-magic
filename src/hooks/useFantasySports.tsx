@@ -48,41 +48,37 @@ export const useFantasySports = () => {
         throw leaguesError;
       }
 
-      const leagueIds = (leaguesData || []).map((league) => league.id);
-
       // If there are no leagues yet, we can short‑circuit
-      if (leagueIds.length === 0) {
+      if (!leaguesData || leaguesData.length === 0) {
         setLeagues([]);
         setMyTeams([]);
         setIsLoading(false);
         return;
       }
 
-      // Fetch all teams for these leagues in a single batched query
-      const { data: teamsData, error: teamsError } = await supabase
-        .from("fantasy_teams")
-        .select("*")
-        .in("league_id", leagueIds);
+      // Optionally fetch this user's teams only (single query, avoids giant IN list)
+      let userTeams: FantasyTeam[] = [];
+      if (user) {
+        const { data: teamsData, error: teamsError } = await supabase
+          .from("fantasy_teams")
+          .select("*")
+          .eq("user_id", user.id);
 
-      if (teamsError) {
-        console.error('Error fetching fantasy teams:', teamsError);
-        throw teamsError;
+        if (teamsError) {
+          console.error('Error fetching user fantasy teams:', teamsError);
+        } else {
+          userTeams = teamsData || [];
+        }
       }
 
-      const allTeams = teamsData || [];
-
       const enrichedLeagues = (leaguesData || []).map((league) => {
-        const leagueTeams = allTeams.filter((team) => team.league_id === league.id);
-        const participants = leagueTeams.length;
-
-        let myTeam: FantasyTeam | null = null;
-        if (user) {
-          myTeam = leagueTeams.find((team) => team.user_id === user.id) || null;
-        }
+        const myTeam = user
+          ? userTeams.find((team) => team.league_id === league.id) || null
+          : null;
 
         return {
           ...league,
-          participants,
+          participants: undefined,
           my_team: myTeam,
         } as FantasyLeague;
       });
@@ -91,11 +87,11 @@ export const useFantasySports = () => {
       setLeagues(enrichedLeagues);
 
       if (user) {
-        const userTeams = enrichedLeagues
+        const onlyMyTeams = enrichedLeagues
           .filter((l) => l.my_team)
           .map((l) => l.my_team!) as FantasyTeam[];
-        setMyTeams(userTeams);
-        console.log(`User has ${userTeams.length} teams`);
+        setMyTeams(onlyMyTeams);
+        console.log(`User has ${onlyMyTeams.length} teams`);
       } else {
         setMyTeams([]);
       }
