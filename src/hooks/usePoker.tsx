@@ -52,12 +52,25 @@ export function usePoker() {
   const startGame = useCallback(async () => {
     setIsLoading(true);
     try {
-      // Create AI opponents
-      const { data, error } = await supabase.functions.invoke('ai-poker', {
+      console.log('Starting poker game, creating AI opponents...');
+      
+      // Create AI opponents with timeout
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Request timed out after 10 seconds')), 10000)
+      );
+      
+      const invokePromise = supabase.functions.invoke('ai-poker', {
         body: { action: 'create_opponents', count: 3 },
       });
+      
+      const { data, error } = await Promise.race([invokePromise, timeoutPromise]) as any;
+      
+      console.log('AI opponents response:', { data, error });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error from edge function:', error);
+        throw error;
+      }
 
       const newDeck = createDeck();
       const humanPlayer: Player = {
@@ -90,8 +103,14 @@ export function usePoker() {
       toast({ title: 'Game Started', description: 'Good luck at the table!' });
     } catch (error) {
       console.error('Error starting game:', error);
-      toast({ title: 'Error', description: 'Failed to start game', variant: 'destructive' });
+      const errorMessage = error instanceof Error ? error.message : 'Failed to start game';
+      toast({ 
+        title: 'Error Starting Game', 
+        description: errorMessage,
+        variant: 'destructive' 
+      });
     } finally {
+      console.log('Game setup completed, isLoading set to false');
       setIsLoading(false);
     }
   }, [createDeck]);
