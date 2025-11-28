@@ -626,6 +626,51 @@ export type Database = {
           },
         ]
       }
+      kyc_verifications: {
+        Row: {
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          nin: string
+          provider: string
+          provider_response: Json | null
+          selfie_url: string
+          updated_at: string | null
+          user_id: string
+          verification_score: number | null
+          verification_status: string
+          verified_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          nin: string
+          provider: string
+          provider_response?: Json | null
+          selfie_url: string
+          updated_at?: string | null
+          user_id: string
+          verification_score?: number | null
+          verification_status?: string
+          verified_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          nin?: string
+          provider?: string
+          provider_response?: Json | null
+          selfie_url?: string
+          updated_at?: string | null
+          user_id?: string
+          verification_score?: number | null
+          verification_status?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       leaderboard_entries: {
         Row: {
           bonus_points: number | null
