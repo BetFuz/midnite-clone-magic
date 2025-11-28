@@ -185,3 +185,9 @@ verify_jwt = false
 
 [functions.payment-waitlist-notify]
 verify_jwt = false
+
+[functions.health-odds]
+verify_jwt = false
+
+[functions.suspend-live-events]
+verify_jwt = false

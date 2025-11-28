@@ -155,6 +155,7 @@ const Compliance = lazy(() => import("./pages/admin/Compliance"));
 const Operations = lazy(() => import("./pages/admin/Operations"));
 const GrowthTools = lazy(() => import("./pages/admin/GrowthTools"));
 const Status = lazy(() => import("./pages/Status"));
+const HealthOdds = lazy(() => import("./pages/HealthOdds"));
 const PlayerProtection = lazy(() => import("./pages/account/PlayerProtection"));
 const AdminSetup = lazy(() => import("./pages/admin/AdminSetup"));
 const AdminAssets = lazy(() => import("./pages/admin/AIAssets"));
