@@ -26,7 +26,7 @@ Deno.serve(async (req) => {
     );
 
     const now = TimeService.getDatabaseTimestamp();
-    const STALE_THRESHOLD_SECONDS = 60;
+    const STALE_THRESHOLD_SECONDS = 30; // 30s SLA for live betting operations
     const FAILOVER_THRESHOLD_SECONDS = 30;
 
     // Check Betradar (primary feed) - query matches table for latest update

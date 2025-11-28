@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
+import { KillSwitch } from "@/components/admin/KillSwitch";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -151,6 +152,9 @@ export default function Operations() {
           <h1 className="text-3xl font-bold">Operations</h1>
           <p className="text-muted-foreground">Manage users, bets, and payouts</p>
         </div>
+
+        {/* Emergency Kill Switch */}
+        <KillSwitch />
 
         <div className="grid gap-6 md:grid-cols-2">
           {/* User Search */}
