@@ -13,6 +13,7 @@ import { toast } from "@/hooks/use-toast";
 import { formatCurrency } from "@/lib/currency";
 import { formatDistanceToNow } from "date-fns";
 import { PlayerDraftInterface } from "@/components/fantasy/PlayerDraftInterface";
+import { SalaryCapDraftInterface } from "@/components/fantasy/SalaryCapDraftInterface";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function LeagueDetail() {
@@ -190,11 +191,10 @@ export default function LeagueDetail() {
                   </Badge>
                 </div>
 
-                <PlayerDraftInterface
+                <SalaryCapDraftInterface
                   leagueId={league.id}
                   sport={league.sport}
-                  budget={100000}
-                  onTeamComplete={handleTeamComplete}
+                  onLineupComplete={handleTeamComplete}
                 />
               </Card>
             </div>

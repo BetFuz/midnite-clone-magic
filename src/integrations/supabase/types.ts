@@ -750,6 +750,42 @@ export type Database = {
           },
         ]
       }
+      fantasy_contest_types: {
+        Row: {
+          code: string
+          created_at: string | null
+          description: string | null
+          entry_multiplier: number | null
+          id: string
+          max_entries: number | null
+          min_entries: number | null
+          name: string
+          payout_structure: Json
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          description?: string | null
+          entry_multiplier?: number | null
+          id?: string
+          max_entries?: number | null
+          min_entries?: number | null
+          name: string
+          payout_structure: Json
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          description?: string | null
+          entry_multiplier?: number | null
+          id?: string
+          max_entries?: number | null
+          min_entries?: number | null
+          name?: string
+          payout_structure?: Json
+        }
+        Relationships: []
+      }
       fantasy_leagues: {
         Row: {
           created_at: string | null
@@ -786,6 +822,228 @@ export type Database = {
           season?: string
           sport?: string
           status?: string
+        }
+        Relationships: []
+      }
+      fantasy_lineups: {
+        Row: {
+          created_at: string | null
+          current_points: number | null
+          id: string
+          is_locked: boolean | null
+          league_id: string
+          lineup_name: string
+          projected_points: number | null
+          roster: Json
+          salary_cap: number
+          team_id: string
+          total_salary: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          current_points?: number | null
+          id?: string
+          is_locked?: boolean | null
+          league_id: string
+          lineup_name: string
+          projected_points?: number | null
+          roster?: Json
+          salary_cap?: number
+          team_id: string
+          total_salary?: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          current_points?: number | null
+          id?: string
+          is_locked?: boolean | null
+          league_id?: string
+          lineup_name?: string
+          projected_points?: number | null
+          roster?: Json
+          salary_cap?: number
+          team_id?: string
+          total_salary?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fantasy_lineups_league_id_fkey"
+            columns: ["league_id"]
+            isOneToOne: false
+            referencedRelation: "fantasy_leagues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fantasy_lineups_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "fantasy_teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fantasy_live_scores: {
+        Row: {
+          id: string
+          last_updated: string | null
+          lineup_id: string
+          live_points: number | null
+          player_id: string
+          stats: Json | null
+        }
+        Insert: {
+          id?: string
+          last_updated?: string | null
+          lineup_id: string
+          live_points?: number | null
+          player_id: string
+          stats?: Json | null
+        }
+        Update: {
+          id?: string
+          last_updated?: string | null
+          lineup_id?: string
+          live_points?: number | null
+          player_id?: string
+          stats?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fantasy_live_scores_lineup_id_fkey"
+            columns: ["lineup_id"]
+            isOneToOne: false
+            referencedRelation: "fantasy_lineups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fantasy_live_scores_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "fantasy_players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fantasy_player_ownership: {
+        Row: {
+          id: string
+          league_id: string
+          ownership_percentage: number | null
+          player_id: string
+          total_lineups: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          league_id: string
+          ownership_percentage?: number | null
+          player_id: string
+          total_lineups?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          league_id?: string
+          ownership_percentage?: number | null
+          player_id?: string
+          total_lineups?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fantasy_player_ownership_league_id_fkey"
+            columns: ["league_id"]
+            isOneToOne: false
+            referencedRelation: "fantasy_leagues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fantasy_player_ownership_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "fantasy_players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fantasy_players: {
+        Row: {
+          average_points: number | null
+          created_at: string | null
+          external_player_id: string
+          full_name: string
+          id: string
+          injury_status: string | null
+          metadata: Json | null
+          position: string
+          projected_points: number | null
+          salary: number
+          sport: string
+          team: string
+          updated_at: string | null
+        }
+        Insert: {
+          average_points?: number | null
+          created_at?: string | null
+          external_player_id: string
+          full_name: string
+          id?: string
+          injury_status?: string | null
+          metadata?: Json | null
+          position: string
+          projected_points?: number | null
+          salary?: number
+          sport: string
+          team: string
+          updated_at?: string | null
+        }
+        Update: {
+          average_points?: number | null
+          created_at?: string | null
+          external_player_id?: string
+          full_name?: string
+          id?: string
+          injury_status?: string | null
+          metadata?: Json | null
+          position?: string
+          projected_points?: number | null
+          salary?: number
+          sport?: string
+          team?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      fantasy_scoring_rules: {
+        Row: {
+          created_at: string | null
+          id: string
+          points_per: number
+          position: string
+          sport: string
+          stat_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          points_per: number
+          position: string
+          sport: string
+          stat_type: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          points_per?: number
+          position?: string
+          sport?: string
+          stat_type?: string
         }
         Relationships: []
       }
