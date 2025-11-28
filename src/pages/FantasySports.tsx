@@ -13,6 +13,7 @@ import { useFantasySports } from "@/hooks/useFantasySports";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNow } from "date-fns";
 import { CreateLeagueDialog } from "@/components/fantasy/CreateLeagueDialog";
+import { EmptyLeagueState } from "@/components/fantasy/EmptyLeagueState";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
