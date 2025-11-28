@@ -69,6 +69,7 @@ const Sidebar = ({ className, showOnMobile = false }: SidebarProps) => {
     { icon: Shield, label: "Admin Dashboard", url: "/admin/dashboard", badge: "ADMIN" },
     { icon: FileText, label: "Immutable Ledger", url: "/admin/ledger", badge: "AUDIT" },
     { icon: Database, label: "Disaster Recovery", url: "/admin/disaster-recovery", badge: "BACKUP" },
+    { icon: DollarSign, label: "Treasury & Float", url: "/admin/treasury", badge: "MONEY" },
     { icon: Shield, label: "Compliance & AML", url: "/admin/compliance", badge: "NLRC" },
     { icon: Lock, label: "Webhook Settings", url: "/admin/webhooks", badge: "SUPER" },
   ];
