@@ -921,6 +921,54 @@ export type Database = {
         }
         Relationships: []
       }
+      deposit_reconciliation: {
+        Row: {
+          created_at: string | null
+          difference: number
+          id: string
+          ledger_total: number
+          matched_count: number
+          provider: string
+          reconciled_at: string | null
+          reconciliation_date: string
+          settlement_file_path: string | null
+          settlement_total: number
+          status: string
+          support_ticket_id: string | null
+          unmatched_count: number
+        }
+        Insert: {
+          created_at?: string | null
+          difference?: number
+          id?: string
+          ledger_total?: number
+          matched_count?: number
+          provider: string
+          reconciled_at?: string | null
+          reconciliation_date: string
+          settlement_file_path?: string | null
+          settlement_total?: number
+          status?: string
+          support_ticket_id?: string | null
+          unmatched_count?: number
+        }
+        Update: {
+          created_at?: string | null
+          difference?: number
+          id?: string
+          ledger_total?: number
+          matched_count?: number
+          provider?: string
+          reconciled_at?: string | null
+          reconciliation_date?: string
+          settlement_file_path?: string | null
+          settlement_total?: number
+          status?: string
+          support_ticket_id?: string | null
+          unmatched_count?: number
+        }
+        Relationships: []
+      }
       document_archives: {
         Row: {
           archived_at: string | null
@@ -1054,6 +1102,60 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      failed_deposit_retries: {
+        Row: {
+          account_number: string
+          amount: number
+          bank_code: string
+          created_at: string | null
+          failure_reason: string
+          id: string
+          last_retry_at: string | null
+          max_retries: number
+          next_retry_at: string | null
+          original_transaction_ref: string
+          retry_count: number
+          sms_notifications_sent: number | null
+          status: string
+          success_at: string | null
+          user_id: string
+        }
+        Insert: {
+          account_number: string
+          amount: number
+          bank_code: string
+          created_at?: string | null
+          failure_reason: string
+          id?: string
+          last_retry_at?: string | null
+          max_retries?: number
+          next_retry_at?: string | null
+          original_transaction_ref: string
+          retry_count?: number
+          sms_notifications_sent?: number | null
+          status?: string
+          success_at?: string | null
+          user_id: string
+        }
+        Update: {
+          account_number?: string
+          amount?: number
+          bank_code?: string
+          created_at?: string | null
+          failure_reason?: string
+          id?: string
+          last_retry_at?: string | null
+          max_retries?: number
+          next_retry_at?: string | null
+          original_transaction_ref?: string
+          retry_count?: number
+          sms_notifications_sent?: number | null
+          status?: string
+          success_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       fantasy_contest_entries: {
         Row: {
@@ -2284,6 +2386,57 @@ export type Database = {
         }
         Relationships: []
       }
+      instant_payouts: {
+        Row: {
+          account_name: string
+          account_number: string
+          amount: number
+          bank_code: string
+          completed_at: string | null
+          created_at: string | null
+          error_message: string | null
+          id: string
+          processing_time_ms: number | null
+          provider: string
+          status: string
+          transaction_ref: string | null
+          user_id: string
+          withdrawal_id: string
+        }
+        Insert: {
+          account_name: string
+          account_number: string
+          amount: number
+          bank_code: string
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          processing_time_ms?: number | null
+          provider?: string
+          status?: string
+          transaction_ref?: string | null
+          user_id: string
+          withdrawal_id: string
+        }
+        Update: {
+          account_name?: string
+          account_number?: string
+          amount?: number
+          bank_code?: string
+          completed_at?: string | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          processing_time_ms?: number | null
+          provider?: string
+          status?: string
+          transaction_ref?: string | null
+          user_id?: string
+          withdrawal_id?: string
+        }
+        Relationships: []
+      }
       kyc_verifications: {
         Row: {
           created_at: string | null
@@ -2821,6 +2974,45 @@ export type Database = {
           unpaid_tickets?: number
           unpaid_tickets_value?: number
           year?: number
+        }
+        Relationships: []
+      }
+      nuban_validations: {
+        Row: {
+          bank_name: string
+          created_at: string | null
+          fuzzy_score: number
+          id: string
+          kyc_name: string
+          match_result: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          user_id: string
+          withdrawal_id: string
+        }
+        Insert: {
+          bank_name: string
+          created_at?: string | null
+          fuzzy_score: number
+          id?: string
+          kyc_name: string
+          match_result: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          user_id: string
+          withdrawal_id: string
+        }
+        Update: {
+          bank_name?: string
+          created_at?: string | null
+          fuzzy_score?: number
+          id?: string
+          kyc_name?: string
+          match_result?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          user_id?: string
+          withdrawal_id?: string
         }
         Relationships: []
       }

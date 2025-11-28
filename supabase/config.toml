@@ -276,6 +276,18 @@ verify_jwt = true
 [functions.free-bet-expiry]
 verify_jwt = false
 
+[functions.nuban-name-validation]
+verify_jwt = true
+
+[functions.instant-payout]
+verify_jwt = true
+
+[functions.deposit-reconciliation]
+verify_jwt = false
+
+[functions.failed-deposit-retry]
+verify_jwt = false
+
 [functions.exposure-monitor]
 verify_jwt = false
 
