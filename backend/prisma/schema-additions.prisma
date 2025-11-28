@@ -1,0 +1,90 @@
+// Add these models to your existing schema.prisma
+
+model TopupTransaction {
+  id                 String   @id @default(cuid())
+  userId             String
+  phone              String
+  carrier            String   // mtn, airtel, glo, 9mobile
+  amount             Float
+  type               String   // airtime, data
+  status             String   @default("pending") // pending, completed, failed
+  reference          String   @unique
+  externalReference  String?  // Selcom reference
+  idempotencyKey     String   @unique
+  metadata           Json?
+  errorMessage       String?
+  completedAt        DateTime?
+  createdAt          DateTime @default(now())
+
+  user               User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model BankAccount {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  accountNumber  String   @unique
+  accountName    String
+  bankName       String
+  bankCode       String
+  balance        Float    @default(0)
+  status         String   @default("active") // active, suspended, closed
+  reference      String   @unique
+  bvn            String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user           User     @relation(fields: [userId], references: [id])
+  transactions   BankTransaction[]
+
+  @@index([userId])
+  @@index([accountNumber])
+}
+
+model BankTransaction {
+  id                   String   @id @default(cuid())
+  bankAccountId        String
+  userId               String
+  type                 String   // credit, debit
+  amount               Float
+  transactionReference String   @unique
+  senderName           String?
+  senderAccount        String?
+  senderBank           String?
+  narration            String?
+  transactionDate      DateTime
+  status               String   @default("completed")
+  createdAt            DateTime @default(now())
+
+  bankAccount          BankAccount @relation(fields: [bankAccountId], references: [id])
+  user                 User        @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([bankAccountId])
+  @@index([transactionDate])
+}
+
+model LedgerEntry {
+  id           String   @id @default(cuid())
+  betSlipId    String   @unique
+  betHash      String   // SHA-256 hash of betSlipId
+  winAmount    Float
+  txHash       String?  // Polygon transaction hash
+  blockNumber  Int?     // Block number on Polygon
+  network      String   @default("polygon-mumbai")
+  status       String   @default("pending") // pending, confirmed, failed
+  errorMessage String?
+  createdAt    DateTime @default(now())
+
+  @@index([betSlipId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// Add these relations to existing User model:
+// topupTransactions TopupTransaction[]
+// bankAccount       BankAccount?
+// bankTransactions  BankTransaction[]
