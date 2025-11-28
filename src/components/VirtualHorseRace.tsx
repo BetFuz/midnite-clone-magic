@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useBetSlip } from '@/contexts/BetSlipContext';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -18,14 +18,14 @@ const TRACK_LENGTH = 1600;
 const TICK_MS = 200;
 
 const HORSES: Horse[] = [
-  { id: 'h1', name: 'Pixel Pegasus',  color: 'bg-amber-500', distance: 0, speed: 0, finished: false, finalPosition: null },
-  { id: 'h2', name: 'Binary Bolt',    color: 'bg-sky-500',   distance: 0, speed: 0, finished: false, finalPosition: null },
-  { id: 'h3', name: 'Circuit Storm',  color: 'bg-emerald-500', distance: 0, speed: 0, finished: false, finalPosition: null },
-  { id: 'h4', name: 'Data Dasher',    color: 'bg-violet-500', distance: 0, speed: 0, finished: false, finalPosition: null },
-  { id: 'h5', name: 'Giga Gallop',    color: 'bg-rose-500',  distance: 0, speed: 0, finished: false, finalPosition: null },
-  { id: 'h6', name: 'Neon Nelly',     color: 'bg-indigo-500', distance: 0, speed: 0, finished: false, finalPosition: null },
-  { id: 'h7', name: 'Quantum Quick',  color: 'bg-orange-500', distance: 0, speed: 0, finished: false, finalPosition: null },
-  { id: 'h8', name: 'Synth Steed',    color: 'bg-teal-500',  distance: 0, speed: 0, finished: false, finalPosition: null },
+  { id: 'h1', name: 'Pixel Pegasus', color: 'bg-amber-500', distance: 0, speed: 0, finished: false, finalPosition: null },
+  { id: 'h2', name: 'Binary Bolt', color: 'bg-sky-500', distance: 0, speed: 0, finished: false, finalPosition: null },
+  { id: 'h3', name: 'Circuit Storm', color: 'bg-emerald-500', distance: 0, speed: 0, finished: false, finalPosition: null },
+  { id: 'h4', name: 'Data Dasher', color: 'bg-violet-500', distance: 0, speed: 0, finished: false, finalPosition: null },
+  { id: 'h5', name: 'Giga Gallop', color: 'bg-rose-500', distance: 0, speed: 0, finished: false, finalPosition: null },
+  { id: 'h6', name: 'Neon Nelly', color: 'bg-indigo-500', distance: 0, speed: 0, finished: false, finalPosition: null },
+  { id: 'h7', name: 'Quantum Quick', color: 'bg-orange-500', distance: 0, speed: 0, finished: false, finalPosition: null },
+  { id: 'h8', name: 'Synth Steed', color: 'bg-teal-500', distance: 0, speed: 0, finished: false, finalPosition: null },
 ];
 
 export default function VirtualHorseRace() {
@@ -36,23 +36,7 @@ export default function VirtualHorseRace() {
   const [countdown, setCountdown] = useState(5);
   const intervalRef = useRef<number | null>(null);
 
-  useEffect(() => {
-    if (raceStatus !== 'waiting') return;
-    const cd = setInterval(() => {
-      setCountdown((c) => {
-        if (c === 1) {
-          clearInterval(cd);
-          startRace();
-          return 0;
-        }
-        setCommentary(`Race starts in ${c - 1}`);
-        return c - 1;
-      });
-    }, 1000);
-    return () => clearInterval(cd);
-  }, [raceStatus]);
-
-  const startRace = () => {
+  const startRace = useCallback(() => {
     setRaceStatus('running');
     setCommentary('And they are off!');
     intervalRef.current = window.setInterval(() => {
@@ -83,7 +67,23 @@ export default function VirtualHorseRace() {
         return next;
       });
     }, TICK_MS);
-  };
+  }, []);
+
+  useEffect(() => {
+    if (raceStatus !== 'waiting') return;
+    const cd = setInterval(() => {
+      setCountdown((c) => {
+        if (c === 1) {
+          clearInterval(cd);
+          startRace();
+          return 0;
+        }
+        setCommentary(`Race starts in ${c - 1}`);
+        return c - 1;
+      });
+    }, 1000);
+    return () => clearInterval(cd);
+  }, [raceStatus, startRace]);
 
   const resetRace = () => {
     if (intervalRef.current) clearInterval(intervalRef.current);
@@ -123,7 +123,7 @@ export default function VirtualHorseRace() {
           </Badge>
         </div>
         {raceStatus === 'finished' && (
-          <Button onClick={resetRace} variant="default" className="gap-2">
+          <Button onClick={resetRace} variant="default">
             New Race
           </Button>
         )}
@@ -156,7 +156,7 @@ export default function VirtualHorseRace() {
                 </span>
                 {h.finished && (
                   <span className="absolute right-2 text-xs font-bold text-white">
-                    Finished #{h.finalPosition}
+                    Finish #{h.finalPosition}
                   </span>
                 )}
               </div>
