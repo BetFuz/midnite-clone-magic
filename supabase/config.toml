@@ -258,6 +258,15 @@ verify_jwt = false
 [functions.compliance-messaging]
 verify_jwt = false
 
+[functions.data-source-validator]
+verify_jwt = false
+
+[functions.bet-builder-pricing]
+verify_jwt = false
+
+[functions.streaming-token]
+verify_jwt = true
+
 [functions.exposure-monitor]
 verify_jwt = false
 

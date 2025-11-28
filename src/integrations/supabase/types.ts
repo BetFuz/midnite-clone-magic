@@ -373,6 +373,47 @@ export type Database = {
         }
         Relationships: []
       }
+      bet_builder_selections: {
+        Row: {
+          bet_slip_id: string | null
+          correlation_factor: number | null
+          created_at: string | null
+          id: string
+          match_id: string
+          odds: number
+          selection_type: string
+          selection_value: string
+        }
+        Insert: {
+          bet_slip_id?: string | null
+          correlation_factor?: number | null
+          created_at?: string | null
+          id?: string
+          match_id: string
+          odds: number
+          selection_type: string
+          selection_value: string
+        }
+        Update: {
+          bet_slip_id?: string | null
+          correlation_factor?: number | null
+          created_at?: string | null
+          id?: string
+          match_id?: string
+          odds?: number
+          selection_type?: string
+          selection_value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bet_builder_selections_bet_slip_id_fkey"
+            columns: ["bet_slip_id"]
+            isOneToOne: false
+            referencedRelation: "bet_slips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bet_copies: {
         Row: {
           bet_slip_id: string
@@ -2651,6 +2692,42 @@ export type Database = {
         }
         Relationships: []
       }
+      official_data_sources: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean
+          is_official: boolean
+          league: string
+          priority: number
+          provider: string
+          sport: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean
+          is_official?: boolean
+          league: string
+          priority?: number
+          provider: string
+          sport: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean
+          is_official?: boolean
+          league?: string
+          priority?: number
+          provider?: string
+          sport?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       parimutuel_bets: {
         Row: {
           actual_payout: number | null
@@ -2803,6 +2880,51 @@ export type Database = {
           read?: boolean | null
           title?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      player_props: {
+        Row: {
+          created_at: string | null
+          feed_provider: string
+          id: string
+          line: number
+          market_status: string | null
+          match_id: string
+          over_odds: number
+          player_name: string
+          prop_type: string
+          team: string
+          under_odds: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          feed_provider: string
+          id?: string
+          line: number
+          market_status?: string | null
+          match_id: string
+          over_odds: number
+          player_name: string
+          prop_type: string
+          team: string
+          under_odds: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          feed_provider?: string
+          id?: string
+          line?: number
+          market_status?: string | null
+          match_id?: string
+          over_odds?: number
+          player_name?: string
+          prop_type?: string
+          team?: string
+          under_odds?: number
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -3398,6 +3520,39 @@ export type Database = {
           state_name?: string
           tax_rate?: number
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      streaming_sessions: {
+        Row: {
+          bet_placed: boolean | null
+          ended_at: string | null
+          id: string
+          match_id: string
+          session_token: string | null
+          started_at: string | null
+          stream_provider: string
+          user_id: string
+        }
+        Insert: {
+          bet_placed?: boolean | null
+          ended_at?: string | null
+          id?: string
+          match_id: string
+          session_token?: string | null
+          started_at?: string | null
+          stream_provider?: string
+          user_id: string
+        }
+        Update: {
+          bet_placed?: boolean | null
+          ended_at?: string | null
+          id?: string
+          match_id?: string
+          session_token?: string | null
+          started_at?: string | null
+          stream_provider?: string
+          user_id?: string
         }
         Relationships: []
       }
