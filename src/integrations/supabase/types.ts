@@ -476,6 +476,96 @@ export type Database = {
         }
         Relationships: []
       }
+      cashout_rules: {
+        Row: {
+          cool_down_seconds: number
+          created_at: string | null
+          id: number
+          max_cashout_pct: number
+          min_pct: number
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          cool_down_seconds?: number
+          created_at?: string | null
+          id?: number
+          max_cashout_pct?: number
+          min_pct?: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          cool_down_seconds?: number
+          created_at?: string | null
+          id?: number
+          max_cashout_pct?: number
+          min_pct?: number
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      cashout_transactions: {
+        Row: {
+          bet_slip_id: string
+          cashout_amount: number
+          cashout_pct: number
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          last_cashout_at: string | null
+          original_stake: number
+          potential_win: number
+          rejection_reason: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          bet_slip_id: string
+          cashout_amount: number
+          cashout_pct: number
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          last_cashout_at?: string | null
+          original_stake: number
+          potential_win: number
+          rejection_reason?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          bet_slip_id?: string
+          cashout_amount?: number
+          cashout_pct?: number
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          last_cashout_at?: string | null
+          original_stake?: number
+          potential_win?: number
+          rejection_reason?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cashout_transactions_bet_slip_id_fkey"
+            columns: ["bet_slip_id"]
+            isOneToOne: false
+            referencedRelation: "bet_slips"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cashout_transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       daily_retention_caps: {
         Row: {
           cap_date: string
