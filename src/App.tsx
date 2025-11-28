@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { BetSlipProvider } from "@/contexts/BetSlipContext";
 import { lazy, Suspense } from "react";
 import { Loader2 } from "lucide-react";
+import { LiveChatWidget } from "@/components/LiveChatWidget";
 
 // Critical pages - loaded immediately
 import Index from "./pages/Index";
@@ -152,6 +153,8 @@ const Ledger = lazy(() => import("./pages/admin/Ledger"));
 const DisasterRecovery = lazy(() => import("./pages/admin/DisasterRecovery"));
 const Treasury = lazy(() => import("./pages/admin/Treasury"));
 const Compliance = lazy(() => import("./pages/admin/Compliance"));
+const Operations = lazy(() => import("./pages/admin/Operations"));
+const Status = lazy(() => import("./pages/Status"));
 const PlayerProtection = lazy(() => import("./pages/account/PlayerProtection"));
 const AdminSetup = lazy(() => import("./pages/admin/AdminSetup"));
 const AdminAssets = lazy(() => import("./pages/admin/AIAssets"));
@@ -226,6 +229,7 @@ const App = () => (
     <BetSlipProvider>
       <Toaster />
       <Sonner />
+      <LiveChatWidget />
       <BrowserRouter>
         <Suspense fallback={<PageLoader />}>
           <NetworkStatus />
@@ -442,6 +446,9 @@ const App = () => (
           <Route path="/admin/settings" element={<AdminSettings />} />
           <Route path="/admin/security" element={<AdminSecurity />} />
           <Route path="/admin/seed" element={<SeedData />} />
+          
+          {/* Status Page */}
+          <Route path="/status" element={<Status />} />
           
           {/* Match Details */}
           <Route path="/match/:id" element={<MatchDetail />} />

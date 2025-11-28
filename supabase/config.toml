@@ -147,6 +147,18 @@ verify_jwt = false
 [functions.nlrc-quarterly-report]
 verify_jwt = false
 
+[functions.admin-user-search]
+verify_jwt = false
+
+[functions.admin-void-bet]
+verify_jwt = false
+
+[functions.admin-manual-payout]
+verify_jwt = false
+
+[functions.admin-export-ledger]
+verify_jwt = false
+
 [functions.withdraw]
 verify_jwt = true
 
