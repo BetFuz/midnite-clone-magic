@@ -77,6 +77,37 @@ serve(async (req) => {
       return jsonResponse({ error: 'Profile not found' }, 404);
     }
 
+    // Check KYC requirement for withdrawals > ₦50,000 (NLRC requirement)
+    if (amount > 50000) {
+      const { data: kycData, error: kycError } = await serviceClient
+        .from('kyc_verifications')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('verification_status', 'verified')
+        .single();
+
+      if (kycError || !kycData) {
+        console.log('KYC verification required for withdrawal:', user.id);
+        return jsonResponse({
+          error: 'KYC verification required for withdrawals above ₦50,000. Please complete NIN verification before proceeding.',
+          requiresKyc: true,
+          nlrcCompliance: true
+        }, 403);
+      }
+
+      // Check if KYC has expired
+      if (kycData.expires_at && new Date(kycData.expires_at) < new Date()) {
+        console.log('KYC verification expired for user:', user.id);
+        return jsonResponse({
+          error: 'Your KYC verification has expired. Please re-verify your NIN before withdrawing.',
+          requiresKyc: true,
+          nlrcCompliance: true
+        }, 403);
+      }
+
+      console.log('KYC verification confirmed for user:', user.id, 'Score:', kycData.verification_score);
+    }
+
     // Validate withdrawal
     const validation = validateWithdrawal(amount, profile.balance, method);
     if (!validation.isValid) {
