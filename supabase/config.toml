@@ -267,6 +267,15 @@ verify_jwt = false
 [functions.streaming-token]
 verify_jwt = true
 
+[functions.bonus-abuse-detector]
+verify_jwt = false
+
+[functions.bonus-forfeiture]
+verify_jwt = true
+
+[functions.free-bet-expiry]
+verify_jwt = false
+
 [functions.exposure-monitor]
 verify_jwt = false
 

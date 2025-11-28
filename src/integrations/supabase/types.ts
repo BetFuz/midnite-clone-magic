@@ -675,6 +675,135 @@ export type Database = {
         }
         Relationships: []
       }
+      bonus_abuse_flags: {
+        Row: {
+          created_at: string | null
+          details: Json | null
+          device_fingerprint: string | null
+          flag_type: string
+          id: string
+          ip_address: unknown
+          related_user_ids: string[] | null
+          resolved: boolean | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          details?: Json | null
+          device_fingerprint?: string | null
+          flag_type: string
+          id?: string
+          ip_address?: unknown
+          related_user_ids?: string[] | null
+          resolved?: boolean | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          details?: Json | null
+          device_fingerprint?: string | null
+          flag_type?: string
+          id?: string
+          ip_address?: unknown
+          related_user_ids?: string[] | null
+          resolved?: boolean | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      bonus_forfeitures: {
+        Row: {
+          balance_adjusted: boolean | null
+          bonus_id: string
+          bonus_type: string
+          created_at: string | null
+          forfeited_amount: number
+          id: string
+          reason: string | null
+          rollover_cleared: number
+          rollover_remaining: number
+          user_id: string
+        }
+        Insert: {
+          balance_adjusted?: boolean | null
+          bonus_id: string
+          bonus_type: string
+          created_at?: string | null
+          forfeited_amount: number
+          id?: string
+          reason?: string | null
+          rollover_cleared?: number
+          rollover_remaining: number
+          user_id: string
+        }
+        Update: {
+          balance_adjusted?: boolean | null
+          bonus_id?: string
+          bonus_type?: string
+          created_at?: string | null
+          forfeited_amount?: number
+          id?: string
+          reason?: string | null
+          rollover_cleared?: number
+          rollover_remaining?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      bonus_rollover: {
+        Row: {
+          bonus_id: string
+          bonus_type: string
+          completed: number
+          completed_at: string | null
+          created_at: string | null
+          forfeited_at: string | null
+          id: string
+          min_odds: number | null
+          remaining: number
+          status: string
+          total_required: number
+          user_id: string
+        }
+        Insert: {
+          bonus_id: string
+          bonus_type: string
+          completed?: number
+          completed_at?: string | null
+          created_at?: string | null
+          forfeited_at?: string | null
+          id?: string
+          min_odds?: number | null
+          remaining: number
+          status?: string
+          total_required: number
+          user_id: string
+        }
+        Update: {
+          bonus_id?: string
+          bonus_type?: string
+          completed?: number
+          completed_at?: string | null
+          created_at?: string | null
+          forfeited_at?: string | null
+          id?: string
+          min_odds?: number | null
+          remaining?: number
+          status?: string
+          total_required?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       cashout_rules: {
         Row: {
           cool_down_seconds: number
@@ -1919,6 +2048,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      free_bet_tokens: {
+        Row: {
+          amount: number
+          bet_slip_id: string | null
+          expires_at: string
+          id: string
+          issued_at: string | null
+          reminder_sent: boolean | null
+          reminder_sent_at: string | null
+          source: string | null
+          status: string
+          terms: Json | null
+          token_code: string
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          bet_slip_id?: string | null
+          expires_at: string
+          id?: string
+          issued_at?: string | null
+          reminder_sent?: boolean | null
+          reminder_sent_at?: string | null
+          source?: string | null
+          status?: string
+          terms?: Json | null
+          token_code: string
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          bet_slip_id?: string | null
+          expires_at?: string
+          id?: string
+          issued_at?: string | null
+          reminder_sent?: boolean | null
+          reminder_sent_at?: string | null
+          source?: string | null
+          status?: string
+          terms?: Json | null
+          token_code?: string
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       game_bets: {
         Row: {
