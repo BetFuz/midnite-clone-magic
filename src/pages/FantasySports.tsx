@@ -121,81 +121,85 @@ const FantasySports = () => {
       <div className="flex pt-16">
         <Sidebar />
         
-        <main className="flex-1 md:ml-64 pb-20 md:pb-6">
-          <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
-            <div className="flex items-center justify-between mb-6">
+        <main className="flex-1 md:ml-64 pb-20 md:pb-6 overflow-x-hidden">
+          <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-6 overflow-x-hidden">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center flex-shrink-0">
                   <Trophy className="w-6 h-6 text-white" />
                 </div>
-                <div>
-                  <h1 className="text-3xl font-bold text-foreground">Fantasy Sports</h1>
-                  <p className="text-muted-foreground">Build your dream team and compete</p>
+                <div className="min-w-0">
+                  <h1 className="text-2xl md:text-3xl font-bold text-foreground">Fantasy Sports</h1>
+                  <p className="text-sm text-muted-foreground">Build your dream team and compete</p>
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
                 <Button variant="outline" size="sm" onClick={handleGenerateLeagues} disabled={generating} className="gap-2">
                   <RefreshCw className={`w-4 h-4 ${generating ? 'animate-spin' : ''}`} />
-                  Generate Leagues
+                  <span className="hidden sm:inline">Generate Leagues</span>
                 </Button>
-                <Button className="gap-2" onClick={() => setCreateDialogOpen(true)}>
+                <Button size="sm" className="gap-2" onClick={() => setCreateDialogOpen(true)}>
                   <Plus className="w-4 h-4" />
-                  Create League
+                  <span className="hidden sm:inline">Create League</span>
                 </Button>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Card className="p-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+              <Card className="p-3 md:p-4">
                 <p className="text-xs text-muted-foreground mb-1">Active Leagues</p>
-                <p className="text-2xl font-bold">{leagues.length}</p>
-                <p className="text-xs text-green-500 mt-1">All sports covered</p>
+                <p className="text-xl md:text-2xl font-bold">{leagues.length}</p>
+                <p className="text-xs text-green-500 mt-1 hidden sm:block">All sports covered</p>
               </Card>
-              <Card className="p-4">
+              <Card className="p-3 md:p-4">
                 <p className="text-xs text-muted-foreground mb-1">Total Players</p>
-                <p className="text-2xl font-bold">{leagues.reduce((sum, l) => sum + (l.participants || 0), 0).toLocaleString()}</p>
-                <p className="text-xs text-muted-foreground mt-1">Across all sports</p>
+                <p className="text-xl md:text-2xl font-bold">{leagues.reduce((sum, l) => sum + (l.participants || 0), 0).toLocaleString()}</p>
+                <p className="text-xs text-muted-foreground mt-1 hidden sm:block">Across all sports</p>
               </Card>
-              <Card className="p-4">
+              <Card className="p-3 md:p-4">
                 <p className="text-xs text-muted-foreground mb-1">My Teams</p>
-                <p className="text-2xl font-bold text-primary">{leagues.filter(l => l.my_team).length}</p>
-                <p className="text-xs text-muted-foreground mt-1">Active entries</p>
+                <p className="text-xl md:text-2xl font-bold text-primary">{leagues.filter(l => l.my_team).length}</p>
+                <p className="text-xs text-muted-foreground mt-1 hidden sm:block">Active entries</p>
               </Card>
-              <Card className="p-4">
-                <p className="text-xs text-muted-foreground mb-1">Total Prize Pool</p>
-                <p className="text-2xl font-bold text-green-500">{formatCurrency(leagues.reduce((sum, l) => sum + Number(l.prize_pool), 0))}</p>
-                <p className="text-xs text-muted-foreground mt-1">Up for grabs</p>
+              <Card className="p-3 md:p-4">
+                <p className="text-xs text-muted-foreground mb-1 truncate">Prize Pool</p>
+                <p className="text-xl md:text-2xl font-bold text-green-500 truncate">{formatCurrency(leagues.reduce((sum, l) => sum + Number(l.prize_pool), 0))}</p>
+                <p className="text-xs text-muted-foreground mt-1 hidden sm:block">Up for grabs</p>
               </Card>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 space-y-6">
-                <Tabs value={activeTab} onValueChange={setActiveTab}>
-                  <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 mb-6 h-auto">
-                    <TabsTrigger value="football">Football</TabsTrigger>
-                    <TabsTrigger value="basketball">Basketball</TabsTrigger>
-                    <TabsTrigger value="cricket">Cricket</TabsTrigger>
-                    <TabsTrigger value="tennis">Tennis</TabsTrigger>
-                    <TabsTrigger value="rugby">Rugby</TabsTrigger>
-                    <TabsTrigger value="ice-hockey">Ice Hockey</TabsTrigger>
-                  </TabsList>
-                  <TabsList className="grid w-full grid-cols-3 mb-6 h-auto">
-                    <TabsTrigger value="baseball">Baseball</TabsTrigger>
-                    <TabsTrigger value="american-football">Am. Football</TabsTrigger>
-                    <TabsTrigger value="volleyball">Volleyball</TabsTrigger>
-                  </TabsList>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+              <div className="lg:col-span-2 space-y-4 md:space-y-6 min-w-0">
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                  <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+                    <TabsList className="grid w-full min-w-[600px] md:min-w-0 grid-cols-6 mb-4 h-auto">
+                      <TabsTrigger value="football" className="text-xs md:text-sm">Football</TabsTrigger>
+                      <TabsTrigger value="basketball" className="text-xs md:text-sm">Basketball</TabsTrigger>
+                      <TabsTrigger value="cricket" className="text-xs md:text-sm">Cricket</TabsTrigger>
+                      <TabsTrigger value="tennis" className="text-xs md:text-sm">Tennis</TabsTrigger>
+                      <TabsTrigger value="rugby" className="text-xs md:text-sm">Rugby</TabsTrigger>
+                      <TabsTrigger value="ice-hockey" className="text-xs md:text-sm">Ice Hockey</TabsTrigger>
+                    </TabsList>
+                  </div>
+                  <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+                    <TabsList className="grid w-full min-w-[450px] md:min-w-0 grid-cols-3 mb-4 md:mb-6 h-auto">
+                      <TabsTrigger value="baseball" className="text-xs md:text-sm">Baseball</TabsTrigger>
+                      <TabsTrigger value="american-football" className="text-xs md:text-sm">Am. Football</TabsTrigger>
+                      <TabsTrigger value="volleyball" className="text-xs md:text-sm">Volleyball</TabsTrigger>
+                    </TabsList>
+                  </div>
 
                   <TabsContent value="football" className="space-y-4">
                     {footballLeagues.length === 0 ? (
-                      <Card className="p-12 text-center">
-                        <Trophy className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                        <h3 className="text-xl font-semibold mb-2">No Football Leagues</h3>
-                        <p className="text-muted-foreground">Check back soon</p>
+                      <Card className="p-8 md:p-12 text-center">
+                        <Trophy className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 text-muted-foreground" />
+                        <h3 className="text-lg md:text-xl font-semibold mb-2">No Football Leagues</h3>
+                        <p className="text-sm text-muted-foreground">Check back soon</p>
                       </Card>
                     ) : (
                       footballLeagues.map(league => (
-                        <Card key={league.id} className={`p-6 ${league.my_team ? 'border-primary/50 bg-primary/5' : ''}`}>
-                          <div className="flex items-center gap-2 mb-2">
+                        <Card key={league.id} className={`p-4 md:p-6 ${league.my_team ? 'border-primary/50 bg-primary/5' : ''}`}>
+                          <div className="flex flex-wrap items-center gap-2 mb-2">
                             <Badge variant="outline">{league.sport}</Badge>
                             <Badge variant="secondary">{league.season}</Badge>
                             {league.my_team && (
@@ -205,52 +209,52 @@ const FantasySports = () => {
                               </Badge>
                             )}
                           </div>
-                          <h3 className="text-xl font-bold mb-3">{league.name}</h3>
+                          <h3 className="text-lg md:text-xl font-bold mb-3 break-words">{league.name}</h3>
                           
-                          <div className="grid grid-cols-2 gap-4 mb-4">
+                          <div className="grid grid-cols-2 gap-3 md:gap-4 mb-4">
                             <div>
                               <p className="text-xs text-muted-foreground">Participants</p>
                               <p className="font-bold">{league.participants?.toLocaleString()}</p>
                             </div>
                             <div>
                               <p className="text-xs text-muted-foreground">Prize Pool</p>
-                              <p className="font-bold text-green-500">{formatCurrency(league.prize_pool)}</p>
+                              <p className="font-bold text-green-500 truncate">{formatCurrency(league.prize_pool)}</p>
                             </div>
                             <div>
                               <p className="text-xs text-muted-foreground">Entry Fee</p>
-                              <p className="font-bold">{formatCurrency(league.entry_fee)}</p>
+                              <p className="font-bold truncate">{formatCurrency(league.entry_fee)}</p>
                             </div>
                             <div>
                               <p className="text-xs text-muted-foreground">Deadline</p>
-                              <p className="font-bold text-orange-500">{formatDistanceToNow(new Date(league.deadline))}</p>
+                              <p className="font-bold text-orange-500 text-sm">{formatDistanceToNow(new Date(league.deadline))}</p>
                             </div>
                           </div>
 
                           {league.my_team && (
-                            <div className="bg-muted/50 rounded-lg p-4 mb-4">
+                            <div className="bg-muted/50 rounded-lg p-3 md:p-4 mb-4">
                               <div className="grid grid-cols-2 gap-4">
                                 <div>
                                   <p className="text-xs text-muted-foreground">My Rank</p>
-                                  <p className="text-xl font-bold text-primary">#{league.my_team.rank || 'N/A'}</p>
+                                  <p className="text-lg md:text-xl font-bold text-primary">#{league.my_team.rank || 'N/A'}</p>
                                 </div>
                                 <div>
                                   <p className="text-xs text-muted-foreground">My Points</p>
-                                  <p className="text-xl font-bold">{league.my_team.total_points}</p>
+                                  <p className="text-lg md:text-xl font-bold">{league.my_team.total_points}</p>
                                 </div>
                               </div>
                             </div>
                           )}
 
-                          <div className="flex gap-3">
+                          <div className="flex flex-col sm:flex-row gap-2 md:gap-3">
                             {league.my_team ? (
                               <>
-                                <Button className="flex-1" onClick={() => navigate(`/fantasy-sports/${league.id}`)}>Manage Team</Button>
-                                <Button variant="outline" onClick={() => navigate(`/fantasy-sports/${league.id}`)}>View Leaderboard</Button>
+                                <Button className="flex-1" size="sm" onClick={() => navigate(`/fantasy-sports/${league.id}`)}>Manage Team</Button>
+                                <Button variant="outline" size="sm" onClick={() => navigate(`/fantasy-sports/${league.id}`)}>Leaderboard</Button>
                               </>
                             ) : (
                               <>
-                                <Button className="flex-1" onClick={() => navigate(`/fantasy-sports/${league.id}`)}>Join League</Button>
-                                <Button variant="outline" onClick={() => navigate(`/fantasy-sports/${league.id}`)}>View Details</Button>
+                                <Button className="flex-1" size="sm" onClick={() => navigate(`/fantasy-sports/${league.id}`)}>Join League</Button>
+                                <Button variant="outline" size="sm" onClick={() => navigate(`/fantasy-sports/${league.id}`)}>Details</Button>
                               </>
                             )}
                           </div>
@@ -501,29 +505,29 @@ const FantasySports = () => {
                 </Tabs>
               </div>
 
-              <div className="space-y-6">
-                <Card className="p-6">
+              <div className="space-y-4 md:space-y-6 min-w-0">
+                <Card className="p-4 md:p-6">
                   <div className="flex items-center gap-2 mb-4">
                     <Crown className="w-5 h-5 text-yellow-500" />
-                    <h3 className="font-bold text-lg">Top Managers</h3>
+                    <h3 className="font-bold text-base md:text-lg">Top Managers</h3>
                   </div>
                   <div className="space-y-3">
                     {topManagers.map(manager => (
                       <div key={manager.rank} className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
+                        <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 ${
                           manager.rank === 1 ? 'bg-yellow-500 text-white' :
                           manager.rank === 2 ? 'bg-gray-400 text-white' :
                           'bg-orange-500 text-white'
                         }`}>
                           {manager.rank}
                         </div>
-                        <div className="flex-1">
-                          <p className="font-semibold text-sm">{manager.name}</p>
-                          <p className="text-xs text-muted-foreground">{manager.team}</p>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-sm truncate">{manager.name}</p>
+                          <p className="text-xs text-muted-foreground truncate">{manager.team}</p>
                         </div>
-                        <div className="text-right">
+                        <div className="text-right flex-shrink-0">
                           <p className="font-bold text-sm">{manager.points}</p>
-                          <p className="text-xs text-green-500">{formatCurrency(manager.profit)}</p>
+                          <p className="text-xs text-green-500 truncate">{formatCurrency(manager.profit)}</p>
                         </div>
                       </div>
                     ))}
