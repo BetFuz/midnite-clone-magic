@@ -224,3 +224,9 @@ verify_jwt = false
 
 [functions.fantasy-optimize-lineup]
 verify_jwt = false
+
+[functions.fantasy-player-research]
+verify_jwt = false
+
+[functions.fantasy-generate-contests]
+verify_jwt = false

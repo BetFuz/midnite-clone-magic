@@ -158,6 +158,9 @@ const GrowthTools = lazy(() => import("./pages/admin/GrowthTools"));
 const Status = lazy(() => import("./pages/Status"));
 const Affiliate = lazy(() => import("./pages/Affiliate"));
 const LeagueDetail = lazy(() => import("./pages/fantasy/LeagueDetail"));
+const ContestLobby = lazy(() => import("./pages/fantasy/ContestLobby"));
+const LiveLeaderboard = lazy(() => import("./pages/fantasy/LiveLeaderboard"));
+const ContestHistory = lazy(() => import("./pages/fantasy/ContestHistory"));
 const HealthOdds = lazy(() => import("./pages/HealthOdds"));
 const PlayerProtection = lazy(() => import("./pages/account/PlayerProtection"));
 const AdminSetup = lazy(() => import("./pages/admin/AdminSetup"));
@@ -259,6 +262,9 @@ const App = () => (
           <Route path="/pool-betting" element={<PoolBetting />} />
           <Route path="/fantasy-sports" element={<FantasySports />} />
           <Route path="/fantasy-sports/:leagueId" element={<LeagueDetail />} />
+          <Route path="/fantasy/contests" element={<ContestLobby />} />
+          <Route path="/fantasy/leaderboard/:contestId" element={<LiveLeaderboard />} />
+          <Route path="/fantasy/history" element={<ContestHistory />} />
           <Route path="/live-streaming" element={<LiveStreaming />} />
           <Route path="/web3-hub" element={<Web3Hub />} />
           <Route path="/virtual-stadium" element={<VirtualStadium />} />

@@ -11,6 +11,9 @@ import { formatCurrency } from "@/lib/currency";
 import { TrendingUp, Sparkles, Users, Star, Lock, Info, Share2 } from "lucide-react";
 import { PlayerResearchModal } from "./PlayerResearchModal";
 import { LineupExportModal } from "./LineupExportModal";
+import { MultiEntryManager } from "./MultiEntryManager";
+import { LateSwapPanel } from "./LateSwapPanel";
+import { StackingSuggestions } from "./StackingSuggestions";
 
 interface Player {
   id: string;
@@ -482,6 +485,37 @@ export const SalaryCapDraftInterface = ({ leagueId, sport, onLineupComplete }: S
               </div>
             )}
           </Card>
+        </div>
+
+        {/* Right sidebar with advanced features */}
+        <div className="space-y-4">
+          <MultiEntryManager
+            maxEntries={3}
+            currentLineup={selectedPlayers}
+            totalSalary={totalSalary}
+            salaryCap={SALARY_CAP}
+          />
+
+          <LateSwapPanel
+            contestId={leagueId}
+            lateSwapDeadline={new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString()}
+            currentLineup={selectedPlayers.map(p => ({ ...p, gameTime: new Date().toISOString() }))}
+            onSwapPlayer={(oldId, newId) => {
+              const newPlayers = selectedPlayers.filter(p => p.id !== oldId);
+              setSelectedPlayers(newPlayers);
+              toast.success("Ready to swap player");
+            }}
+          />
+
+          <StackingSuggestions
+            currentLineup={selectedPlayers}
+            onApplyStack={(players) => {
+              players.forEach(p => {
+                const player = players.find(ap => ap.id === p.id);
+                if (player) togglePlayer(player);
+              });
+            }}
+          />
         </div>
       </div>
 
