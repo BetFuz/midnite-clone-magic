@@ -37,10 +37,13 @@ export const useFantasySports = () => {
       const { data: { user } } = await supabase.auth.getUser();
       console.log('User:', user?.id || 'Not logged in');
 
-      // Fetch all leagues in a single query
+      // Fetch all leagues with contest information
       const { data: leaguesData, error: leaguesError } = await supabase
         .from("fantasy_leagues")
-        .select("*")
+        .select(`
+          *,
+          fantasy_contests(count)
+        `)
         .order("created_at", { ascending: false });
 
       if (leaguesError) {
@@ -48,7 +51,7 @@ export const useFantasySports = () => {
         throw leaguesError;
       }
 
-      // If there are no leagues yet, we can short‑circuit
+      // If there are no leagues yet, short-circuit
       if (!leaguesData || leaguesData.length === 0) {
         setLeagues([]);
         setMyTeams([]);
@@ -56,7 +59,7 @@ export const useFantasySports = () => {
         return;
       }
 
-      // Optionally fetch this user's teams only (single query, avoids giant IN list)
+      // Fetch user's teams if logged in
       let userTeams: FantasyTeam[] = [];
       if (user) {
         const { data: teamsData, error: teamsError } = await supabase
