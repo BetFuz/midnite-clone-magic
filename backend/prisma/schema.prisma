@@ -14,6 +14,7 @@ model User {
   fullName      String?  @map("full_name")
   balance       Decimal  @default(0) @db.Decimal(15, 2)
   currencyCode  String   @default("NGN") @map("currency_code")
+  tronAddress   String?  @map("tron_address")
   isActive      Boolean  @default(true) @map("is_active")
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
@@ -21,6 +22,8 @@ model User {
   bets          Bet[]
   transactions  Transaction[]
   affiliateLinks AffiliateLink[]
+  bonuses       Bonus[]
+  withdrawals   Withdrawal[]
 
   @@map("users")
 }
@@ -115,6 +118,55 @@ model NlrcLicence {
   @@map("nlrc_licences")
 }
 
+model Bonus {
+  id                String   @id @default(uuid())
+  userId            String   @map("user_id")
+  depositAmount     Decimal  @db.Decimal(15, 2) @map("deposit_amount")
+  usdtBonus         Decimal  @db.Decimal(15, 2) @map("usdt_bonus")
+  ngnBonus          Decimal  @db.Decimal(15, 2) @map("ngn_bonus")
+  usdtReleased      Boolean  @default(false) @map("usdt_released")
+  ngnLocked         Boolean  @default(true) @map("ngn_locked")
+  rolloverRequired  Decimal  @db.Decimal(15, 2) @map("rollover_required")
+  rolloverProgress  Decimal  @default(0) @db.Decimal(15, 2) @map("rollover_progress")
+  minOdds           Decimal  @db.Decimal(10, 4) @map("min_odds")
+  status            BonusStatus @default(PENDING)
+  tronAddress       String?  @map("tron_address")
+  releasedAt        DateTime? @map("released_at")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  user              User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@map("bonuses")
+}
+
+model Withdrawal {
+  id                String   @id @default(uuid())
+  userId            String   @map("user_id")
+  amount            Decimal  @db.Decimal(15, 2)
+  method            WithdrawalMethod
+  destination       String
+  status            WithdrawalStatus @default(PENDING)
+  requestedAt       DateTime @default(now()) @map("requested_at")
+  processedAt       DateTime? @map("processed_at")
+  timerStarted      DateTime? @map("timer_started")
+  timerExpired      Boolean  @default(false) @map("timer_expired")
+  compensationPaid  Boolean  @default(false) @map("compensation_paid")
+  compensationAmount Decimal? @db.Decimal(15, 2) @map("compensation_amount")
+  reference         String   @unique
+  metadata          Json?
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  user              User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@map("withdrawals")
+}
+
 enum BetStatus {
   PENDING
   WON
@@ -152,4 +204,29 @@ enum LicenceStatus {
   EXPIRED
   SUSPENDED
   UNKNOWN
+}
+
+enum BonusStatus {
+  PENDING
+  USDT_RELEASED
+  NGN_RELEASED
+  COMPLETED
+  EXPIRED
+  CANCELLED
+}
+
+enum WithdrawalMethod {
+  BANK_TRANSFER
+  USDT_TRC20
+  CRYPTO
+  MOBILE_MONEY
+}
+
+enum WithdrawalStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+  COMPENSATED
 }
