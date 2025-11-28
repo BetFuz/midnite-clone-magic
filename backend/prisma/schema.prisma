@@ -1,0 +1,155 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  phone         String?
+  fullName      String?  @map("full_name")
+  balance       Decimal  @default(0) @db.Decimal(15, 2)
+  currencyCode  String   @default("NGN") @map("currency_code")
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  bets          Bet[]
+  transactions  Transaction[]
+  affiliateLinks AffiliateLink[]
+
+  @@map("users")
+}
+
+model Bet {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  stakeAmount     Decimal  @db.Decimal(15, 2) @map("stake_amount")
+  totalOdds       Decimal  @db.Decimal(10, 4) @map("total_odds")
+  potentialWin    Decimal  @db.Decimal(15, 2) @map("potential_win")
+  status          BetStatus @default(PENDING)
+  betType         String   @map("bet_type")
+  settledAt       DateTime? @map("settled_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  user            User @relation(fields: [userId], references: [id])
+  selections      BetSelection[]
+
+  @@index([userId])
+  @@index([status])
+  @@map("bets")
+}
+
+model BetSelection {
+  id            String   @id @default(uuid())
+  betId         String   @map("bet_id")
+  matchId       String   @map("match_id")
+  homeTeam      String   @map("home_team")
+  awayTeam      String   @map("away_team")
+  selectionType String   @map("selection_type")
+  selectionValue String  @map("selection_value")
+  odds          Decimal  @db.Decimal(10, 4)
+  status        SelectionStatus @default(PENDING)
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  bet           Bet @relation(fields: [betId], references: [id], onDelete: Cascade)
+
+  @@index([betId])
+  @@map("bet_selections")
+}
+
+model Transaction {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  type            TransactionType
+  amount          Decimal  @db.Decimal(15, 2)
+  status          TransactionStatus @default(PENDING)
+  paymentMethod   String?  @map("payment_method")
+  reference       String   @unique
+  metadata        Json?
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  user            User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@map("transactions")
+}
+
+model AffiliateLink {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  code            String   @unique
+  clicks          Int      @default(0)
+  conversions     Int      @default(0)
+  commission      Decimal  @default(0) @db.Decimal(15, 2)
+  commissionRate  Decimal  @db.Decimal(5, 4) @map("commission_rate")
+  isActive        Boolean  @default(true) @map("is_active")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  user            User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([code])
+  @@map("affiliate_links")
+}
+
+model NlrcLicence {
+  id              Int      @id @default(autoincrement())
+  status          LicenceStatus
+  licenceNumber   String   @map("licence_number")
+  expiryDate      DateTime @map("expiry_date")
+  lastChecked     DateTime @map("last_checked")
+  responseData    Json?    @map("response_data")
+  errorMessage    String?  @map("error_message")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("nlrc_licences")
+}
+
+enum BetStatus {
+  PENDING
+  WON
+  LOST
+  VOID
+  CASHED_OUT
+}
+
+enum SelectionStatus {
+  PENDING
+  WON
+  LOST
+  VOID
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+  BET_STAKE
+  BET_WIN
+  COMMISSION
+  BONUS
+  REFUND
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum LicenceStatus {
+  ACTIVE
+  EXPIRED
+  SUSPENDED
+  UNKNOWN
+}
