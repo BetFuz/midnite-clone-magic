@@ -251,18 +251,24 @@ export default function LeagueDetail() {
             {/* League Header */}
             <Card className="p-6 bg-gradient-to-br from-primary/10 to-accent/10">
               <div className="flex items-start justify-between mb-4">
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Badge variant="outline">{league.sport}</Badge>
-                    <Badge variant="secondary">{league.season}</Badge>
-                    <Badge variant={league.status === 'open' ? 'default' : 'secondary'}>
-                      {league.status}
-                    </Badge>
+                <div className="flex items-start gap-4 flex-1">
+                  {/* League Badge */}
+                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center flex-shrink-0 shadow-2xl">
+                    <Trophy className="w-10 h-10 text-white" />
                   </div>
-                  <h1 className="text-3xl font-bold mb-2">{league.name}</h1>
-                  <p className="text-muted-foreground">
-                    Deadline: {formatDistanceToNow(new Date(league.deadline), { addSuffix: true })}
-                  </p>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Badge variant="outline">{league.sport}</Badge>
+                      <Badge variant="secondary">{league.season}</Badge>
+                      <Badge variant={league.status === 'open' ? 'default' : 'secondary'}>
+                        {league.status}
+                      </Badge>
+                    </div>
+                    <h1 className="text-3xl font-bold mb-2">{league.name}</h1>
+                    <p className="text-muted-foreground">
+                      Deadline: {formatDistanceToNow(new Date(league.deadline), { addSuffix: true })}
+                    </p>
+                  </div>
                 </div>
                 {!myTeam && (
                   <Button size="lg" onClick={() => setShowDraft(true)}>
@@ -295,7 +301,16 @@ export default function LeagueDetail() {
 
             {myTeam && (
               <Card className="p-6">
-                <h3 className="text-xl font-bold mb-4">My Team: {myTeam.team_name}</h3>
+                <div className="flex items-start gap-4 mb-4">
+                  {/* Team Badge */}
+                  <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center flex-shrink-0 shadow-xl">
+                    <Users className="w-8 h-8 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold mb-1">{myTeam.team_name}</h3>
+                    <p className="text-sm text-muted-foreground">Your Fantasy Squad</p>
+                  </div>
+                </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
                     <p className="text-sm text-muted-foreground">Total Points</p>

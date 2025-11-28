@@ -199,17 +199,25 @@ const FantasySports = () => {
                     ) : (
                       footballLeagues.map(league => (
                         <Card key={league.id} className={`p-4 md:p-6 ${league.my_team ? 'border-primary/50 bg-primary/5' : ''}`}>
-                          <div className="flex flex-wrap items-center gap-2 mb-2">
-                            <Badge variant="outline">{league.sport}</Badge>
-                            <Badge variant="secondary">{league.season}</Badge>
-                            {league.my_team && (
-                              <Badge className="bg-primary/10 text-primary border-primary/20">
-                                <Star className="w-3 h-3 mr-1 fill-current" />
-                                My Team
-                              </Badge>
-                            )}
+                          <div className="flex items-start gap-4 mb-3">
+                            {/* League Badge */}
+                            <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center flex-shrink-0 shadow-lg">
+                              <Trophy className="w-8 h-8 text-white" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex flex-wrap items-center gap-2 mb-2">
+                                <Badge variant="outline">{league.sport}</Badge>
+                                <Badge variant="secondary">{league.season}</Badge>
+                                {league.my_team && (
+                                  <Badge className="bg-primary/10 text-primary border-primary/20">
+                                    <Star className="w-3 h-3 mr-1 fill-current" />
+                                    My Team
+                                  </Badge>
+                                )}
+                              </div>
+                              <h3 className="text-lg md:text-xl font-bold break-words">{league.name}</h3>
+                            </div>
                           </div>
-                          <h3 className="text-lg md:text-xl font-bold mb-3 break-words">{league.name}</h3>
                           
                           <div className="grid grid-cols-2 gap-3 md:gap-4 mb-4">
                             <div>
@@ -273,8 +281,15 @@ const FantasySports = () => {
                     ) : (
                       basketballLeagues.map(league => (
                         <Card key={league.id} className={`p-6 ${league.my_team ? 'border-primary/50 bg-primary/5' : ''}`}>
-                          <Badge variant="outline" className="mb-2">{league.sport}</Badge>
-                          <h3 className="text-xl font-bold mb-3">{league.name}</h3>
+                          <div className="flex items-start gap-4 mb-3">
+                            <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center flex-shrink-0 shadow-lg">
+                              <Trophy className="w-8 h-8 text-white" />
+                            </div>
+                            <div className="flex-1">
+                              <Badge variant="outline" className="mb-2">{league.sport}</Badge>
+                              <h3 className="text-xl font-bold">{league.name}</h3>
+                            </div>
+                          </div>
                           <div className="grid grid-cols-2 gap-4 mb-4">
                             <div>
                               <p className="text-xs text-muted-foreground">Prize Pool</p>
