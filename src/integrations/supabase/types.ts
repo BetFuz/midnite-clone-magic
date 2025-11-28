@@ -98,6 +98,39 @@ export type Database = {
         }
         Relationships: []
       }
+      affiliate_boost_periods: {
+        Row: {
+          commission_multiplier: number
+          created_at: string | null
+          created_by: string | null
+          end_time: string
+          event_name: string
+          id: string
+          is_active: boolean | null
+          start_time: string
+        }
+        Insert: {
+          commission_multiplier?: number
+          created_at?: string | null
+          created_by?: string | null
+          end_time: string
+          event_name: string
+          id?: string
+          is_active?: boolean | null
+          start_time: string
+        }
+        Update: {
+          commission_multiplier?: number
+          created_at?: string | null
+          created_by?: string | null
+          end_time?: string
+          event_name?: string
+          id?: string
+          is_active?: boolean | null
+          start_time?: string
+        }
+        Relationships: []
+      }
       ai_chat_messages: {
         Row: {
           content: string
@@ -439,6 +472,33 @@ export type Database = {
           percentage?: number | null
           selection_type?: string
           selection_value?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      daily_retention_caps: {
+        Row: {
+          cap_date: string
+          cap_limit: number
+          created_at: string | null
+          id: string
+          total_spent: number
+          updated_at: string | null
+        }
+        Insert: {
+          cap_date?: string
+          cap_limit?: number
+          created_at?: string | null
+          id?: string
+          total_spent?: number
+          updated_at?: string | null
+        }
+        Update: {
+          cap_date?: string
+          cap_limit?: number
+          created_at?: string | null
+          id?: string
+          total_spent?: number
           updated_at?: string | null
         }
         Relationships: []
@@ -1202,6 +1262,36 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_waitlist: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          notified: boolean | null
+          notified_at: string | null
+          payment_method: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          notified?: boolean | null
+          notified_at?: string | null
+          payment_method: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          notified?: boolean | null
+          notified_at?: string | null
+          payment_method?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       pending_notifications: {
         Row: {
           created_at: string | null
@@ -1413,6 +1503,36 @@ export type Database = {
           self_excluded_until?: string | null
           session_time_limit?: number
           updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      retention_incentives: {
+        Row: {
+          amount: number
+          credited_at: string | null
+          days_inactive: number
+          id: string
+          incentive_type: string
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          credited_at?: string | null
+          days_inactive: number
+          id?: string
+          incentive_type?: string
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          credited_at?: string | null
+          days_inactive?: number
+          id?: string
+          incentive_type?: string
+          metadata?: Json | null
           user_id?: string
         }
         Relationships: []
