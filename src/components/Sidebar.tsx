@@ -23,6 +23,7 @@ const Sidebar = ({ className, showOnMobile = false }: SidebarProps) => {
     { icon: BarChart3, label: "Statistics", url: "/account/statistics" },
     { icon: CreditCard, label: "Transactions", url: "/account/transactions" },
     { icon: Shield, label: "Player Protection", url: "/account/player-protection", badge: "NLRC" },
+    { icon: Users, label: "Affiliate Program", url: "/affiliate", badge: "EARN" },
     { icon: Trophy, label: "Rewards", url: "/promotions/welcome" },
     { icon: Hammer, label: "Acca Builder", url: "/promotions/acca-boost" },
     { icon: Vote, label: "FuzPolitics", url: "/politics" },
