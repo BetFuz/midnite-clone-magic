@@ -1,0 +1,154 @@
+name: ECS Blue-Green Deployment
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: betfuz-backend
+  ECS_CLUSTER: betfuz-prod-cluster
+  ECS_SERVICE: betfuz-api-service
+  TASK_DEFINITION: betfuz-task-def
+  CONTAINER_NAME: betfuz-api
+  POSTMAN_COLLECTION_URL: https://api.getpostman.com/collections/${{ secrets.POSTMAN_COLLECTION_ID }}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build Docker image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ steps.version.outputs.VERSION }}
+        run: |
+          docker build \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:latest \
+            -f backend/Dockerfile \
+            ./backend
+          
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+      - name: Download task definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition ${{ env.TASK_DEFINITION }} \
+            --query taskDefinition > task-definition.json
+
+      - name: Update task definition with new image
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ steps.version.outputs.VERSION }}
+
+      - name: Deploy to ECS with Blue-Green
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
+          codedeploy-appspec: appspec.yml
+          codedeploy-application: betfuz-codedeploy-app
+          codedeploy-deployment-group: betfuz-deployment-group
+
+      - name: Wait for green environment to stabilize
+        run: sleep 60
+
+      - name: Run Postman smoke tests
+        id: postman-tests
+        continue-on-error: true
+        env:
+          POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
+        run: |
+          # Install Newman (Postman CLI)
+          npm install -g newman
+          
+          # Download collection
+          curl -H "X-Api-Key: $POSTMAN_API_KEY" \
+            $POSTMAN_COLLECTION_URL \
+            -o collection.json
+          
+          # Run smoke tests against green environment
+          GREEN_URL=$(aws ecs describe-services \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --services ${{ env.ECS_SERVICE }} \
+            --query 'services[0].loadBalancers[0].targetGroupArn' \
+            --output text)
+          
+          newman run collection.json \
+            --env-var "base_url=https://api-staging.betfuz.com" \
+            --reporters cli,json \
+            --reporter-json-export test-results.json
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: postman-test-results
+          path: test-results.json
+
+      - name: Rollback on failure
+        if: steps.postman-tests.outcome == 'failure'
+        run: |
+          echo "Smoke tests failed! Initiating rollback..."
+          
+          # Trigger CodeDeploy to stop deployment (automatic rollback)
+          DEPLOYMENT_ID=$(aws deploy list-deployments \
+            --application-name betfuz-codedeploy-app \
+            --deployment-group-name betfuz-deployment-group \
+            --include-only-statuses InProgress \
+            --query 'deployments[0]' \
+            --output text)
+          
+          if [ "$DEPLOYMENT_ID" != "None" ]; then
+            aws deploy stop-deployment \
+              --deployment-id $DEPLOYMENT_ID \
+              --auto-rollback-enabled
+            
+            echo "Rollback initiated for deployment $DEPLOYMENT_ID"
+          fi
+          
+          exit 1
+
+      - name: Notify deployment success
+        if: success()
+        run: |
+          echo "✅ Deployment successful: v${{ steps.version.outputs.VERSION }}"
+          echo "Green environment is now active and serving traffic"
+
+      - name: Notify deployment failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Deployment Failed: v${{ steps.version.outputs.VERSION }}`,
+              body: `Deployment failed and was rolled back.\n\nCheck workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`,
+              labels: ['deployment-failure']
+            })
