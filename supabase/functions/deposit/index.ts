@@ -105,6 +105,16 @@ serve(async (req) => {
       }
     });
 
+    // Trigger AML detection in background (non-blocking)
+    serviceClient.functions.invoke('aml-detection', {
+      body: {
+        userId: user.id,
+        transactionType: 'deposit',
+        amount,
+        metadata: { method: provider, reference: transactionRef },
+      },
+    }).catch(err => console.error('AML detection failed:', err));
+
     // PRODUCTION: Initialize payment with selected provider
     if (provider === 'flutterwave') {
       return await initiateFlutterwavePayment(user.id, profile?.email || '', amount, currency, transactionRef, metadata);

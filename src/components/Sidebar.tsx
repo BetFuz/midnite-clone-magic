@@ -22,6 +22,7 @@ const Sidebar = ({ className, showOnMobile = false }: SidebarProps) => {
     { icon: History, label: "History", url: "/account/history" },
     { icon: BarChart3, label: "Statistics", url: "/account/statistics" },
     { icon: CreditCard, label: "Transactions", url: "/account/transactions" },
+    { icon: Shield, label: "Player Protection", url: "/account/player-protection", badge: "NLRC" },
     { icon: Trophy, label: "Rewards", url: "/promotions/welcome" },
     { icon: Hammer, label: "Acca Builder", url: "/promotions/acca-boost" },
     { icon: Vote, label: "FuzPolitics", url: "/politics" },
@@ -68,6 +69,7 @@ const Sidebar = ({ className, showOnMobile = false }: SidebarProps) => {
     { icon: Shield, label: "Admin Dashboard", url: "/admin/dashboard", badge: "ADMIN" },
     { icon: FileText, label: "Immutable Ledger", url: "/admin/ledger", badge: "AUDIT" },
     { icon: Database, label: "Disaster Recovery", url: "/admin/disaster-recovery", badge: "BACKUP" },
+    { icon: Shield, label: "Compliance & AML", url: "/admin/compliance", badge: "NLRC" },
     { icon: Lock, label: "Webhook Settings", url: "/admin/webhooks", badge: "SUPER" },
   ];
 

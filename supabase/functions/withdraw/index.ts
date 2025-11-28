@@ -153,6 +153,16 @@ serve(async (req) => {
       }
     });
 
+    // Trigger AML detection in background (non-blocking)
+    serviceClient.functions.invoke('aml-detection', {
+      body: {
+        userId: user.id,
+        transactionType: 'withdrawal',
+        amount,
+        metadata: { method, reference, accountDetails: account_details },
+      },
+    }).catch(err => console.error('AML detection failed:', err));
+
     // TODO: Call Go service for KYC/fraud checks
     /*
     const goServiceUrl = Deno.env.get('GO_WITHDRAWAL_SERVICE_URL');
