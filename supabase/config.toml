@@ -257,3 +257,18 @@ verify_jwt = false
 
 [functions.compliance-messaging]
 verify_jwt = false
+
+[functions.exposure-monitor]
+verify_jwt = false
+
+[functions.odds-override]
+verify_jwt = true
+
+[functions.bet-delay-processor]
+verify_jwt = false
+
+[functions.early-payout-calculator]
+verify_jwt = false
+
+[functions.parimutuel-pool]
+verify_jwt = false

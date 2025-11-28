@@ -405,6 +405,60 @@ export type Database = {
           },
         ]
       }
+      bet_delays: {
+        Row: {
+          bet_slip_id: string
+          created_at: string | null
+          decided_at: string | null
+          decision_reason: string | null
+          delay_seconds: number
+          expires_at: string
+          id: string
+          league: string
+          match_id: string
+          potential_win: number
+          status: string
+          submitted_at: string
+          total_stake: number
+          trader_id: string | null
+          user_id: string
+        }
+        Insert: {
+          bet_slip_id: string
+          created_at?: string | null
+          decided_at?: string | null
+          decision_reason?: string | null
+          delay_seconds?: number
+          expires_at: string
+          id?: string
+          league: string
+          match_id: string
+          potential_win: number
+          status?: string
+          submitted_at?: string
+          total_stake: number
+          trader_id?: string | null
+          user_id: string
+        }
+        Update: {
+          bet_slip_id?: string
+          created_at?: string | null
+          decided_at?: string | null
+          decision_reason?: string | null
+          delay_seconds?: number
+          expires_at?: string
+          id?: string
+          league?: string
+          match_id?: string
+          potential_win?: number
+          status?: string
+          submitted_at?: string
+          total_stake?: number
+          trader_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       bet_listings: {
         Row: {
           asking_price: number
@@ -733,6 +787,51 @@ export type Database = {
           retention_until?: string
           storage_path?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      early_payouts: {
+        Row: {
+          accepted_at: string | null
+          bet_slip_id: string
+          created_at: string | null
+          early_payout_amount: number
+          id: string
+          monte_carlo_probability: number
+          offer_expires_at: string
+          original_potential_win: number
+          remaining_legs: number
+          settled_legs: number
+          status: string
+          user_id: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          bet_slip_id: string
+          created_at?: string | null
+          early_payout_amount: number
+          id?: string
+          monte_carlo_probability: number
+          offer_expires_at: string
+          original_potential_win: number
+          remaining_legs: number
+          settled_legs: number
+          status?: string
+          user_id: string
+        }
+        Update: {
+          accepted_at?: string | null
+          bet_slip_id?: string
+          created_at?: string | null
+          early_payout_amount?: number
+          id?: string
+          monte_carlo_probability?: number
+          offer_expires_at?: string
+          original_potential_win?: number
+          remaining_legs?: number
+          settled_legs?: number
+          status?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -1928,6 +2027,45 @@ export type Database = {
           },
         ]
       }
+      high_risk_leagues: {
+        Row: {
+          bet_delay_seconds: number
+          created_at: string | null
+          id: string
+          is_active: boolean
+          league_name: string
+          max_stake_limit: number | null
+          requires_trader_approval: boolean
+          risk_level: string
+          sport: string
+          updated_at: string | null
+        }
+        Insert: {
+          bet_delay_seconds?: number
+          created_at?: string | null
+          id?: string
+          is_active?: boolean
+          league_name: string
+          max_stake_limit?: number | null
+          requires_trader_approval?: boolean
+          risk_level: string
+          sport: string
+          updated_at?: string | null
+        }
+        Update: {
+          bet_delay_seconds?: number
+          created_at?: string | null
+          id?: string
+          is_active?: boolean
+          league_name?: string
+          max_stake_limit?: number | null
+          requires_trader_approval?: boolean
+          risk_level?: string
+          sport?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       kyc_verifications: {
         Row: {
           created_at: string | null
@@ -2150,6 +2288,54 @@ export type Database = {
           stream_url?: string | null
           updated_at?: string | null
           viewer_count?: number
+        }
+        Relationships: []
+      }
+      market_exposure: {
+        Row: {
+          bet_count: number
+          created_at: string | null
+          id: string
+          is_suspended: boolean
+          last_updated: string
+          market_type: string
+          match_id: string
+          max_liability_threshold: number
+          selection_value: string
+          suspended_at: string | null
+          suspended_by: string | null
+          total_liability: number
+          total_stakes: number
+        }
+        Insert: {
+          bet_count?: number
+          created_at?: string | null
+          id?: string
+          is_suspended?: boolean
+          last_updated?: string
+          market_type: string
+          match_id: string
+          max_liability_threshold?: number
+          selection_value: string
+          suspended_at?: string | null
+          suspended_by?: string | null
+          total_liability?: number
+          total_stakes?: number
+        }
+        Update: {
+          bet_count?: number
+          created_at?: string | null
+          id?: string
+          is_suspended?: boolean
+          last_updated?: string
+          market_type?: string
+          match_id?: string
+          max_liability_threshold?: number
+          selection_value?: string
+          suspended_at?: string | null
+          suspended_by?: string | null
+          total_liability?: number
+          total_stakes?: number
         }
         Relationships: []
       }
@@ -2417,6 +2603,143 @@ export type Database = {
           unpaid_tickets?: number
           unpaid_tickets_value?: number
           year?: number
+        }
+        Relationships: []
+      }
+      odds_overrides: {
+        Row: {
+          applied_at: string
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          market_type: string
+          match_id: string
+          original_odds: number
+          override_odds: number
+          reason: string | null
+          selection_value: string
+          trader_id: string
+        }
+        Insert: {
+          applied_at?: string
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          market_type: string
+          match_id: string
+          original_odds: number
+          override_odds: number
+          reason?: string | null
+          selection_value: string
+          trader_id: string
+        }
+        Update: {
+          applied_at?: string
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          market_type?: string
+          match_id?: string
+          original_odds?: number
+          override_odds?: number
+          reason?: string | null
+          selection_value?: string
+          trader_id?: string
+        }
+        Relationships: []
+      }
+      parimutuel_bets: {
+        Row: {
+          actual_payout: number | null
+          created_at: string | null
+          id: string
+          pool_id: string
+          potential_dividend: number | null
+          selections: Json
+          stake_amount: number
+          status: string
+          units: number
+          user_id: string
+        }
+        Insert: {
+          actual_payout?: number | null
+          created_at?: string | null
+          id?: string
+          pool_id: string
+          potential_dividend?: number | null
+          selections: Json
+          stake_amount: number
+          status?: string
+          units: number
+          user_id: string
+        }
+        Update: {
+          actual_payout?: number | null
+          created_at?: string | null
+          id?: string
+          pool_id?: string
+          potential_dividend?: number | null
+          selections?: Json
+          stake_amount?: number
+          status?: string
+          units?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parimutuel_bets_pool_id_fkey"
+            columns: ["pool_id"]
+            isOneToOne: false
+            referencedRelation: "parimutuel_pools"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      parimutuel_pools: {
+        Row: {
+          closed_at: string | null
+          created_at: string | null
+          id: string
+          platform_commission: number
+          pool_type: string
+          race_id: string
+          race_start_time: string
+          race_type: string
+          settled_at: string | null
+          status: string
+          total_pool: number
+          winning_selections: Json | null
+        }
+        Insert: {
+          closed_at?: string | null
+          created_at?: string | null
+          id?: string
+          platform_commission?: number
+          pool_type: string
+          race_id: string
+          race_start_time: string
+          race_type: string
+          settled_at?: string | null
+          status?: string
+          total_pool?: number
+          winning_selections?: Json | null
+        }
+        Update: {
+          closed_at?: string | null
+          created_at?: string | null
+          id?: string
+          platform_commission?: number
+          pool_type?: string
+          race_id?: string
+          race_start_time?: string
+          race_type?: string
+          settled_at?: string | null
+          status?: string
+          total_pool?: number
+          winning_selections?: Json | null
         }
         Relationships: []
       }
