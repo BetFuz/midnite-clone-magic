@@ -153,13 +153,17 @@ const FantasySports = () => {
                     {footballLeagues.length === 0 ? (
                       <Card className="p-8 md:p-12 text-center">
                         <Trophy className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 text-muted-foreground" />
-                        <h3 className="text-lg md:text-xl font-semibold mb-2">No Football Leagues</h3>
-                        <p className="text-sm text-muted-foreground">Check back soon</p>
+                        <h3 className="text-lg md:text-xl font-semibold mb-2">Nigerian Fantasy Football is live</h3>
+                        <p className="text-sm text-muted-foreground">Build your ₦100M squad with Osimhen, Lookman, Bassey and more.</p>
+                        <Button size="sm" className="mt-4" onClick={() => navigate("/fantasy/nigerian")}>
+                          Launch Nigerian Fantasy
+                        </Button>
                       </Card>
                     ) : (
                       footballLeagues.map(league => (
                         <Card key={league.id} className={`p-4 md:p-6 ${league.my_team ? 'border-primary/50 bg-primary/5' : ''}`}>
                           <div className="flex items-start gap-4 mb-3">
+
                             {/* League Badge */}
                             <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center flex-shrink-0 shadow-lg">
                               <Trophy className="w-8 h-8 text-white" />
