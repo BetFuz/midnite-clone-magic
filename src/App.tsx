@@ -139,6 +139,7 @@ const ReferFriend = lazy(() => import("./pages/promotions/ReferFriend"));
 const About = lazy(() => import("./pages/info/About"));
 const HelpCenter = lazy(() => import("./pages/info/HelpCenter"));
 const ResponsibleGambling = lazy(() => import("./pages/info/ResponsibleGambling"));
+const ResponsibleGaming = lazy(() => import("./pages/ResponsibleGaming"));
 const Terms = lazy(() => import("./pages/info/Terms"));
 const Privacy = lazy(() => import("./pages/info/Privacy"));
 const Contact = lazy(() => import("./pages/info/Contact"));
@@ -416,7 +417,8 @@ const App = () => (
           {/* Info */}
           <Route path="/info/about" element={<About />} />
           <Route path="/info/help" element={<HelpCenter />} />
-          <Route path="/info/responsible-gambling" element={<ResponsibleGambling />} />
+        <Route path="/info/responsible-gambling" element={<ResponsibleGambling />} />
+        <Route path="/responsible-gaming" element={<ResponsibleGaming />} />
           <Route path="/info/terms" element={<Terms />} />
           <Route path="/info/privacy" element={<Privacy />} />
           <Route path="/info/contact" element={<Contact />} />

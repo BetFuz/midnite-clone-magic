@@ -165,6 +165,15 @@ verify_jwt = false
 [functions.withdraw]
 verify_jwt = true
 
+[functions.kyc-verification]
+verify_jwt = true
+
+[functions.aml-check]
+verify_jwt = false
+
+[functions.chargeback-handler]
+verify_jwt = false
+
 [functions.kie-ai-generate]
 verify_jwt = false
 
