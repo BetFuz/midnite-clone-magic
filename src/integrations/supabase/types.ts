@@ -131,6 +131,71 @@ export type Database = {
         }
         Relationships: []
       }
+      affiliate_links: {
+        Row: {
+          active_referrals: number
+          clicks: number
+          code: string
+          commission: number
+          commission_rate: number
+          conversions: number
+          created_at: string
+          daily_salary: number
+          id: string
+          is_active: boolean
+          last_salary_paid_at: string | null
+          override_rate: number
+          parent_id: string | null
+          tier: Database["public"]["Enums"]["affiliate_tier"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active_referrals?: number
+          clicks?: number
+          code: string
+          commission?: number
+          commission_rate?: number
+          conversions?: number
+          created_at?: string
+          daily_salary?: number
+          id?: string
+          is_active?: boolean
+          last_salary_paid_at?: string | null
+          override_rate?: number
+          parent_id?: string | null
+          tier?: Database["public"]["Enums"]["affiliate_tier"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active_referrals?: number
+          clicks?: number
+          code?: string
+          commission?: number
+          commission_rate?: number
+          conversions?: number
+          created_at?: string
+          daily_salary?: number
+          id?: string
+          is_active?: boolean
+          last_salary_paid_at?: string | null
+          override_rate?: number
+          parent_id?: string | null
+          tier?: Database["public"]["Enums"]["affiliate_tier"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_links_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_links"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_chat_messages: {
         Row: {
           content: string
@@ -401,6 +466,7 @@ export type Database = {
       }
       bet_slips: {
         Row: {
+          affiliate_code: string | null
           bet_type: string
           created_at: string | null
           id: string
@@ -412,6 +478,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          affiliate_code?: string | null
           bet_type?: string
           created_at?: string | null
           id?: string
@@ -423,6 +490,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          affiliate_code?: string | null
           bet_type?: string
           created_at?: string | null
           id?: string
@@ -2142,6 +2210,12 @@ export type Database = {
       }
     }
     Functions: {
+      get_affiliate_ancestors: {
+        Args: { p_user_id: string }
+        Returns: {
+          ancestor_id: string
+        }[]
+      }
       get_daily_usage: {
         Args: { p_user_id: string }
         Returns: {
@@ -2223,6 +2297,7 @@ export type Database = {
       }
     }
     Enums: {
+      affiliate_tier: "BRONZE" | "SILVER" | "GOLD"
       app_role: "user" | "admin" | "superadmin"
     }
     CompositeTypes: {
@@ -2351,6 +2426,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      affiliate_tier: ["BRONZE", "SILVER", "GOLD"],
       app_role: ["user", "admin", "superadmin"],
     },
   },
