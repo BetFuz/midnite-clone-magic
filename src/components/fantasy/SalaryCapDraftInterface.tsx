@@ -8,7 +8,9 @@ import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/currency";
-import { TrendingUp, Sparkles, Users, Star, Lock } from "lucide-react";
+import { TrendingUp, Sparkles, Users, Star, Lock, Info, Share2 } from "lucide-react";
+import { PlayerResearchModal } from "./PlayerResearchModal";
+import { LineupExportModal } from "./LineupExportModal";
 
 interface Player {
   id: string;
@@ -36,6 +38,8 @@ export const SalaryCapDraftInterface = ({ leagueId, sport, onLineupComplete }: S
   const [searchTerm, setSearchTerm] = useState("");
   const [positionFilter, setPositionFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<"projected" | "salary" | "value">("projected");
+  const [researchPlayer, setResearchPlayer] = useState<{ id: string; name: string } | null>(null);
+  const [showExport, setShowExport] = useState(false);
   
   const SALARY_CAP = 60000;
   const totalSalary = selectedPlayers.reduce((sum, p) => sum + p.salary, 0);
@@ -235,6 +239,17 @@ export const SalaryCapDraftInterface = ({ leagueId, sport, onLineupComplete }: S
         >
           Refresh Players
         </Button>
+        <Button
+          variant="outline"
+          size="lg"
+          disabled={selectedPlayers.length === 0}
+          onClick={() => setShowExport(true)}
+          className="gap-2"
+        >
+          <Share2 className="w-4 h-4" />
+          Export/Import
+        </Button>
+        
         {isLineupComplete && (
           <Button 
             size="lg"
@@ -326,6 +341,19 @@ export const SalaryCapDraftInterface = ({ leagueId, sport, onLineupComplete }: S
 
                       <div className="p-5">
                         <div className="flex items-start justify-between gap-4">
+                          {/* Research Button */}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="absolute top-2 right-12 z-20 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setResearchPlayer({ id: player.id, name: player.full_name });
+                            }}
+                          >
+                            <Info className="w-4 h-4" />
+                          </Button>
+
                           {/* Player Info */}
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-2">
@@ -456,6 +484,23 @@ export const SalaryCapDraftInterface = ({ leagueId, sport, onLineupComplete }: S
           </Card>
         </div>
       </div>
+
+      {/* Modals */}
+      {researchPlayer && (
+        <PlayerResearchModal
+          playerId={researchPlayer.id}
+          playerName={researchPlayer.name}
+          open={!!researchPlayer}
+          onOpenChange={(open) => !open && setResearchPlayer(null)}
+        />
+      )}
+
+      <LineupExportModal
+        lineupId={leagueId}
+        lineupData={selectedPlayers}
+        open={showExport}
+        onOpenChange={setShowExport}
+      />
     </div>
   );
 };
