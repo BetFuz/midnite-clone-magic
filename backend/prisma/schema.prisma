@@ -89,18 +89,28 @@ model AffiliateLink {
   id              String   @id @default(uuid())
   userId          String   @map("user_id")
   code            String   @unique
+  tier            AffiliateTier @default(BRONZE)
   clicks          Int      @default(0)
   conversions     Int      @default(0)
+  activeReferrals Int      @default(0) @map("active_referrals")
   commission      Decimal  @default(0) @db.Decimal(15, 2)
   commissionRate  Decimal  @db.Decimal(5, 4) @map("commission_rate")
+  overrideRate    Decimal  @default(0) @db.Decimal(5, 4) @map("override_rate")
+  dailySalary     Decimal  @default(0) @db.Decimal(15, 2) @map("daily_salary")
+  parentId        String?  @map("parent_id")
   isActive        Boolean  @default(true) @map("is_active")
+  lastSalaryPaidAt DateTime? @map("last_salary_paid_at")
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
   user            User @relation(fields: [userId], references: [id])
+  parent          AffiliateLink? @relation("AffiliateTree", fields: [parentId], references: [id])
+  children        AffiliateLink[] @relation("AffiliateTree")
 
   @@index([userId])
   @@index([code])
+  @@index([parentId])
+  @@index([tier])
   @@map("affiliate_links")
 }
 
@@ -229,4 +239,10 @@ enum WithdrawalStatus {
   FAILED
   CANCELLED
   COMPENSATED
+}
+
+enum AffiliateTier {
+  BRONZE
+  SILVER
+  GOLD
 }
