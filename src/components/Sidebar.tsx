@@ -54,6 +54,7 @@ const Sidebar = ({ className, showOnMobile = false }: SidebarProps) => {
     { icon: Brain, label: "AI Predictions", url: "/ai-predictions", badge: "AI" },
     { icon: Users, label: "Pool Betting", url: "/pool-betting" },
     { icon: Trophy, label: "Fantasy Sports", url: "/fantasy-sports" },
+    { icon: Trophy, label: "Nigerian Fantasy", url: "/fantasy/nigerian", badge: "🇳🇬" },
     { icon: Play, label: "Live Streaming", url: "/live-streaming", badge: "LIVE" },
     { icon: Wallet, label: "Web3 Hub", url: "/web3-hub", badge: "NFT" },
     { icon: Glasses, label: "Virtual Stadium", url: "/virtual-stadium", badge: "VR" },

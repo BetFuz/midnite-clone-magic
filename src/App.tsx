@@ -204,6 +204,7 @@ const BetMarketplace = lazy(() => import("./pages/BetMarketplace"));
 const AIPredictions = lazy(() => import("./pages/AIPredictions"));
 const PoolBetting = lazy(() => import("./pages/PoolBetting"));
 const FantasySports = lazy(() => import("./pages/FantasySports"));
+const NigerianFantasy = lazy(() => import("./pages/fantasy/NigerianFantasy"));
 const LiveStreaming = lazy(() => import("./pages/LiveStreaming"));
 const Web3Hub = lazy(() => import("./pages/Web3Hub"));
 const VirtualStadium = lazy(() => import("./pages/VirtualStadium"));
@@ -263,6 +264,7 @@ const App = () => (
           <Route path="/pool-betting" element={<PoolBetting />} />
           <Route path="/fantasy-sports" element={<FantasySports />} />
           <Route path="/fantasy-sports/:leagueId" element={<LeagueDetail />} />
+          <Route path="/fantasy/nigerian" element={<NigerianFantasy />} />
           <Route path="/fantasy/contests" element={<ContestLobby />} />
           <Route path="/fantasy/leaderboard/:contestId" element={<LiveLeaderboard />} />
           <Route path="/fantasy/history" element={<ContestHistory />} />
