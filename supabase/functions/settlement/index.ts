@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createServiceClient } from '../_shared/supabase-client.ts';
 import { corsHeaders, handleCorsOptions, jsonResponse } from '../_shared/cors.ts';
 import { DeadHeatService } from '../_shared/dead-heat-service.ts';
+import { TimeService } from '../_shared/time-service.ts';
 
 // TODO: DEV – call Go settlement service before commit
 // This is a STUB function for bet settlement
@@ -99,7 +100,7 @@ serve(async (req) => {
       .from('bet_slips')
       .update({ 
         status: body.result,
-        settled_at: new Date().toISOString()
+        settled_at: TimeService.getDatabaseTimestamp()
       })
       .eq('id', body.bet_id);
 
