@@ -194,6 +194,51 @@ export type Database = {
         }
         Relationships: []
       }
+      aml_alerts: {
+        Row: {
+          alert_type: string
+          created_at: string | null
+          description: string
+          id: string
+          metadata: Json | null
+          resolution_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          severity: string
+          status: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string | null
+          description: string
+          id?: string
+          metadata?: Json | null
+          resolution_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          severity?: string
+          status?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string | null
+          description?: string
+          id?: string
+          metadata?: Json | null
+          resolution_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          severity?: string
+          status?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       bet_copies: {
         Row: {
           bet_slip_id: string
@@ -395,6 +440,45 @@ export type Database = {
           selection_type?: string
           selection_value?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      document_archives: {
+        Row: {
+          archived_at: string | null
+          created_at: string | null
+          document_id: string
+          document_type: string
+          id: string
+          is_immutable: boolean | null
+          metadata: Json | null
+          retention_until: string
+          storage_path: string
+          user_id: string | null
+        }
+        Insert: {
+          archived_at?: string | null
+          created_at?: string | null
+          document_id: string
+          document_type: string
+          id?: string
+          is_immutable?: boolean | null
+          metadata?: Json | null
+          retention_until: string
+          storage_path: string
+          user_id?: string | null
+        }
+        Update: {
+          archived_at?: string | null
+          created_at?: string | null
+          document_id?: string
+          document_type?: string
+          id?: string
+          is_immutable?: boolean | null
+          metadata?: Json | null
+          retention_until?: string
+          storage_path?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -1058,6 +1142,63 @@ export type Database = {
           rarity?: string | null
           token_id?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      nlrc_reports: {
+        Row: {
+          active_players: number
+          created_at: string | null
+          exported_at: string | null
+          gross_gaming_revenue: number
+          id: string
+          quarter: string
+          quarter_number: number
+          report_data: Json
+          submitted_at: string | null
+          submitted_by: string | null
+          submitted_to_nlrc: boolean | null
+          tax_payable: number
+          total_players: number
+          unpaid_tickets: number
+          unpaid_tickets_value: number
+          year: number
+        }
+        Insert: {
+          active_players?: number
+          created_at?: string | null
+          exported_at?: string | null
+          gross_gaming_revenue?: number
+          id?: string
+          quarter: string
+          quarter_number: number
+          report_data?: Json
+          submitted_at?: string | null
+          submitted_by?: string | null
+          submitted_to_nlrc?: boolean | null
+          tax_payable?: number
+          total_players?: number
+          unpaid_tickets?: number
+          unpaid_tickets_value?: number
+          year: number
+        }
+        Update: {
+          active_players?: number
+          created_at?: string | null
+          exported_at?: string | null
+          gross_gaming_revenue?: number
+          id?: string
+          quarter?: string
+          quarter_number?: number
+          report_data?: Json
+          submitted_at?: string | null
+          submitted_by?: string | null
+          submitted_to_nlrc?: boolean | null
+          tax_payable?: number
+          total_players?: number
+          unpaid_tickets?: number
+          unpaid_tickets_value?: number
+          year?: number
         }
         Relationships: []
       }

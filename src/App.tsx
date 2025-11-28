@@ -150,6 +150,8 @@ const WebhookSettings = lazy(() => import("./pages/admin/WebhookSettings"));
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const Ledger = lazy(() => import("./pages/admin/Ledger"));
 const DisasterRecovery = lazy(() => import("./pages/admin/DisasterRecovery"));
+const Compliance = lazy(() => import("./pages/admin/Compliance"));
+const PlayerProtection = lazy(() => import("./pages/account/PlayerProtection"));
 const AdminSetup = lazy(() => import("./pages/admin/AdminSetup"));
 const AdminAssets = lazy(() => import("./pages/admin/AIAssets"));
 const SeedData = lazy(() => import("./pages/admin/SeedData"));
@@ -383,6 +385,7 @@ const App = () => (
           <Route path="/bet-ticket/:ticketId" element={<BetTicketDetail />} />
           <Route path="/account/settings" element={<AccountSettings />} />
           <Route path="/account/limits" element={<ResponsibleGamingLimits />} />
+          <Route path="/account/player-protection" element={<PlayerProtection />} />
           <Route path="/account/live-bets" element={<LiveBets />} />
           
           {/* Account Tiers */}
@@ -420,6 +423,7 @@ const App = () => (
           <Route path="/admin/setup" element={<AdminSetup />} />
           <Route path="/admin/ledger" element={<Ledger />} />
           <Route path="/admin/disaster-recovery" element={<DisasterRecovery />} />
+          <Route path="/admin/compliance" element={<Compliance />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/events" element={<AdminEvents />} />
           <Route path="/admin/odds" element={<AdminOdds />} />

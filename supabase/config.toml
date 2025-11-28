@@ -138,6 +138,15 @@ verify_jwt = false
 [functions.restore-database]
 verify_jwt = false
 
+[functions.aml-detection]
+verify_jwt = false
+
+[functions.document-archival]
+verify_jwt = false
+
+[functions.nlrc-quarterly-report]
+verify_jwt = false
+
 [functions.withdraw]
 verify_jwt = true
 
