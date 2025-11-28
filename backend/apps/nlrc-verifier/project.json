@@ -1,0 +1,52 @@
+{
+  "name": "nlrc-verifier",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/nlrc-verifier/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/node:webpack",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/nlrc-verifier",
+        "main": "apps/nlrc-verifier/src/main.ts",
+        "tsConfig": "apps/nlrc-verifier/tsconfig.app.json",
+        "assets": ["apps/nlrc-verifier/src/assets"]
+      },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "extractLicenses": true,
+          "inspect": false
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/node:node",
+      "options": {
+        "buildTarget": "nlrc-verifier:build"
+      },
+      "configurations": {
+        "production": {
+          "buildTarget": "nlrc-verifier:build:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/nlrc-verifier/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/apps/nlrc-verifier"],
+      "options": {
+        "jestConfig": "apps/nlrc-verifier/jest.config.ts",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": ["scope:backend", "type:app"]
+}
