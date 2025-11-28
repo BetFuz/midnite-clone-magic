@@ -172,6 +172,7 @@ const AdminReports = lazy(() => import("./pages/admin/Reports"));
 const AdminAuditLog = lazy(() => import("./pages/admin/AuditLog"));
 const AdminSettings = lazy(() => import("./pages/admin/Settings"));
 const AdminSecurity = lazy(() => import("./pages/admin/Security"));
+const EscrowManagement = lazy(() => import("./pages/admin/EscrowManagement"));
 
 const MobileBetSlip = lazy(() => import("./components/MobileBetSlip"));
 const BottomNav = lazy(() => import("./components/mobile/BottomNav").then(m => ({ default: m.BottomNav })));
@@ -445,6 +446,7 @@ const App = () => (
           <Route path="/admin/audit-log" element={<AdminAuditLog />} />
           <Route path="/admin/settings" element={<AdminSettings />} />
           <Route path="/admin/security" element={<AdminSecurity />} />
+          <Route path="/admin/escrow" element={<EscrowManagement />} />
           <Route path="/admin/seed" element={<SeedData />} />
           <Route path="/admin/operations" element={<Operations />} />
           <Route path="/admin/growth" element={<GrowthTools />} />

@@ -700,6 +700,56 @@ export type Database = {
         }
         Relationships: []
       }
+      escrow_transfers: {
+        Row: {
+          amount: number
+          completed_at: string | null
+          created_at: string | null
+          destination_wallet: string
+          id: string
+          initiated_by: string | null
+          reason: string
+          regulatory_flag_id: string | null
+          source_wallet: string
+          status: string
+          tx_hash: string | null
+        }
+        Insert: {
+          amount: number
+          completed_at?: string | null
+          created_at?: string | null
+          destination_wallet?: string
+          id?: string
+          initiated_by?: string | null
+          reason: string
+          regulatory_flag_id?: string | null
+          source_wallet?: string
+          status?: string
+          tx_hash?: string | null
+        }
+        Update: {
+          amount?: number
+          completed_at?: string | null
+          created_at?: string | null
+          destination_wallet?: string
+          id?: string
+          initiated_by?: string | null
+          reason?: string
+          regulatory_flag_id?: string | null
+          source_wallet?: string
+          status?: string
+          tx_hash?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "escrow_transfers_regulatory_flag_id_fkey"
+            columns: ["regulatory_flag_id"]
+            isOneToOne: false
+            referencedRelation: "regulatory_flags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fantasy_leagues: {
         Row: {
           created_at: string | null
@@ -1626,6 +1676,42 @@ export type Database = {
           market?: string
           match_id?: string
           odds?: Json
+        }
+        Relationships: []
+      }
+      regulatory_flags: {
+        Row: {
+          activated_at: string | null
+          activated_by: string | null
+          created_at: string | null
+          deactivated_at: string | null
+          flag_type: string
+          id: string
+          is_active: boolean
+          reason: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          activated_at?: string | null
+          activated_by?: string | null
+          created_at?: string | null
+          deactivated_at?: string | null
+          flag_type: string
+          id?: string
+          is_active?: boolean
+          reason?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          activated_at?: string | null
+          activated_by?: string | null
+          created_at?: string | null
+          deactivated_at?: string | null
+          flag_type?: string
+          id?: string
+          is_active?: boolean
+          reason?: string | null
+          updated_at?: string | null
         }
         Relationships: []
       }

@@ -200,3 +200,9 @@ verify_jwt = false
 
 [functions.send-sms]
 verify_jwt = true
+
+[functions.escrow-transfer]
+verify_jwt = true
+
+[functions.check-escrow-trigger]
+verify_jwt = false
