@@ -750,6 +750,60 @@ export type Database = {
           },
         ]
       }
+      fantasy_contest_entries: {
+        Row: {
+          contest_id: string | null
+          created_at: string | null
+          current_points: number | null
+          current_rank: number | null
+          entry_number: number
+          id: string
+          lineup_id: string | null
+          prize_won: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          contest_id?: string | null
+          created_at?: string | null
+          current_points?: number | null
+          current_rank?: number | null
+          entry_number: number
+          id?: string
+          lineup_id?: string | null
+          prize_won?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          contest_id?: string | null
+          created_at?: string | null
+          current_points?: number | null
+          current_rank?: number | null
+          entry_number?: number
+          id?: string
+          lineup_id?: string | null
+          prize_won?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fantasy_contest_entries_contest_id_fkey"
+            columns: ["contest_id"]
+            isOneToOne: false
+            referencedRelation: "fantasy_contests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fantasy_contest_entries_lineup_id_fkey"
+            columns: ["lineup_id"]
+            isOneToOne: false
+            referencedRelation: "fantasy_lineups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fantasy_contest_types: {
         Row: {
           code: string
@@ -785,6 +839,81 @@ export type Database = {
           payout_structure?: Json
         }
         Relationships: []
+      }
+      fantasy_contests: {
+        Row: {
+          allows_late_swap: boolean | null
+          allows_multi_entry: boolean | null
+          contest_type_id: string | null
+          created_at: string | null
+          current_entries: number | null
+          entry_fee: number
+          id: string
+          is_beginner_only: boolean | null
+          late_swap_deadline: string | null
+          league_id: string | null
+          max_entries: number
+          max_entries_per_user: number | null
+          name: string
+          prize_pool: number
+          starts_at: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          allows_late_swap?: boolean | null
+          allows_multi_entry?: boolean | null
+          contest_type_id?: string | null
+          created_at?: string | null
+          current_entries?: number | null
+          entry_fee: number
+          id?: string
+          is_beginner_only?: boolean | null
+          late_swap_deadline?: string | null
+          league_id?: string | null
+          max_entries: number
+          max_entries_per_user?: number | null
+          name: string
+          prize_pool: number
+          starts_at: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          allows_late_swap?: boolean | null
+          allows_multi_entry?: boolean | null
+          contest_type_id?: string | null
+          created_at?: string | null
+          current_entries?: number | null
+          entry_fee?: number
+          id?: string
+          is_beginner_only?: boolean | null
+          late_swap_deadline?: string | null
+          league_id?: string | null
+          max_entries?: number
+          max_entries_per_user?: number | null
+          name?: string
+          prize_pool?: number
+          starts_at?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fantasy_contests_contest_type_id_fkey"
+            columns: ["contest_type_id"]
+            isOneToOne: false
+            referencedRelation: "fantasy_contest_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fantasy_contests_league_id_fkey"
+            columns: ["league_id"]
+            isOneToOne: false
+            referencedRelation: "fantasy_leagues"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       fantasy_leagues: {
         Row: {
@@ -824,6 +953,47 @@ export type Database = {
           status?: string
         }
         Relationships: []
+      }
+      fantasy_lineup_exports: {
+        Row: {
+          created_at: string | null
+          expires_at: string | null
+          export_code: string
+          export_data: Json
+          id: string
+          lineup_id: string | null
+          times_imported: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string | null
+          export_code: string
+          export_data: Json
+          id?: string
+          lineup_id?: string | null
+          times_imported?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string | null
+          export_code?: string
+          export_data?: Json
+          id?: string
+          lineup_id?: string | null
+          times_imported?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fantasy_lineup_exports_lineup_id_fkey"
+            columns: ["lineup_id"]
+            isOneToOne: false
+            referencedRelation: "fantasy_lineups"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       fantasy_lineups: {
         Row: {
@@ -930,6 +1100,94 @@ export type Database = {
           },
         ]
       }
+      fantasy_matchups: {
+        Row: {
+          created_at: string | null
+          difficulty_rating: number | null
+          id: string
+          match_date: string
+          opponent_def_rating: number | null
+          opponent_rank: number | null
+          opponent_team: string
+          over_under: number | null
+          player_id: string | null
+          vegas_line: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          difficulty_rating?: number | null
+          id?: string
+          match_date: string
+          opponent_def_rating?: number | null
+          opponent_rank?: number | null
+          opponent_team: string
+          over_under?: number | null
+          player_id?: string | null
+          vegas_line?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          difficulty_rating?: number | null
+          id?: string
+          match_date?: string
+          opponent_def_rating?: number | null
+          opponent_rank?: number | null
+          opponent_team?: string
+          over_under?: number | null
+          player_id?: string | null
+          vegas_line?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fantasy_matchups_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "fantasy_players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fantasy_player_news: {
+        Row: {
+          content: string | null
+          created_at: string | null
+          headline: string
+          id: string
+          impact: string | null
+          news_type: string | null
+          player_id: string | null
+          published_at: string | null
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string | null
+          headline: string
+          id?: string
+          impact?: string | null
+          news_type?: string | null
+          player_id?: string | null
+          published_at?: string | null
+        }
+        Update: {
+          content?: string | null
+          created_at?: string | null
+          headline?: string
+          id?: string
+          impact?: string | null
+          news_type?: string | null
+          player_id?: string | null
+          published_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fantasy_player_news_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "fantasy_players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fantasy_player_ownership: {
         Row: {
           id: string
@@ -965,6 +1223,83 @@ export type Database = {
           },
           {
             foreignKeyName: "fantasy_player_ownership_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "fantasy_players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fantasy_player_stats: {
+        Row: {
+          assists: number | null
+          clean_sheet: boolean | null
+          clearances: number | null
+          created_at: string | null
+          fantasy_points: number | null
+          game_date: string
+          goals: number | null
+          id: string
+          interceptions: number | null
+          match_id: string | null
+          minutes_played: number | null
+          pass_accuracy: number | null
+          passes_completed: number | null
+          player_id: string | null
+          red_cards: number | null
+          saves: number | null
+          shots: number | null
+          shots_on_target: number | null
+          tackles: number | null
+          yellow_cards: number | null
+        }
+        Insert: {
+          assists?: number | null
+          clean_sheet?: boolean | null
+          clearances?: number | null
+          created_at?: string | null
+          fantasy_points?: number | null
+          game_date: string
+          goals?: number | null
+          id?: string
+          interceptions?: number | null
+          match_id?: string | null
+          minutes_played?: number | null
+          pass_accuracy?: number | null
+          passes_completed?: number | null
+          player_id?: string | null
+          red_cards?: number | null
+          saves?: number | null
+          shots?: number | null
+          shots_on_target?: number | null
+          tackles?: number | null
+          yellow_cards?: number | null
+        }
+        Update: {
+          assists?: number | null
+          clean_sheet?: boolean | null
+          clearances?: number | null
+          created_at?: string | null
+          fantasy_points?: number | null
+          game_date?: string
+          goals?: number | null
+          id?: string
+          interceptions?: number | null
+          match_id?: string | null
+          minutes_played?: number | null
+          pass_accuracy?: number | null
+          passes_completed?: number | null
+          player_id?: string | null
+          red_cards?: number | null
+          saves?: number | null
+          shots?: number | null
+          shots_on_target?: number | null
+          tackles?: number | null
+          yellow_cards?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fantasy_player_stats_player_id_fkey"
             columns: ["player_id"]
             isOneToOne: false
             referencedRelation: "fantasy_players"
