@@ -302,3 +302,15 @@ verify_jwt = false
 
 [functions.parimutuel-pool]
 verify_jwt = false
+
+[functions.kyc-sla-monitor]
+verify_jwt = false
+
+[functions.bet-dispute-handler]
+verify_jwt = true
+
+[functions.live-chat-cobrowse]
+verify_jwt = true
+
+[functions.rtp-calculator]
+verify_jwt = true
