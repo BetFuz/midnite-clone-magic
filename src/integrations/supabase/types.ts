@@ -1737,6 +1737,45 @@ export type Database = {
         }
         Relationships: []
       }
+      sms_delivery_log: {
+        Row: {
+          created_at: string
+          delivered_at: string | null
+          id: string
+          message: string
+          phone_number: string
+          retry_count: number | null
+          status: string
+          telco_response: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          delivered_at?: string | null
+          id?: string
+          message: string
+          phone_number: string
+          retry_count?: number | null
+          status?: string
+          telco_response?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          delivered_at?: string | null
+          id?: string
+          message?: string
+          phone_number?: string
+          retry_count?: number | null
+          status?: string
+          telco_response?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       social_bets: {
         Row: {
           bet_slip_id: string
