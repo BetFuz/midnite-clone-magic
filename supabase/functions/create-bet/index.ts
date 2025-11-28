@@ -43,6 +43,59 @@ serve(async (req) => {
       return jsonResponse({ error: 'Insufficient balance' }, 400);
     }
 
+    // Check responsible gaming limits
+    const { data: limits } = await supabase
+      .from('responsible_gaming_limits')
+      .select('*')
+      .eq('user_id', user.id)
+      .single();
+
+    if (limits) {
+      // Check self-exclusion
+      if (limits.self_excluded_until && new Date(limits.self_excluded_until) > new Date()) {
+        return jsonResponse({ 
+          error: 'Account is self-excluded',
+          self_excluded_until: limits.self_excluded_until
+        }, 403);
+      }
+
+      // Check cooling-off period
+      if (limits.cooling_off_until && new Date(limits.cooling_off_until) > new Date()) {
+        return jsonResponse({ 
+          error: 'Account is in cooling-off period',
+          cooling_off_until: limits.cooling_off_until
+        }, 403);
+      }
+
+      // Get daily usage
+      const { data: usageData } = await supabase.rpc('get_daily_usage', { 
+        p_user_id: user.id 
+      }).single();
+
+      const usage = usageData as { total_stake: number; total_loss: number } | null;
+
+      if (usage) {
+        // Check daily stake limit
+        if (usage.total_stake + stake > limits.daily_stake_limit) {
+          return jsonResponse({ 
+            error: 'Daily stake limit exceeded',
+            current_stake: usage.total_stake,
+            limit: limits.daily_stake_limit,
+            attempted: stake
+          }, 403);
+        }
+
+        // Check daily loss limit
+        if (usage.total_loss >= limits.daily_loss_limit) {
+          return jsonResponse({ 
+            error: 'Daily loss limit reached',
+            current_loss: usage.total_loss,
+            limit: limits.daily_loss_limit
+          }, 403);
+        }
+      }
+    }
+
     // TODO: DEV – call risk engine before insert
 
     // Calculate total odds

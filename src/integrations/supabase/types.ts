@@ -1183,6 +1183,42 @@ export type Database = {
         }
         Relationships: []
       }
+      responsible_gaming_limits: {
+        Row: {
+          cooling_off_until: string | null
+          created_at: string | null
+          daily_loss_limit: number
+          daily_stake_limit: number
+          id: string
+          self_excluded_until: string | null
+          session_time_limit: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          cooling_off_until?: string | null
+          created_at?: string | null
+          daily_loss_limit?: number
+          daily_stake_limit?: number
+          id?: string
+          self_excluded_until?: string | null
+          session_time_limit?: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          cooling_off_until?: string | null
+          created_at?: string | null
+          daily_loss_limit?: number
+          daily_stake_limit?: number
+          id?: string
+          self_excluded_until?: string | null
+          session_time_limit?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       security_alerts: {
         Row: {
           alert_type: string
@@ -1698,6 +1734,13 @@ export type Database = {
       }
     }
     Functions: {
+      get_daily_usage: {
+        Args: { p_user_id: string }
+        Returns: {
+          total_loss: number
+          total_stake: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
