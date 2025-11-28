@@ -156,6 +156,7 @@ const Compliance = lazy(() => import("./pages/admin/Compliance"));
 const Operations = lazy(() => import("./pages/admin/Operations"));
 const GrowthTools = lazy(() => import("./pages/admin/GrowthTools"));
 const Status = lazy(() => import("./pages/Status"));
+const Affiliate = lazy(() => import("./pages/Affiliate"));
 const HealthOdds = lazy(() => import("./pages/HealthOdds"));
 const PlayerProtection = lazy(() => import("./pages/account/PlayerProtection"));
 const AdminSetup = lazy(() => import("./pages/admin/AdminSetup"));
@@ -419,6 +420,7 @@ const App = () => (
           <Route path="/info/help" element={<HelpCenter />} />
         <Route path="/info/responsible-gambling" element={<ResponsibleGambling />} />
         <Route path="/responsible-gaming" element={<ResponsibleGaming />} />
+        <Route path="/affiliate" element={<Affiliate />} />
           <Route path="/info/terms" element={<Terms />} />
           <Route path="/info/privacy" element={<Privacy />} />
           <Route path="/info/contact" element={<Contact />} />
