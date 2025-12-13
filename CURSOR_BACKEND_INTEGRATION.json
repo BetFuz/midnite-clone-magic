@@ -1,0 +1,266 @@
+{
+  "project": {
+    "name": "betfuz-backend",
+    "description": "Complete Betfuz betting platform backend integration for Cursor",
+    "version": "1.0.0"
+  },
+  "supabase": {
+    "project_id": "aacjfdrctnmnenebzdxg",
+    "url": "https://aacjfdrctnmnenebzdxg.supabase.co",
+    "anon_key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFhY2pmZHJjdG5tbmVuZWJ6ZHhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3OTQ1MjEsImV4cCI6MjA3ODM3MDUyMX0.CWYjgGOs-b64CbfzlIfy6P-hSGA1SMgWs6qD0tu7TrY"
+  },
+  "edge_functions": {
+    "base_url": "https://aacjfdrctnmnenebzdxg.supabase.co/functions/v1",
+    "functions": {
+      "betting": [
+        "create-bet",
+        "list-bets",
+        "settlement",
+        "cashout",
+        "bet-delay-processor",
+        "bet-builder-pricing",
+        "bet-dispute-handler",
+        "early-payout-calculator"
+      ],
+      "payments": [
+        "deposit",
+        "withdraw",
+        "instant-payout",
+        "payment-webhook",
+        "chargeback-handler",
+        "paystack-chargeback-handler",
+        "flutterwave-chargeback-handler",
+        "failed-deposit-retry",
+        "deposit-reconciliation",
+        "nuban-name-validation",
+        "bank-reconciliation"
+      ],
+      "admin": [
+        "admin-api-gateway",
+        "admin-audit-logs",
+        "admin-bet-settlement",
+        "admin-export-ledger",
+        "admin-financial-reports",
+        "admin-manual-payout",
+        "admin-platform-control",
+        "admin-realtime-analytics",
+        "admin-security-monitor",
+        "admin-user-management",
+        "admin-user-search",
+        "admin-void-bet",
+        "admin-webhook-settings"
+      ],
+      "compliance": [
+        "kyc-verification",
+        "kyc-sla-monitor",
+        "aml-check",
+        "aml-detection",
+        "age-verification",
+        "nlrc-quarterly-report",
+        "state-tax-engine",
+        "sar-filing",
+        "self-exclusion-sync",
+        "compliance-messaging",
+        "document-archival"
+      ],
+      "ai_games": [
+        "ai-slot-theme",
+        "ai-blackjack",
+        "ai-roulette",
+        "ai-poker",
+        "ai-baccarat",
+        "ai-keno",
+        "ai-scratch-card",
+        "ai-craps",
+        "ai-rps",
+        "ai-coin-flip",
+        "ai-game-show",
+        "live-dealer-voice",
+        "ai-provably-fair",
+        "ai-fraud-detection"
+      ],
+      "racing": [
+        "racing-simulation",
+        "f1-racing-ai"
+      ],
+      "fantasy": [
+        "generate-fantasy-leagues",
+        "fantasy-player-projections",
+        "fantasy-nigerian-players",
+        "fantasy-optimize-lineup",
+        "fantasy-player-research",
+        "fantasy-generate-contests",
+        "universal-fantasy-scoring",
+        "fantasy-live-websocket"
+      ],
+      "bonus_affiliate": [
+        "affiliate-boost-check",
+        "bonus-abuse-detector",
+        "bonus-forfeiture",
+        "free-bet-expiry",
+        "retention-flow"
+      ],
+      "risk_trading": [
+        "exposure-monitor",
+        "odds-override",
+        "suspend-live-events",
+        "parimutuel-pool",
+        "health-odds",
+        "data-source-validator"
+      ],
+      "data_sync": [
+        "update-leagues",
+        "update-matches",
+        "update-all-matches",
+        "refresh-football-matches",
+        "public-matches",
+        "seed-matches",
+        "n8n-webhook-receiver",
+        "marketing-post",
+        "user-registration-webhook"
+      ],
+      "utilities": [
+        "diagnostic",
+        "send-sms",
+        "streaming-token",
+        "voice-betting-token",
+        "backup-database",
+        "restore-database",
+        "sweep-dust",
+        "float-health-metrics",
+        "escrow-transfer",
+        "check-escrow-trigger",
+        "kie-ai-generate",
+        "rtp-calculator",
+        "live-chat-cobrowse",
+        "decode-flash-slip",
+        "ussd-betting",
+        "bet-recommendations",
+        "ai-betting-chat",
+        "ai-predictions",
+        "mark-notifications-read",
+        "payment-waitlist-notify"
+      ]
+    }
+  },
+  "n8n_integration": {
+    "webhook_endpoints": {
+      "incoming": {
+        "n8n_webhook_receiver": "/functions/v1/n8n-webhook-receiver",
+        "update_leagues": "/functions/v1/update-leagues",
+        "update_matches": "/functions/v1/update-matches",
+        "marketing_post": "/functions/v1/marketing-post"
+      },
+      "outgoing": {
+        "user_registration": "https://pannaafric.app.n8n.cloud/webhook/user-registration",
+        "bet_placed": "configure-in-admin-webhooks",
+        "bet_won": "configure-in-admin-webhooks",
+        "bet_lost": "configure-in-admin-webhooks",
+        "deposit": "configure-in-admin-webhooks",
+        "withdrawal": "configure-in-admin-webhooks"
+      }
+    },
+    "event_types": [
+      "odds_update",
+      "bet_settlement",
+      "promotion_trigger",
+      "system_alert",
+      "user_notification",
+      "balance_update",
+      "game_state_change"
+    ]
+  },
+  "nx_monorepo": {
+    "apps": {
+      "api-gateway": {
+        "type": "NestJS",
+        "port": 3000,
+        "features": ["REST", "GraphQL", "Authentication", "Rate Limiting"]
+      },
+      "ussd-microservice": {
+        "type": "NestJS",
+        "port": 3001,
+        "features": ["Africa's Talking USSD", "Flash Slip Decode", "Offline Betting"]
+      },
+      "affiliate-engine": {
+        "type": "BullMQ",
+        "port": 3002,
+        "features": ["Commission Processing", "Daily Salary", "Tier Management"]
+      },
+      "nlrc-verifier": {
+        "type": "NestJS Cron",
+        "port": 3003,
+        "features": ["Hourly License Check", "Bet Blocking", "Health Endpoint"]
+      },
+      "treasury-service": {
+        "type": "NestJS",
+        "port": 3004,
+        "features": ["Wema Bank NUBAN", "Virtual Accounts", "Webhook Processing"]
+      }
+    }
+  },
+  "database": {
+    "prisma_schema": "backend/prisma/schema.prisma",
+    "supabase_types": "src/integrations/supabase/types.ts",
+    "core_tables": [
+      "profiles",
+      "bet_slips",
+      "bet_selections",
+      "matches",
+      "sports_leagues",
+      "ledger_entries",
+      "user_roles",
+      "transactions",
+      "affiliate_links",
+      "responsible_gaming_limits",
+      "kyc_verifications",
+      "nlrc_licences",
+      "admin_audit_log"
+    ]
+  },
+  "secrets_required": [
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "ODDS_API_KEY",
+    "SPORTRADAR_API_KEY",
+    "OPENAI_API_KEY",
+    "LOVABLE_API_KEY",
+    "N8N_BEARER_TOKEN",
+    "KIE_AI_API_KEY",
+    "NEWS_API_KEY",
+    "GNEWS_API_KEY"
+  ],
+  "docker_services": {
+    "postgres": {
+      "image": "postgres:16-alpine",
+      "port": 5432
+    },
+    "redis": {
+      "image": "redis:7-alpine",
+      "port": 6379
+    },
+    "rabbitmq": {
+      "image": "rabbitmq:3.12-management-alpine",
+      "ports": [5672, 15672]
+    }
+  },
+  "realtime_channels": [
+    "matches",
+    "balance_change",
+    "notifications:{userId}",
+    "social_bets",
+    "marketing:updates"
+  ],
+  "compliance": {
+    "nlrc": "Nigerian License Regulatory Commission - hourly verification",
+    "kyc_threshold": "₦50,000 withdrawal requires NIN verification",
+    "aml": "Suspicious activity flagging for ₦15M+ in 24hrs",
+    "gaming_limits": "Daily stake/loss limits with self-exclusion"
+  },
+  "cursor_rules": {
+    "backend_first": true,
+    "use_edge_functions": true,
+    "integrate_n8n": true,
+    "maintain_rls": true,
+    "log_all_mutations": true
+  }
+}
