@@ -1,0 +1,133 @@
+{
+  "project": "betfuz",
+  "environment": {
+    "supabase": {
+      "url": "https://aacjfdrctnmnenebzdxg.supabase.co",
+      "anon_key": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFhY2pmZHJjdG5tbmVuZWJ6ZHhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI3OTQ1MjEsImV4cCI6MjA3ODM3MDUyMX0.CWYjgGOs-b64CbfzlIfy6P-hSGA1SMgWs6qD0tu7TrY",
+      "project_id": "aacjfdrctnmnenebzdxg",
+      "service_role_key": "REQUIRED_FOR_ADMIN_OPERATIONS"
+    },
+    "secrets": {
+      "ai_providers": {
+        "LOVABLE_API_KEY": {
+          "status": "configured_in_lovable_cloud",
+          "note": "Auto-provisioned. Contact support@lovable.dev for local access",
+          "gateway": "https://ai.gateway.lovable.dev/v1/chat/completions"
+        },
+        "OPENAI_API_KEY": {
+          "status": "configured_in_lovable_cloud",
+          "source": "https://platform.openai.com/api-keys",
+          "used_for": ["voice-betting-token", "direct OpenAI calls"]
+        },
+        "KIE_AI_API_KEY": {
+          "status": "configured_in_lovable_cloud",
+          "source": "https://kie.ai",
+          "used_for": ["premium video generation", "Sora 2", "Veo 3", "racing visuals"]
+        }
+      },
+      "sports_data": {
+        "SPORTRADAR_API_KEY": {
+          "status": "configured_in_lovable_cloud",
+          "source": "https://sportradar.com",
+          "used_for": ["official odds feed", "live scores"]
+        },
+        "ODDS_API_KEY": {
+          "status": "configured_in_lovable_cloud",
+          "source": "https://the-odds-api.com",
+          "used_for": ["betting odds aggregation"]
+        },
+        "API_SPORTS_API_KEY": {
+          "status": "configured_in_lovable_cloud",
+          "source": "https://api-sports.io",
+          "used_for": ["sports data", "fixtures"]
+        },
+        "SPORTMONKS_API_KEY": {
+          "status": "configured_in_lovable_cloud",
+          "source": "https://sportmonks.com",
+          "used_for": ["football data"]
+        },
+        "FOOTBALL_DATA_ORG_API_KEY": {
+          "status": "configured_in_lovable_cloud",
+          "source": "https://football-data.org",
+          "used_for": ["free football API"]
+        },
+        "SERPAPI_SPORTS_API_KEY": {
+          "status": "configured_in_lovable_cloud",
+          "source": "https://serpapi.com",
+          "used_for": ["sports search data"]
+        }
+      },
+      "news": {
+        "NEWS_API_KEY": {
+          "status": "configured_in_lovable_cloud",
+          "source": "https://newsapi.org"
+        },
+        "GNEWS_API_KEY": {
+          "status": "configured_in_lovable_cloud",
+          "source": "https://gnews.io"
+        },
+        "CURRENTS_API_KEY": {
+          "status": "configured_in_lovable_cloud",
+          "source": "https://currentsapi.services"
+        }
+      },
+      "integrations": {
+        "N8N_BEARER_TOKEN": {
+          "status": "configured_in_lovable_cloud",
+          "source": "n8n instance settings",
+          "used_for": ["workflow automation backend"]
+        }
+      },
+      "security": {
+        "BACKUP_ENCRYPTION_KEY": {
+          "status": "configured_in_lovable_cloud",
+          "generate": "openssl rand -hex 32"
+        }
+      }
+    }
+  },
+  "edge_functions": {
+    "base_url": "https://aacjfdrctnmnenebzdxg.supabase.co/functions/v1",
+    "functions": [
+      "ai-betting-chat",
+      "ai-predictions",
+      "bet-recommendations",
+      "voice-betting-token",
+      "ai-blackjack",
+      "ai-roulette",
+      "ai-poker",
+      "ai-baccarat",
+      "ai-craps",
+      "ai-keno",
+      "ai-scratch-card",
+      "ai-slot-theme",
+      "ai-coin-flip",
+      "ai-rps",
+      "ai-game-show",
+      "ai-provably-fair",
+      "ai-fraud-detection",
+      "f1-racing-ai",
+      "fantasy-optimize-lineup",
+      "fantasy-player-research"
+    ]
+  },
+  "local_development": {
+    "instructions": [
+      "1. Copy .env.template to .env.local",
+      "2. Fill in API keys from original providers",
+      "3. For LOVABLE_API_KEY: use OPENAI_API_KEY directly in local dev",
+      "4. Edge functions in Lovable Cloud already have all secrets configured",
+      "5. Local testing requires manual secret setup"
+    ],
+    "docker_services": {
+      "postgres": "postgresql://postgres:postgres@localhost:5432/betfuz",
+      "redis": "redis://localhost:6379",
+      "rabbitmq": "amqp://localhost:5672"
+    }
+  },
+  "notes": {
+    "lovable_cloud": "All 14 secrets are already configured and injected at runtime",
+    "cursor_access": "Cursor can see code but not runtime secrets",
+    "deployment": "Edge functions auto-deploy via Lovable with secrets injected"
+  }
+}
