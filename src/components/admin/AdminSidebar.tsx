@@ -15,6 +15,8 @@ import {
   Bell,
   Zap,
   Sparkles,
+  Globe,
+  Building2,
 } from "lucide-react";
 import {
   Sidebar,
@@ -33,6 +35,7 @@ const menuItems = [
     title: "Overview",
     items: [
       { title: "Dashboard", url: "/admin/dashboard", icon: LayoutDashboard },
+      { title: "Super Admin", url: "/admin/super", icon: Globe, superAdminOnly: true },
       { title: "Analytics", url: "/admin/analytics", icon: BarChart3 },
     ],
   },
