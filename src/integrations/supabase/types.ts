@@ -59,6 +59,47 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_tenant_assignments: {
+        Row: {
+          admin_role: Database["public"]["Enums"]["admin_role"]
+          granted_at: string
+          granted_by: string | null
+          id: string
+          is_primary: boolean
+          revoked_at: string | null
+          tenant_id: string
+          user_id: string
+        }
+        Insert: {
+          admin_role: Database["public"]["Enums"]["admin_role"]
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          is_primary?: boolean
+          revoked_at?: string | null
+          tenant_id: string
+          user_id: string
+        }
+        Update: {
+          admin_role?: Database["public"]["Enums"]["admin_role"]
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          is_primary?: boolean
+          revoked_at?: string | null
+          tenant_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_tenant_assignments_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       admin_webhook_settings: {
         Row: {
           bet_lost: string | null
@@ -3557,6 +3598,7 @@ export type Database = {
           nin_verification_status: string | null
           phone: string | null
           state_code: string | null
+          tenant_id: string | null
           updated_at: string | null
         }
         Insert: {
@@ -3571,6 +3613,7 @@ export type Database = {
           nin_verification_status?: string | null
           phone?: string | null
           state_code?: string | null
+          tenant_id?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -3585,9 +3628,18 @@ export type Database = {
           nin_verification_status?: string | null
           phone?: string | null
           state_code?: string | null
+          tenant_id?: string | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       realtime_odds_cache: {
         Row: {
@@ -4170,6 +4222,107 @@ export type Database = {
         }
         Relationships: []
       }
+      tenant_kpis: {
+        Row: {
+          active_users_24h: number
+          created_at: string
+          gross_revenue: number
+          id: string
+          kpi_date: string
+          live_matches: number
+          new_users_24h: number
+          pending_bets: number
+          tenant_id: string
+          total_bets: number
+          total_payouts: number
+          total_staked: number
+          total_users: number
+          updated_at: string
+        }
+        Insert: {
+          active_users_24h?: number
+          created_at?: string
+          gross_revenue?: number
+          id?: string
+          kpi_date?: string
+          live_matches?: number
+          new_users_24h?: number
+          pending_bets?: number
+          tenant_id: string
+          total_bets?: number
+          total_payouts?: number
+          total_staked?: number
+          total_users?: number
+          updated_at?: string
+        }
+        Update: {
+          active_users_24h?: number
+          created_at?: string
+          gross_revenue?: number
+          id?: string
+          kpi_date?: string
+          live_matches?: number
+          new_users_24h?: number
+          pending_bets?: number
+          tenant_id?: string
+          total_bets?: number
+          total_payouts?: number
+          total_staked?: number
+          total_users?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_kpis_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenants: {
+        Row: {
+          config: Json
+          country_code: string
+          country_name: string
+          created_at: string
+          currency: string
+          id: string
+          is_active: boolean
+          license_expiry: string | null
+          regulatory_license: string | null
+          timezone: string
+          updated_at: string
+        }
+        Insert: {
+          config?: Json
+          country_code: string
+          country_name: string
+          created_at?: string
+          currency?: string
+          id?: string
+          is_active?: boolean
+          license_expiry?: string | null
+          regulatory_license?: string | null
+          timezone?: string
+          updated_at?: string
+        }
+        Update: {
+          config?: Json
+          country_code?: string
+          country_name?: string
+          created_at?: string
+          currency?: string
+          id?: string
+          is_active?: boolean
+          license_expiry?: string | null
+          regulatory_license?: string | null
+          timezone?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_achievements: {
         Row: {
           achievement_description: string | null
@@ -4523,6 +4676,13 @@ export type Database = {
           total_stake: number
         }[]
       }
+      get_user_tenants: {
+        Args: { _user_id: string }
+        Returns: {
+          admin_role: Database["public"]["Enums"]["admin_role"]
+          tenant_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -4530,6 +4690,15 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_tenant_role: {
+        Args: {
+          _admin_role: Database["public"]["Enums"]["admin_role"]
+          _tenant_id: string
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_super_admin: { Args: { _user_id: string }; Returns: boolean }
       log_admin_action: {
         Args: {
           _action: string
@@ -4601,6 +4770,12 @@ export type Database = {
       }
     }
     Enums: {
+      admin_role:
+        | "super_admin"
+        | "country_admin"
+        | "compliance_officer"
+        | "finance_admin"
+        | "support_agent"
       affiliate_tier: "BRONZE" | "SILVER" | "GOLD"
       app_role: "user" | "admin" | "superadmin"
     }
@@ -4730,6 +4905,13 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      admin_role: [
+        "super_admin",
+        "country_admin",
+        "compliance_officer",
+        "finance_admin",
+        "support_agent",
+      ],
       affiliate_tier: ["BRONZE", "SILVER", "GOLD"],
       app_role: ["user", "admin", "superadmin"],
     },
