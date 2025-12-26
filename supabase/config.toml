@@ -314,3 +314,6 @@ verify_jwt = true
 
 [functions.rtp-calculator]
 verify_jwt = true
+
+[functions.admin-global-kpis]
+verify_jwt = true
