@@ -22,9 +22,9 @@ export const useUserProfile = () => {
     try {
       const { data, error } = await supabase
         .from("profiles")
-        .select("*")
+        .select("id, email, full_name, phone, balance, currency_code, created_at, updated_at")
         .eq("id", userId)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       setProfile(data);

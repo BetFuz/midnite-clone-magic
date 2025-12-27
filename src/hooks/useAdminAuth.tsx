@@ -30,7 +30,8 @@ export const useAdminAuth = () => {
         .select("role")
         .eq("user_id", userId)
         .in("role", ["admin", "superadmin"])
-        .maybeSingle(); // Use maybeSingle instead of single to avoid errors
+        .limit(1)
+        .maybeSingle();
 
       if (error) {
         console.error("Error checking user role:", error);
