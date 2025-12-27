@@ -25,72 +25,30 @@ export const useLeagueMatches = (leagueName: string, daysAhead: number = 7) => {
       const futureDate = new Date();
       futureDate.setDate(futureDate.getDate() + daysAhead);
 
-      console.info('useLeagueMatches:start', { leagueName, daysAhead, range: [now.toISOString(), futureDate.toISOString()] });
-
-      // Attempt 1: normalized view via league_id
-      const { data: leagueRow, error: leagueErr } = await supabase
-        .from('leagues')
-        .select('id')
-        .eq('name', leagueName)
-        .maybeSingle();
-      if (leagueErr) {
-        console.warn('useLeagueMatches: leagues lookup error (non-fatal)', leagueErr);
-      }
-      if (leagueRow?.id) {
-        const { data: viewData, error: viewErr } = await supabase
-          .from('public_matches')
-          .select('*')
-          .eq('league_id', leagueRow.id)
-          .gte('kickoff_at', now.toISOString())
-          .lte('kickoff_at', futureDate.toISOString())
-          .order('kickoff_at', { ascending: true });
-        if (viewErr) {
-          console.warn('useLeagueMatches: view query error (will fallback)', viewErr);
-        } else if (viewData && viewData.length > 0) {
-          const mappedFromView: Match[] = viewData.map((m: any) => ({
-            id: m.id,
-            match_id: m.match_id,
-            league_id: m.league_id,
-            league_name: m.league_name,
-            sport_key: m.sport_key,
-            sport_title: m.sport_title,
-            home_team: m.home_team,
-            away_team: m.away_team,
-            commence_time: m.kickoff_at,
-            home_odds: m.home_odds,
-            draw_odds: m.draw_odds,
-            away_odds: m.away_odds,
-            status: m.status,
-          }));
-          console.info('useLeagueMatches: view result', { leagueId: leagueRow.id, count: mappedFromView.length });
-          return mappedFromView;
-        }
-      }
-
-      // Attempt 2: direct table query by league_name
+      // Fast path: Try direct table query first (most common case)
       const { data: tableData, error: tableErr } = await supabase
         .from('matches')
-        .select('*')
+        .select('id, match_id, league_id, sport_key, sport_title, league_name, home_team, away_team, commence_time, home_odds, draw_odds, away_odds, status')
         .eq('league_name', leagueName)
         .gte('commence_time', now.toISOString())
         .lte('commence_time', futureDate.toISOString())
-        .order('commence_time', { ascending: true });
-      if (tableErr) {
-        console.warn('useLeagueMatches: table query error (will fallback)', tableErr);
-      } else if (tableData && tableData.length > 0) {
-        console.info('useLeagueMatches: table result', { leagueName, count: tableData.length });
+        .order('commence_time', { ascending: true })
+        .limit(50);
+
+      if (!tableErr && tableData && tableData.length > 0) {
         return tableData as Match[];
       }
 
-      // Fallback: call public-matches edge function (supports both league_name and days)
-      console.info('useLeagueMatches: fallback to function', { leagueName, daysAhead });
+      // Fallback: call edge function only if direct query returned nothing
       const { data: fnData, error: fnError } = await supabase.functions.invoke('public-matches', {
         body: { league_name: leagueName, days: daysAhead },
       });
+      
       if (fnError) {
         console.error('useLeagueMatches: function error', fnError);
         return [] as Match[];
       }
+      
       const mapped: Match[] = (fnData?.matches ?? []).map((m: any) => ({
         id: m.id,
         match_id: m.match_id,
@@ -106,10 +64,11 @@ export const useLeagueMatches = (leagueName: string, daysAhead: number = 7) => {
         away_odds: m.odds?.away,
         status: m.status ?? 'upcoming',
       }));
-      console.info('useLeagueMatches: function result', { leagueName, count: mapped.length });
+      
       return mapped;
     },
-    refetchInterval: 60000, // Refresh every minute
+    staleTime: 30000, // Cache for 30 seconds
+    refetchInterval: 60000,
   });
 };
 
