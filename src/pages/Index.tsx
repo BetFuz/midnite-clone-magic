@@ -9,6 +9,8 @@ import PopularBetsWidget from "@/components/PopularBetsWidget";
 import { buttonVariants } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ChevronRight, Award, TrendingUp as TrendingUpIcon } from "lucide-react";
+import { useFeaturedMatches } from "@/hooks/useFeaturedMatches";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Import league logos
 import premierLeagueLogo from "@/assets/leagues/premier-league.png";
@@ -80,6 +82,8 @@ import esportsController from "@/assets/sports/esports-controller.png";
 import virtualSports from "@/assets/sports/virtual-sports.png";
 
 const Index = () => {
+  const { data: featuredMatches = [], isLoading: matchesLoading } = useFeaturedMatches();
+  
   const promoCards = [
     { title: "AFCON 2027", image: afconHero, url: "/football/african-cup-of-nations" },
     { title: "World Cup 2026", image: worldCupHero, url: "/football/world-cup" },
@@ -167,84 +171,11 @@ const Index = () => {
     { name: "Ajax", url: "/sports/football", logo: ajaxLogo },
   ];
 
-  const featuredMatches = [
-    // Football
-    {
-      sport: "Football",
-      league: "Premier League",
-      time: "Today 15:00",
-      homeTeam: "Manchester United",
-      awayTeam: "Liverpool FC",
-      homeOdds: "3.60",
-      drawOdds: "3.30",
-      awayOdds: "2.00",
-      homeForm: "WDWLL",
-      awayForm: "WWDWW",
-    },
-    {
-      sport: "Football",
-      league: "La Liga",
-      time: "Today 17:30",
-      homeTeam: "Real Madrid",
-      awayTeam: "Barcelona",
-      homeOdds: "2.15",
-      drawOdds: "3.40",
-      awayOdds: "3.20",
-      homeForm: "WWWDW",
-      awayForm: "WDWWL",
-    },
-    // NBA
-    {
-      sport: "Basketball",
-      league: "NBA",
-      time: "Today 19:00",
-      homeTeam: "LA Lakers",
-      awayTeam: "Golden State Warriors",
-      homeOdds: "1.85",
-      drawOdds: null,
-      awayOdds: "1.95",
-      homeForm: "WWLWW",
-      awayForm: "WLWLL",
-    },
-    {
-      sport: "Basketball",
-      league: "NBA",
-      time: "Today 21:30",
-      homeTeam: "Boston Celtics",
-      awayTeam: "Miami Heat",
-      homeOdds: "1.70",
-      drawOdds: null,
-      awayOdds: "2.20",
-      homeForm: "WWWWL",
-      awayForm: "LWWDL",
-    },
-    // NFL
-    {
-      sport: "American Football",
-      league: "NFL",
-      time: "Today 18:00",
-      homeTeam: "Kansas City Chiefs",
-      awayTeam: "Buffalo Bills",
-      homeOdds: "1.90",
-      drawOdds: null,
-      awayOdds: "1.90",
-      homeForm: "WWLWW",
-      awayForm: "WLWWL",
-    },
-    // Tennis
-    {
-      sport: "Tennis",
-      league: "ATP Masters",
-      time: "Today 16:00",
-      homeTeam: "Novak Djokovic",
-      awayTeam: "Carlos Alcaraz",
-      homeOdds: "2.10",
-      drawOdds: null,
-      awayOdds: "1.75",
-      homeForm: "WWWLW",
-      awayForm: "WWWWL",
-    },
-  ];
+  // Group matches by sport
+  const footballMatches = featuredMatches.filter(m => m.sport === "Football");
+  const basketballMatches = featuredMatches.filter(m => m.sport === "Basketball");
+  const americanFootballMatches = featuredMatches.filter(m => m.sport === "American Football");
+  const tennisMatches = featuredMatches.filter(m => m.sport === "Tennis");
 
   const boosts = [
     {
@@ -352,45 +283,67 @@ const Index = () => {
           <section className="mb-6">
             <h2 className="text-lg font-semibold text-foreground mb-3">Featured Matches</h2>
             
-            {/* Football Matches */}
-            <div className="mb-5">
-              <h3 className="text-base font-semibold text-foreground mb-2.5">⚽ Football</h3>
+            {matchesLoading ? (
               <div className="grid gap-3">
-                {featuredMatches.filter(m => m.sport === "Football").map((match, index) => (
-                  <MatchCard key={index} {...match} />
+                {[1, 2, 3, 4].map((i) => (
+                  <Skeleton key={i} className="h-24 w-full rounded-lg" />
                 ))}
               </div>
-            </div>
+            ) : featuredMatches.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                No upcoming matches available. Check back soon!
+              </div>
+            ) : (
+              <>
+                {/* Football Matches */}
+                {footballMatches.length > 0 && (
+                  <div className="mb-5">
+                    <h3 className="text-base font-semibold text-foreground mb-2.5">⚽ Football</h3>
+                    <div className="grid gap-3">
+                      {footballMatches.slice(0, 4).map((match) => (
+                        <MatchCard key={match.id} {...match} />
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-            {/* Basketball Matches */}
-            <div className="mb-5">
-              <h3 className="text-base font-semibold text-foreground mb-2.5">🏀 Basketball</h3>
-              <div className="grid gap-3">
-                {featuredMatches.filter(m => m.sport === "Basketball").map((match, index) => (
-                  <MatchCard key={index} {...match} />
-                ))}
-              </div>
-            </div>
+                {/* Basketball Matches */}
+                {basketballMatches.length > 0 && (
+                  <div className="mb-5">
+                    <h3 className="text-base font-semibold text-foreground mb-2.5">🏀 Basketball</h3>
+                    <div className="grid gap-3">
+                      {basketballMatches.slice(0, 4).map((match) => (
+                        <MatchCard key={match.id} {...match} />
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-            {/* NFL Matches */}
-            <div className="mb-5">
-              <h3 className="text-base font-semibold text-foreground mb-2.5">🏈 American Football</h3>
-              <div className="grid gap-3">
-                {featuredMatches.filter(m => m.sport === "American Football").map((match, index) => (
-                  <MatchCard key={index} {...match} />
-                ))}
-              </div>
-            </div>
+                {/* NFL Matches */}
+                {americanFootballMatches.length > 0 && (
+                  <div className="mb-5">
+                    <h3 className="text-base font-semibold text-foreground mb-2.5">🏈 American Football</h3>
+                    <div className="grid gap-3">
+                      {americanFootballMatches.slice(0, 4).map((match) => (
+                        <MatchCard key={match.id} {...match} />
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-            {/* Tennis Matches */}
-            <div className="mb-5">
-              <h3 className="text-base font-semibold text-foreground mb-2.5">🎾 Tennis</h3>
-              <div className="grid gap-3">
-                {featuredMatches.filter(m => m.sport === "Tennis").map((match, index) => (
-                  <MatchCard key={index} {...match} />
-                ))}
-              </div>
-            </div>
+                {/* Tennis Matches */}
+                {tennisMatches.length > 0 && (
+                  <div className="mb-5">
+                    <h3 className="text-base font-semibold text-foreground mb-2.5">🎾 Tennis</h3>
+                    <div className="grid gap-3">
+                      {tennisMatches.slice(0, 4).map((match) => (
+                        <MatchCard key={match.id} {...match} />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
           </section>
 
           {/* Quick Bet Builder - SportyBet Style */}
