@@ -85,7 +85,8 @@ const Index = () => {
   const {
     data: featuredMatches = [],
     isLoading: matchesLoading,
-    isError: matchesError,
+    isError: matchesIsError,
+    error: matchesError,
     refetch: refetchFeaturedMatches,
   } = useFeaturedMatches();
 
@@ -294,9 +295,14 @@ const Index = () => {
                   <Skeleton key={i} className="h-24 w-full rounded-lg" />
                 ))}
               </div>
-            ) : matchesError ? (
+            ) : matchesIsError ? (
               <div className="text-center py-8 text-muted-foreground">
                 <p className="mb-3">Couldn’t load featured matches. Please retry.</p>
+                {matchesError ? (
+                  <p className="mb-4 text-xs opacity-80">
+                    {matchesError instanceof Error ? matchesError.message : String(matchesError)}
+                  </p>
+                ) : null}
                 <button
                   type="button"
                   onClick={() => refetchFeaturedMatches()}
