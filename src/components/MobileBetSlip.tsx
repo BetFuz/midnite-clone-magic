@@ -20,17 +20,10 @@ const MobileBetSlip = () => {
 
   
   
-  // Debug logging
-  console.log("MobileBetSlip - selections:", selections);
-  console.log("MobileBetSlip - selections length:", selections.length);
-
   if (selections.length === 0) {
-    console.log("MobileBetSlip - hiding button, no selections");
     // Hide mobile floating cart entirely when there are no selections to prevent accidental opens
     return null;
   }
-
-  console.log("MobileBetSlip - showing button with", selections.length, "selections");
 
   return (
     <Sheet open={open} onOpenChange={(next) => { if (!next) setOpen(false); }}>
