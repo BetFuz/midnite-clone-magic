@@ -43,8 +43,11 @@ export const useFeaturedMatches = () => {
         "basketball_nba": "Basketball",
         "basketball_euroleague": "Basketball",
         "americanfootball_nfl": "American Football",
+        "icehockey_nhl": "Ice Hockey",
         "tennis_atp": "Tennis",
         "tennis_wta": "Tennis",
+        "tennis_atp_wimbledon": "Tennis",
+        "tennis_atp_us_open": "Tennis",
       };
 
       const formatTime = (dateStr: string) => {
