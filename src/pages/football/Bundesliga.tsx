@@ -1,23 +1,11 @@
-import Header from "@/components/Header";
-import Sidebar from "@/components/Sidebar";
-import BetSlip from "@/components/BetSlip";
-import { LeagueMatchSchedule } from "@/components/LeagueMatchSchedule";
+import LeaguePageLayout from "@/components/layouts/LeaguePageLayout";
 
-const Bundesliga = () => {
-  return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <div className="flex">
-        <Sidebar />
-        <main className="flex-1 p-6 overflow-y-auto h-[calc(100vh-4rem)]">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Bundesliga</h1>
-          <p className="text-muted-foreground mb-6">Germany's top football league</p>
-          <LeagueMatchSchedule leagueName="Bundesliga" daysAhead={14} />
-        </main>
-        <BetSlip className="hidden md:flex" />
-      </div>
-    </div>
-  );
-};
+const Bundesliga = () => (
+  <LeaguePageLayout
+    title="Bundesliga"
+    description="Germany's top football league"
+    leagueName="Bundesliga"
+  />
+);
 
 export default Bundesliga;
