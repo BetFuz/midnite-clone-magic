@@ -26,6 +26,50 @@ interface FeaturedMatch {
   awayOdds: string;
 }
 
+function toNumber(v: unknown): number | null {
+  if (typeof v === "number" && Number.isFinite(v)) return v;
+  if (typeof v === "string") {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : null;
+  }
+  return null;
+}
+
+function formatOdds(v: unknown) {
+  const n = toNumber(v);
+  return n === null ? "1.00" : n.toFixed(2);
+}
+
+function normalizeDateString(raw: string) {
+  // Safari/iOS WebViews can fail on some non-ISO formats.
+  // Normalize "YYYY-MM-DD HH:mm:ss+00" => "YYYY-MM-DDTHH:mm:ss+00:00".
+  let s = raw.trim();
+  if (s.includes(" ") && !s.includes("T")) s = s.replace(" ", "T");
+  // If we have a trailing timezone like +00 (hours only), expand it.
+  s = s.replace(/([+-]\d{2})$/, "$1:00");
+  return s;
+}
+
+function formatTime(dateValue: unknown) {
+  if (!dateValue) return "TBD";
+  const date = new Date(normalizeDateString(String(dateValue)));
+  if (Number.isNaN(date.getTime())) return "TBD";
+
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  const timeStr = date.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+
+  if (date.toDateString() === today.toDateString()) return `Today ${timeStr}`;
+  if (date.toDateString() === tomorrow.toDateString()) return `Tomorrow ${timeStr}`;
+  return `${date.toLocaleDateString("en-US", { weekday: "short" })} ${timeStr}`;
+}
+
 export const useFeaturedMatches = () => {
   return useQuery({
     queryKey: ["featured-matches"],
@@ -44,7 +88,7 @@ export const useFeaturedMatches = () => {
           .lte("commence_time", threeDaysFromNow.toISOString())
           .order("commence_time", { ascending: true })
           .limit(20),
-        12000
+        30000
       );
 
       if (error) {
@@ -52,21 +96,6 @@ export const useFeaturedMatches = () => {
         throw error;
       }
 
-      const toNumber = (v: unknown): number | null => {
-        if (typeof v === "number" && Number.isFinite(v)) return v;
-        if (typeof v === "string") {
-          const n = Number(v);
-          return Number.isFinite(n) ? n : null;
-        }
-        return null;
-      };
-
-      const formatOdds = (v: unknown) => {
-        const n = toNumber(v);
-        return n === null ? "1.00" : n.toFixed(2);
-      };
-
-      // Map sport_key to display sport name
       const sportMapping: Record<string, string> = {
         soccer_epl: "Football",
         soccer_spain_la_liga: "Football",
@@ -85,32 +114,9 @@ export const useFeaturedMatches = () => {
         tennis_atp_us_open: "Tennis",
       };
 
-      const formatTime = (dateValue: unknown) => {
-        if (!dateValue) return "TBD";
-        const date = new Date(String(dateValue));
-        if (Number.isNaN(date.getTime())) return "TBD";
-
-        const today = new Date();
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-
-        const timeStr = date.toLocaleTimeString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: false,
-        });
-
-        if (date.toDateString() === today.toDateString()) {
-          return `Today ${timeStr}`;
-        }
-        if (date.toDateString() === tomorrow.toDateString()) {
-          return `Tomorrow ${timeStr}`;
-        }
-        return `${date.toLocaleDateString("en-US", { weekday: "short" })} ${timeStr}`;
-      };
-
       const out: FeaturedMatch[] = [];
       for (const match of (data ?? []) as any[]) {
+        const drawN = toNumber(match.draw_odds);
         out.push({
           id: match.id,
           sport: sportMapping[match.sport_key] || match.sport_title || "Football",
@@ -119,15 +125,16 @@ export const useFeaturedMatches = () => {
           homeTeam: match.home_team || "TBD",
           awayTeam: match.away_team || "TBD",
           homeOdds: formatOdds(match.home_odds),
-          drawOdds: toNumber(match.draw_odds) === null ? null : toNumber(match.draw_odds)!.toFixed(2),
+          drawOdds: drawN === null ? null : drawN.toFixed(2),
           awayOdds: formatOdds(match.away_odds),
         });
       }
 
+      console.debug("featured-matches: fetched", out.length);
       return out;
     },
-    staleTime: 60000, // 1 minute
-    refetchInterval: 60000, // Auto-refresh every minute
+    staleTime: 60000,
+    refetchInterval: 60000,
     retry: 1,
   });
 };
