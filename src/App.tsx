@@ -10,6 +10,23 @@ import { Loader2 } from "lucide-react";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 
+// Football Leagues (eager-loaded to avoid long Suspense spinners)
+import PremierLeague from "./pages/football/PremierLeague";
+import ChampionsLeague from "./pages/football/ChampionsLeague";
+import LaLiga from "./pages/football/LaLiga";
+import SerieA from "./pages/football/SerieA";
+import Bundesliga from "./pages/football/Bundesliga";
+import Ligue1 from "./pages/football/Ligue1";
+import Championship from "./pages/football/Championship";
+import EuropaLeague from "./pages/football/EuropaLeague";
+import WorldCup from "./pages/football/WorldCup";
+import U20WorldCup from "./pages/football/U20WorldCup";
+import U17WorldCup from "./pages/football/U17WorldCup";
+import CAFChampionsLeague from "./pages/football/CAFChampionsLeague";
+import AFCON from "./pages/football/AFCON";
+import EgyptianPremierLeague from "./pages/football/EgyptianPremierLeague";
+import SouthAfricanPremierLeague from "./pages/football/SouthAfricanPremierLeague";
+
 // Lazy load all other pages for faster initial load
 const Live = lazy(() => import("./pages/Live"));
 const Racing = lazy(() => import("./pages/Racing"));
@@ -43,21 +60,7 @@ const BeachVolleyball = lazy(() => import("./pages/sports/BeachVolleyball"));
 const Esports = lazy(() => import("./pages/sports/Esports"));
 
 // Football Leagues
-const PremierLeague = lazy(() => import("./pages/football/PremierLeague"));
-const ChampionsLeague = lazy(() => import("./pages/football/ChampionsLeague"));
-const LaLiga = lazy(() => import("./pages/football/LaLiga"));
-const SerieA = lazy(() => import("./pages/football/SerieA"));
-const Bundesliga = lazy(() => import("./pages/football/Bundesliga"));
-const Ligue1 = lazy(() => import("./pages/football/Ligue1"));
-const Championship = lazy(() => import("./pages/football/Championship"));
-const EuropaLeague = lazy(() => import("./pages/football/EuropaLeague"));
-const WorldCup = lazy(() => import("./pages/football/WorldCup"));
-const U20WorldCup = lazy(() => import("./pages/football/U20WorldCup"));
-const U17WorldCup = lazy(() => import("./pages/football/U17WorldCup"));
-const CAFChampionsLeague = lazy(() => import("./pages/football/CAFChampionsLeague"));
-const AFCON = lazy(() => import("./pages/football/AFCON"));
-const EgyptianPremierLeague = lazy(() => import("./pages/football/EgyptianPremierLeague"));
-const SouthAfricanPremierLeague = lazy(() => import("./pages/football/SouthAfricanPremierLeague"));
+
 
 // Racing Venues
 const Ascot = lazy(() => import("./pages/racing/Ascot"));
