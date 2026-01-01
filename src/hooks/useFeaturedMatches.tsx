@@ -1,6 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
+async function withTimeout<T>(promise: PromiseLike<T>, ms = 12000): Promise<T> {
+  let timeoutId: number | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    timeoutId = window.setTimeout(() => reject(new Error("Request timed out")), ms);
+  });
+
+  try {
+    return (await Promise.race([Promise.resolve(promise), timeout])) as T;
+  } finally {
+    if (timeoutId) window.clearTimeout(timeoutId);
+  }
+}
+
 interface FeaturedMatch {
   id: string;
   sport: string;
@@ -21,13 +34,16 @@ export const useFeaturedMatches = () => {
       const threeDaysFromNow = new Date();
       threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
 
-      const { data, error } = await supabase
-        .from("matches")
-        .select("id, match_id, sport_key, sport_title, league_name, home_team, away_team, commence_time, home_odds, draw_odds, away_odds, status")
-        .gte("commence_time", now)
-        .lte("commence_time", threeDaysFromNow.toISOString())
-        .order("commence_time", { ascending: true })
-        .limit(20);
+      const { data, error } = await withTimeout(
+        supabase
+          .from("matches")
+          .select("id, match_id, sport_key, sport_title, league_name, home_team, away_team, commence_time, home_odds, draw_odds, away_odds, status")
+          .gte("commence_time", now)
+          .lte("commence_time", threeDaysFromNow.toISOString())
+          .order("commence_time", { ascending: true })
+          .limit(20),
+        12000
+      );
 
       if (error) throw error;
 
@@ -81,5 +97,6 @@ export const useFeaturedMatches = () => {
     },
     staleTime: 60000, // 1 minute
     refetchInterval: 60000, // Auto-refresh every minute
+    retry: 1,
   });
 };

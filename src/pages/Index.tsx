@@ -82,9 +82,12 @@ import esportsController from "@/assets/sports/esports-controller.png";
 import virtualSports from "@/assets/sports/virtual-sports.png";
 
 const Index = () => {
-  const { data: featuredMatches = [], isLoading: matchesLoading } = useFeaturedMatches();
-  
-  const promoCards = [
+  const {
+    data: featuredMatches = [],
+    isLoading: matchesLoading,
+    isError: matchesError,
+    refetch: refetchFeaturedMatches,
+  } = useFeaturedMatches();
     { title: "AFCON 2027", image: afconHero, url: "/football/african-cup-of-nations" },
     { title: "World Cup 2026", image: worldCupHero, url: "/football/world-cup" },
     { title: "Welcome Bonus", image: welcomePromo, url: "/promotions/welcome" },
@@ -288,6 +291,17 @@ const Index = () => {
                 {[1, 2, 3, 4].map((i) => (
                   <Skeleton key={i} className="h-24 w-full rounded-lg" />
                 ))}
+              </div>
+            ) : matchesError ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <p className="mb-3">Couldn’t load featured matches. Please retry.</p>
+                <button
+                  type="button"
+                  onClick={() => refetchFeaturedMatches()}
+                  className={buttonVariants({ variant: "secondary", size: "sm" })}
+                >
+                  Retry
+                </button>
               </div>
             ) : featuredMatches.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
