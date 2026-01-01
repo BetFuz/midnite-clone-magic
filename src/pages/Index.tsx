@@ -88,6 +88,8 @@ const Index = () => {
     isError: matchesError,
     refetch: refetchFeaturedMatches,
   } = useFeaturedMatches();
+
+  const promoCards = [
     { title: "AFCON 2027", image: afconHero, url: "/football/african-cup-of-nations" },
     { title: "World Cup 2026", image: worldCupHero, url: "/football/world-cup" },
     { title: "Welcome Bonus", image: welcomePromo, url: "/promotions/welcome" },
