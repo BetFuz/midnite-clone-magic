@@ -994,6 +994,45 @@ export type Database = {
           },
         ]
       }
+      countries: {
+        Row: {
+          code: string
+          created_at: string | null
+          currency_code: string
+          id: string
+          is_active: boolean | null
+          license_number: string | null
+          name: string
+          regulatory_body: string | null
+          timezone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          currency_code?: string
+          id?: string
+          is_active?: boolean | null
+          license_number?: string | null
+          name: string
+          regulatory_body?: string | null
+          timezone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          currency_code?: string
+          id?: string
+          is_active?: boolean | null
+          license_number?: string | null
+          name?: string
+          regulatory_body?: string | null
+          timezone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       daily_retention_caps: {
         Row: {
           cap_date: string
@@ -3086,6 +3125,42 @@ export type Database = {
         }
         Relationships: []
       }
+      n8n_webhook_logs: {
+        Row: {
+          created_at: string | null
+          execution_time_ms: number | null
+          id: string
+          payload: Json | null
+          response_body: Json | null
+          response_status: number | null
+          trigger_event: string
+          workflow_id: string
+          workflow_name: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          execution_time_ms?: number | null
+          id?: string
+          payload?: Json | null
+          response_body?: Json | null
+          response_status?: number | null
+          trigger_event: string
+          workflow_id: string
+          workflow_name?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          execution_time_ms?: number | null
+          id?: string
+          payload?: Json | null
+          response_body?: Json | null
+          response_status?: number | null
+          trigger_event?: string
+          workflow_id?: string
+          workflow_name?: string | null
+        }
+        Relationships: []
+      }
       nft_badges: {
         Row: {
           badge_name: string
@@ -3597,6 +3672,7 @@ export type Database = {
           is_age_verified: boolean | null
           nin_verification_status: string | null
           phone: string | null
+          push_token: string | null
           state_code: string | null
           tenant_id: string | null
           updated_at: string | null
@@ -3612,6 +3688,7 @@ export type Database = {
           is_age_verified?: boolean | null
           nin_verification_status?: string | null
           phone?: string | null
+          push_token?: string | null
           state_code?: string | null
           tenant_id?: string | null
           updated_at?: string | null
@@ -3627,6 +3704,7 @@ export type Database = {
           is_age_verified?: boolean | null
           nin_verification_status?: string | null
           phone?: string | null
+          push_token?: string | null
           state_code?: string | null
           tenant_id?: string | null
           updated_at?: string | null
@@ -3640,6 +3718,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      rate_limits: {
+        Row: {
+          blocked_until: string | null
+          created_at: string | null
+          endpoint: string
+          id: string
+          ip_address: unknown
+          request_count: number | null
+          window_start: string | null
+        }
+        Insert: {
+          blocked_until?: string | null
+          created_at?: string | null
+          endpoint: string
+          id?: string
+          ip_address: unknown
+          request_count?: number | null
+          window_start?: string | null
+        }
+        Update: {
+          blocked_until?: string | null
+          created_at?: string | null
+          endpoint?: string
+          id?: string
+          ip_address?: unknown
+          request_count?: number | null
+          window_start?: string | null
+        }
+        Relationships: []
       }
       realtime_odds_cache: {
         Row: {
@@ -3892,6 +4000,48 @@ export type Database = {
           severity?: string
           status?: string
           updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      security_events: {
+        Row: {
+          action_taken: string | null
+          country_code: string | null
+          created_at: string | null
+          endpoint: string | null
+          event_type: string
+          id: string
+          ip_address: unknown
+          payload_sample: Json | null
+          severity: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action_taken?: string | null
+          country_code?: string | null
+          created_at?: string | null
+          endpoint?: string | null
+          event_type: string
+          id?: string
+          ip_address?: unknown
+          payload_sample?: Json | null
+          severity: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action_taken?: string | null
+          country_code?: string | null
+          created_at?: string | null
+          endpoint?: string | null
+          event_type?: string
+          id?: string
+          ip_address?: unknown
+          payload_sample?: Json | null
+          severity?: string
+          user_agent?: string | null
           user_id?: string | null
         }
         Relationships: []
@@ -4662,6 +4812,15 @@ export type Database = {
       calculate_fantasy_points: {
         Args: { p_player_id: string; p_position: string; p_stats: Json }
         Returns: number
+      }
+      check_rate_limit: {
+        Args: {
+          p_endpoint: string
+          p_ip_address: unknown
+          p_limit?: number
+          p_window_seconds?: number
+        }
+        Returns: Json
       }
       get_affiliate_ancestors: {
         Args: { p_user_id: string }

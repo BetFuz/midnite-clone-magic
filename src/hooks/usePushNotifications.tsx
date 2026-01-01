@@ -48,11 +48,12 @@ export const usePushNotifications = (userId?: string) => {
       setState(prev => ({ ...prev, token: token.value, isRegistered: true }));
       
       // Save token to database if user is logged in
+      // Note: push_token column was added via migration - types will update after refresh
       if (userId) {
         try {
           await supabase
             .from('profiles')
-            .update({ push_token: token.value })
+            .update({ push_token: token.value } as any)
             .eq('id', userId);
         } catch (error) {
           console.error('Failed to save push token:', error);
