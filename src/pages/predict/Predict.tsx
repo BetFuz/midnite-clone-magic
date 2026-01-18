@@ -2,7 +2,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
 import PredictMarketCard from '@/components/predict/PredictMarketCard';
-import { Sparkles, Users, Globe2, Zap, TrendingUp, Clock } from 'lucide-react';
+import EventPredictionsSection from '@/components/predict/EventPredictionsSection';
+import { Sparkles, Users, Globe2, Zap, TrendingUp, Clock, Brain } from 'lucide-react';
 
 const Predict = () => {
   const communityPolls = [
@@ -131,8 +132,12 @@ const Predict = () => {
               </p>
             </div>
 
-            <Tabs defaultValue="community" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 mb-6">
+            <Tabs defaultValue="events" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 mb-6">
+                <TabsTrigger value="events">
+                  <Brain className="h-4 w-4 mr-2" />
+                  AI Events
+                </TabsTrigger>
                 <TabsTrigger value="community">
                   <Users className="h-4 w-4 mr-2" />
                   Community
@@ -150,6 +155,11 @@ const Predict = () => {
                   Quick Polls
                 </TabsTrigger>
               </TabsList>
+
+              {/* New AI-powered Events Tab */}
+              <TabsContent value="events">
+                <EventPredictionsSection />
+              </TabsContent>
 
               <TabsContent value="community" className="space-y-4">
                 <div className="flex items-center gap-2 mb-4">
