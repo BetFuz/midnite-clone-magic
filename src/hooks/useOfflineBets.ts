@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuthStore } from '@/store/authStore';
 import { useToast } from '@/hooks/use-toast';
 import { useNetworkStatus } from '@/hooks/useNetworkStatus';
 
@@ -73,17 +73,13 @@ export function useOfflineBets() {
 
     for (const bet of pendingBets) {
       try {
-        // Attempt to place bet via edge function
-        const { data, error } = await supabase.functions.invoke('create-bet', {
-          body: {
-            stake: bet.stake,
-            selections: bet.selections,
-            affiliateId: bet.affiliateId,
-            offlineBetId: bet.id,
-          },
+        // Place bet via BetFuz API
+        const { betApi } = await import('@/lib/api/bets');
+        await betApi.placeBet({
+          selections: (bet as any).selections || [],
+          stake: bet.stake,
+          betType: (bet as any).betType || 'single',
         });
-
-        if (error) throw error;
 
         // Success - remove from queue
         await removeBetFromIndexedDB(bet.id);

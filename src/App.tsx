@@ -3,8 +3,11 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { BetSlipProvider } from "@/contexts/BetSlipContext";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Loader2 } from "lucide-react";
+import { useAuthStore } from "@/store/authStore";
+import { registerSW } from "@/lib/push";
+import { LangProvider } from "@/contexts/LangContext";
 
 // Critical pages - loaded immediately
 import Index from "./pages/Index";
@@ -120,6 +123,11 @@ const AccountSettings = lazy(() => import("./pages/account/AccountSettings"));
 const Leaderboard = lazy(() => import("./pages/account/Leaderboard"));
 const ResponsibleGamingLimits = lazy(() => import("./pages/account/ResponsibleGaming"));
 const LiveBets = lazy(() => import("./pages/account/LiveBets"));
+const KYCVerification = lazy(() => import("./pages/account/KYCVerification"));
+const Referral = lazy(() => import("./pages/account/Referral"));
+const VIPHub = lazy(() => import("./pages/account/VIPHub"));
+const Bonuses = lazy(() => import("./pages/account/Bonuses"));
+const Join = lazy(() => import("./pages/Join"));
 
 // Account Tiers
 const DiamondTier = lazy(() => import("./pages/account/tiers/DiamondTier"));
@@ -184,6 +192,15 @@ const AdminSettings = lazy(() => import("./pages/admin/Settings"));
 const AdminSecurity = lazy(() => import("./pages/admin/Security"));
 const EscrowManagement = lazy(() => import("./pages/admin/EscrowManagement"));
 const SuperAdminDashboard = lazy(() => import("./pages/admin/SuperAdminDashboard"));
+const AdminCredentials = lazy(() => import("./pages/admin/Credentials"));
+const AdminAICenter = lazy(() => import("./pages/admin/AICenter"));
+const AdminWorkflows = lazy(() => import("./pages/admin/Workflows"));
+const AdminUserDetail = lazy(() => import("./pages/admin/UserDetail"));
+const AdminBonus = lazy(() => import("./pages/admin/Bonus"));
+const AdminRG = lazy(() => import("./pages/admin/RG"));
+const AdminPayments = lazy(() => import("./pages/admin/Payments"));
+const AdminAIControl = lazy(() => import("./pages/admin/AIControl"));
+const AdminJackpot = lazy(() => import("./pages/admin/AdminJackpot"));
 
 const MobileBetSlip = lazy(() => import("./components/MobileBetSlip"));
 const BottomNav = lazy(() => import("./components/mobile/BottomNav").then(m => ({ default: m.BottomNav })));
@@ -197,22 +214,22 @@ const LiveCasinoBaccarat = lazy(() => import("./pages/live-casino/Baccarat"));
 const LiveCasinoBlackjack = lazy(() => import("./pages/live-casino/Blackjack"));
 const BetFeatures = lazy(() => import("./pages/BetFeatures"));
 const EnhancedAccountHub = lazy(() => import("./pages/account/EnhancedAccountHub"));
-const Politics = lazy(() => import("./pages/politics/Politics"));
 const BettingHub = lazy(() => import("./pages/BettingHub"));
+const AIFeatures = lazy(() => import("./pages/AIFeatures"));
+const Politics = lazy(() => import("./pages/politics/Politics"));
 const Economy = lazy(() => import("./pages/economy/Economy"));
 const Social = lazy(() => import("./pages/social/Social"));
 const Predict = lazy(() => import("./pages/predict/Predict"));
-const AIFeatures = lazy(() => import("./pages/AIFeatures"));
 const SocialBetting = lazy(() => import("./pages/SocialBetting"));
 const BetMarketplace = lazy(() => import("./pages/BetMarketplace"));
 const AIPredictions = lazy(() => import("./pages/AIPredictions"));
 const PoolBetting = lazy(() => import("./pages/PoolBetting"));
+const Jackpot = lazy(() => import("./pages/Jackpot"));
 const FantasySports = lazy(() => import("./pages/FantasySports"));
 const NigerianFantasy = lazy(() => import("./pages/fantasy/NigerianFantasy"));
 const LiveStreaming = lazy(() => import("./pages/LiveStreaming"));
 const Web3Hub = lazy(() => import("./pages/Web3Hub"));
 const VirtualStadium = lazy(() => import("./pages/VirtualStadium"));
-const FuzFlix = lazy(() => import("./pages/FuzFlix"));
 const CasinoLobby = lazy(() => import("./pages/casino/CasinoLobby"));
 const Analytics = lazy(() => import("./pages/Analytics"));
 const FuzInsurance = lazy(() => import("./pages/promotions/FuzInsurance"));
@@ -227,7 +244,6 @@ const LiveCasinoLayout = lazy(() => import("./pages/live-casino/LiveCasinoLayout
 const AfricanDraft = lazy(() => import("./pages/games/AfricanDraft"));
 const Morabaraba = lazy(() => import("./pages/games/Morabaraba"));
 const Mancala = lazy(() => import("./pages/games/Mancala"));
-const Tournament = lazy(() => import("./pages/games/Tournament"));
 
 // Loading component
 const PageLoader = () => (
@@ -238,7 +254,14 @@ const PageLoader = () => (
 
 const queryClient = new QueryClient();
 
-const App = () => (
+const App = () => {
+  useEffect(() => {
+    useAuthStore.getState().hydrate();
+    registerSW();
+  }, []);
+
+  return (
+  <LangProvider>
   <QueryClientProvider client={queryClient}>
     <BetSlipProvider>
       <Toaster />
@@ -256,16 +279,13 @@ const App = () => (
           <Route path="/games" element={<Games />} /> {/* Games lobby/overview */}
           <Route path="/virtuals" element={<Virtuals />} />
           <Route path="/bet-features" element={<BetFeatures />} />
-          <Route path="/politics" element={<Politics />} />
           <Route path="/betting-hub" element={<BettingHub />} />
-          <Route path="/economy" element={<Economy />} />
-          <Route path="/social" element={<Social />} />
-          <Route path="/predict" element={<Predict />} />
           <Route path="/ai-features" element={<AIFeatures />} />
           <Route path="/social-betting" element={<SocialBetting />} />
           <Route path="/bet-marketplace" element={<BetMarketplace />} />
           <Route path="/ai-predictions" element={<AIPredictions />} />
           <Route path="/pool-betting" element={<PoolBetting />} />
+          <Route path="/jackpot" element={<Jackpot />} />
           <Route path="/fantasy-sports" element={<FantasySports />} />
           <Route path="/fantasy-sports/:leagueId" element={<LeagueDetail />} />
           <Route path="/fantasy/nigerian" element={<NigerianFantasy />} />
@@ -274,8 +294,11 @@ const App = () => (
           <Route path="/fantasy/history" element={<ContestHistory />} />
           <Route path="/live-streaming" element={<LiveStreaming />} />
           <Route path="/web3-hub" element={<Web3Hub />} />
+          <Route path="/politics" element={<Politics />} />
+          <Route path="/economy" element={<Economy />} />
+          <Route path="/social" element={<Social />} />
+          <Route path="/predict" element={<Predict />} />
           <Route path="/virtual-stadium" element={<VirtualStadium />} />
-          <Route path="/fuzflix" element={<FuzFlix />} />
           <Route path="/casino-lobby" element={<CasinoLobby />} />
           <Route path="/analytics" element={<Analytics />} />
           
@@ -370,12 +393,11 @@ const App = () => (
             <Route path="burst" element={<BurstGames />} />
           </Route>
           
-          {/* Traditional African Games - Grouped for better code splitting */}
+          {/* Traditional African Games */}
           <Route path="/games" element={<GamesLayout />}>
             <Route path="african-draft" element={<AfricanDraft />} />
             <Route path="morabaraba" element={<Morabaraba />} />
             <Route path="mancala" element={<Mancala />} />
-            <Route path="tournament" element={<Tournament />} />
           </Route>
           
           {/* Racing - Grouped for better code splitting */}
@@ -410,7 +432,12 @@ const App = () => (
           <Route path="/account/limits" element={<ResponsibleGamingLimits />} />
           <Route path="/account/player-protection" element={<PlayerProtection />} />
           <Route path="/account/live-bets" element={<LiveBets />} />
-          
+          <Route path="/account/kyc" element={<KYCVerification />} />
+          <Route path="/account/referral" element={<Referral />} />
+          <Route path="/account/vip" element={<VIPHub />} />
+          <Route path="/account/bonuses" element={<Bonuses />} />
+          <Route path="/join" element={<Join />} />
+
           {/* Account Tiers */}
           <Route path="/account/tiers/diamond" element={<DiamondTier />} />
           <Route path="/account/tiers/platinum" element={<PlatinumTier />} />
@@ -442,6 +469,7 @@ const App = () => (
           <Route path="/info/faq" element={<FAQ />} />
 
           {/* Admin */}
+          <Route path="/admin" element={<Navigate to="/admin/auth" replace />} />
           <Route path="/admin/auth" element={<AdminAuth />} />
           <Route path="/admin/login" element={<AdminAuth />} />
           <Route path="/admin/ai-assets" element={<AdminAssets />} />
@@ -462,6 +490,10 @@ const App = () => (
           <Route path="/admin/reports" element={<AdminReports />} />
           <Route path="/admin/data" element={<DataManagement />} />
           <Route path="/admin/webhooks" element={<WebhookSettings />} />
+          <Route path="/admin/ai" element={<AdminAICenter />} />
+          <Route path="/admin/ai-control" element={<AdminAIControl />} />
+          <Route path="/admin/jackpot" element={<AdminJackpot />} />
+          <Route path="/admin/workflows" element={<AdminWorkflows />} />
           <Route path="/admin/audit" element={<AdminAuditLog />} />
           <Route path="/admin/audit-log" element={<AdminAuditLog />} />
           <Route path="/admin/settings" element={<AdminSettings />} />
@@ -471,6 +503,11 @@ const App = () => (
           <Route path="/admin/operations" element={<Operations />} />
           <Route path="/admin/growth" element={<GrowthTools />} />
           <Route path="/admin/super" element={<SuperAdminDashboard />} />
+          <Route path="/admin/credentials" element={<AdminCredentials />} />
+          <Route path="/admin/users/:id" element={<AdminUserDetail />} />
+          <Route path="/admin/bonus" element={<AdminBonus />} />
+          <Route path="/admin/rg" element={<AdminRG />} />
+          <Route path="/admin/payments" element={<AdminPayments />} />
           
           {/* Status Page */}
           <Route path="/status" element={<Status />} />
@@ -504,6 +541,8 @@ const App = () => (
       </BrowserRouter>
     </BetSlipProvider>
   </QueryClientProvider>
-);
+  </LangProvider>
+  );
+};
 
 export default App;

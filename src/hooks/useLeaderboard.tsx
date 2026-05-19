@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuthStore } from '@/store/authStore';
 
 export interface LeaderboardEntry {
   id: string;
@@ -85,7 +85,7 @@ export const useLeaderboard = (weekStart?: string) => {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      // supabase_stub(channel);
     };
   }, [weekStart]);
 

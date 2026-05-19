@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useCasinoBalance } from './useCasinoBalance';
 
 interface CoinFlipState {
   balance: number;
@@ -16,6 +16,7 @@ interface CoinFlipState {
 
 export const useCoinFlip = () => {
   const { toast } = useToast();
+  const { balance: walletBalance, playRound: syncRound } = useCasinoBalance();
   const [state, setState] = useState<CoinFlipState>({
     balance: 50000,
     stake: 1000,
@@ -46,12 +47,8 @@ export const useCoinFlip = () => {
 
   const generateNarrative = async (result: 'heads' | 'tails', prediction: 'heads' | 'tails', won: boolean) => {
     try {
-      const { data, error } = await supabase.functions.invoke('ai-coin-flip', {
-        body: { result, prediction, won }
-      });
-
-      if (error) throw error;
-      return data.narrative || 'The coin has decided your fate...';
+      // AI narrative unavailable
+      return won ? 'Victory! Fortune favors the brave!' : 'Fate had other plans. Try again!';
     } catch (error) {
       console.error('Error generating narrative:', error);
       return won ? '🎉 Victory! The coin favors the bold!' : '💔 Defeat... But fortune favors the brave!';
@@ -93,6 +90,8 @@ export const useCoinFlip = () => {
 
     // Generate AI narrative
     const narrative = await generateNarrative(result, state.prediction!, won);
+
+    syncRound('coin-flip', state.stake, winAmount).catch(() => {});
 
     setState(prev => ({
       ...prev,

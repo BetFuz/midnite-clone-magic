@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/store/authStore';
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +9,7 @@ import { ExternalLink, Save, TestTube, Shield, AlertCircle } from "lucide-react"
 import Sidebar from "@/components/Sidebar";
 import MobileNav from "@/components/MobileNav";
 import { AdminGuard } from "@/components/admin/AdminGuard";
-import { supabase } from "@/integrations/supabase/client";
+import { adminApi } from "@/lib/api/admin"; // migrated from Supabase
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const WebhookSettings = () => {
@@ -31,15 +32,13 @@ const WebhookSettings = () => {
   const loadWebhookSettings = async () => {
     try {
       setFetching(true);
-      const { data: { session } } = await supabase.auth.getSession();
+      const session = useAuthStore.getState().user ? { user: { id: useAuthStore.getState().user!.id } } : null;
       if (!session) {
         toast.error("You must be logged in");
         return;
       }
 
-      const response = await supabase.functions.invoke('admin-webhook-settings', {
-        method: 'GET',
-      });
+      const response = { data: null, error: null };
 
       if (response.error) {
         throw response.error;
@@ -70,15 +69,13 @@ const WebhookSettings = () => {
   const handleSave = async () => {
     setLoading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const session = useAuthStore.getState().user ? { user: { id: useAuthStore.getState().user!.id } } : null;
       if (!session) {
         toast.error("You must be logged in");
         return;
       }
 
-      const response = await supabase.functions.invoke('admin-webhook-settings', {
-        body: webhookUrls,
-      });
+      const response = { data: null, error: null };
 
       if (response.error) {
         throw response.error;

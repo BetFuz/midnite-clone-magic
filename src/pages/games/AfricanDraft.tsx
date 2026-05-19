@@ -1,8 +1,5 @@
+import { useAuthStore } from '@/store/authStore';
 import { useState, useEffect } from 'react';
-import Header from '@/components/Header';
-import Sidebar from '@/components/Sidebar';
-import BetSlip from '@/components/BetSlip';
-import MobileNav from '@/components/MobileNav';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,9 +10,10 @@ import { toast } from '@/hooks/use-toast';
 import AfricanDraftBoard from '@/components/games/AfricanDraftBoard';
 import { useAfricanDraftGame, GameMode } from '@/hooks/useAfricanDraftGame';
 import { UniversalGameInterface } from '@/components/games/UniversalGameInterface';
-import { supabase } from '@/integrations/supabase/client';
+
 
 export default function AfricanDraft() {
+  const { user: authUser } = useAuthStore();
   const [activeMode, setActiveMode] = useState<GameMode>('p2p');
   const [isPlaying, setIsPlaying] = useState(false);
   const [stakeAmount, setStakeAmount] = useState(1000);
@@ -32,12 +30,10 @@ export default function AfricanDraft() {
     'Master': 'master' as const
   };
 
-  // Get current user
+  // Sync userId from auth store
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setUserId(data.user?.id || null);
-    });
-  }, []);
+    setUserId(authUser?.id || null);
+  }, [authUser]);
 
   const { 
     boardState, 
@@ -98,12 +94,7 @@ export default function AfricanDraft() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <div className="flex pt-16">
-        <Sidebar />
-        <main className="flex-1 p-4 md:p-6 md:ml-64">
-          <div className="max-w-7xl mx-auto space-y-6 pb-24 md:pb-6">
+    <div className="max-w-7xl mx-auto space-y-6 pb-6">
             {/* Game Header */}
             <Card className="p-6 border-primary/20 bg-gradient-to-br from-primary/5 to-background">
               <div className="flex items-start gap-4">
@@ -238,11 +229,6 @@ export default function AfricanDraft() {
                 </div>
               </div>
             </Card>
-          </div>
-        </main>
-        <BetSlip />
-      </div>
-      <MobileNav />
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuthStore } from '@/store/authStore';
 import { useToast } from "@/components/ui/use-toast";
 
 export interface SocialBet {
@@ -50,7 +50,7 @@ export const useSocialBetting = () => {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      // supabase_stub(channel);
     };
   }, []);
 
@@ -103,7 +103,7 @@ export const useSocialBetting = () => {
 
   const loadFollowing = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = useAuthStore.getState().user;
       if (!user) return;
 
       const { data, error } = await supabase
@@ -120,7 +120,7 @@ export const useSocialBetting = () => {
 
   const followUser = async (userId: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = useAuthStore.getState().user;
       if (!user) {
         toast({
           title: "Authentication Required",
@@ -153,7 +153,7 @@ export const useSocialBetting = () => {
 
   const unfollowUser = async (userId: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = useAuthStore.getState().user;
       if (!user) return;
 
       const { error } = await supabase
@@ -181,7 +181,7 @@ export const useSocialBetting = () => {
 
   const likeBet = async (betId: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = useAuthStore.getState().user;
       if (!user) {
         toast({
           title: "Authentication Required",
@@ -226,7 +226,7 @@ export const useSocialBetting = () => {
 
   const unlikeBet = async (betId: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = useAuthStore.getState().user;
       if (!user) return;
 
       const { error } = await supabase
@@ -249,7 +249,7 @@ export const useSocialBetting = () => {
 
   const copyBet = async (originalBetId: string, betSlipId: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = useAuthStore.getState().user;
       if (!user) {
         toast({
           title: "Authentication Required",
@@ -328,7 +328,7 @@ export const useSocialBetting = () => {
 
   const shareBet = async (betSlipId: string, caption: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = useAuthStore.getState().user;
       if (!user) {
         toast({
           title: "Authentication Required",

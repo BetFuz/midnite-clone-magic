@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 export interface BetSelection {
@@ -104,9 +103,11 @@ export const BetSlipProvider = ({ children }: { children: ReactNode }) => {
     setIsPlacingBet(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
+      const { betApi } = await import('@/lib/api/bets');
+      const { useAuthStore } = await import('@/store/authStore');
+      const authUser = useAuthStore.getState().user;
+
+      if (!authUser) {
         toast({
           title: "Authentication Required",
           description: "Please login to place a bet",
@@ -115,54 +116,25 @@ export const BetSlipProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
 
-      // Create bet slip
-      const { data: betSlip, error: betSlipError } = await supabase
-        .from("bet_slips")
-        .insert({
-          user_id: user.id,
-          total_stake: stake,
-          total_odds: totalOdds,
-          potential_win: potentialWin,
-          bet_type: selections.length === 1 ? "single" : "multiple",
-        })
-        .select()
-        .single();
+      const apiSelections = selections.map(sel => ({
+        eventId: sel.matchId,
+        marketId: sel.selectionType,
+        oddsId: `${sel.matchId}_${sel.selectionType}_${sel.selectionValue}`,
+        odds: sel.odds,
+      }));
 
-      if (betSlipError) throw betSlipError;
-
-      // Create bet selections
-      const { error: selectionsError } = await supabase
-        .from("bet_selections")
-        .insert(
-          selections.map(sel => ({
-            bet_slip_id: betSlip.id,
-            match_id: sel.matchId,
-            sport: sel.sport,
-            league: sel.league,
-            home_team: sel.homeTeam,
-            away_team: sel.awayTeam,
-            selection_type: sel.selectionType,
-            selection_value: sel.selectionValue,
-            odds: sel.odds,
-            match_time: sel.matchTime,
-          }))
-        );
-
-      if (selectionsError) throw selectionsError;
+      const betType = selections.length === 1 ? 'single' : 'accumulator';
+      const result = await betApi.placeBet({ selections: apiSelections, stake, betType });
 
       toast({
         title: "Bet Placed Successfully! 🎉",
-        description: `Ticket ID: ${betSlip.id.slice(0, 8)}... | Potential win: ₦${potentialWin.toFixed(2)}`,
+        description: `Ticket: ${result?.id?.slice(0, 8) || 'placed'} | Potential win: ₦${potentialWin.toFixed(2)}`,
       });
 
       clearSelections();
     } catch (error: any) {
-      console.error("Error placing bet:", error);
-      toast({
-        title: "Failed to Place Bet",
-        description: error.message || "Please try again",
-        variant: "destructive",
-      });
+      const msg = error?.response?.data?.message || error?.message || "Please try again";
+      toast({ title: "Failed to Place Bet", description: msg, variant: "destructive" });
     } finally {
       setIsPlacingBet(false);
     }

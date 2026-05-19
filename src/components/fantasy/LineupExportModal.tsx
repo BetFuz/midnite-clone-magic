@@ -1,9 +1,9 @@
+import { useAuthStore } from '@/store/authStore';
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Copy, Download, Upload, Share2 } from "lucide-react";
 
@@ -23,7 +23,7 @@ export function LineupExportModal({ lineupId, lineupData, open, onOpenChange }: 
     try {
       setLoading(true);
       const code = Math.random().toString(36).substring(2, 10).toUpperCase();
-      const { data: user } = await supabase.auth.getUser();
+      const { data: user } = { data: { user: useAuthStore.getState().user ? { id: useAuthStore.getState().user!.id, email: useAuthStore.getState().user!.email } : null } };
       if (!user.user) throw new Error("Not authenticated");
 
       const { error } = await supabase

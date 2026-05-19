@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Bell, Mail, MessageSquare, Smartphone } from 'lucide-react';
 import { toast } from 'sonner';
+import { usePush } from '@/hooks/usePush';
 
 interface NotificationSettings {
   email: {
@@ -32,6 +33,7 @@ interface NotificationSettings {
 }
 
 const NotificationPreferences = () => {
+  const { state: pushState, enable: enablePush } = usePush();
   const [settings, setSettings] = useState<NotificationSettings>({
     email: {
       betUpdates: true,
@@ -93,6 +95,37 @@ const NotificationPreferences = () => {
 
   return (
     <div className="space-y-6">
+      {/* Push permission banner */}
+      {pushState !== 'granted' && pushState !== 'unsupported' && pushState !== 'denied' && (
+        <Card className="p-5 border-primary/30 bg-primary/5">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <Bell className="h-5 w-5 text-primary flex-shrink-0" />
+              <div>
+                <p className="font-semibold text-sm">Enable Push Notifications</p>
+                <p className="text-muted-foreground text-xs">Get instant alerts for bet results, wins, and promotions</p>
+              </div>
+            </div>
+            <Button size="sm" onClick={enablePush} disabled={pushState === 'requesting'}>
+              {pushState === 'requesting' ? 'Enabling…' : 'Enable'}
+            </Button>
+          </div>
+        </Card>
+      )}
+      {pushState === 'granted' && (
+        <Card className="p-4 border-green-500/30 bg-green-500/5">
+          <div className="flex items-center gap-2 text-green-500 text-sm">
+            <Bell className="h-4 w-4" />
+            <span className="font-medium">Push notifications are active</span>
+          </div>
+        </Card>
+      )}
+      {pushState === 'denied' && (
+        <Card className="p-4 border-yellow-500/30 bg-yellow-500/5">
+          <p className="text-yellow-500 text-sm">Push notifications are blocked. Enable them in your browser settings.</p>
+        </Card>
+      )}
+
       {/* Email Notifications */}
       <Card className="p-6">
         <div className="flex items-center gap-2 mb-6">

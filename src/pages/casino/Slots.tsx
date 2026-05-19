@@ -13,7 +13,7 @@ const Slots = () => {
           <div className="max-w-7xl mx-auto">
             <h1 className="text-4xl font-bold text-foreground mb-2 text-center">🎰 AI Slot Machine 🎰</h1>
             <p className="text-muted-foreground text-center mb-8">
-              Powered by Lovable AI • Dynamic Themes • Real-time Gaming
+              African Treasures • Dynamic Themes • Real-time Gaming
             </p>
             <SlotMachine />
           </div>

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/lib/api/client';
 
 export interface Match {
   id: string;
@@ -20,57 +20,55 @@ export interface Match {
 export const useLeagueMatches = (leagueName: string, daysAhead: number = 7) => {
   return useQuery({
     queryKey: ['league-matches', leagueName, daysAhead],
-    queryFn: async () => {
-      const now = new Date();
-      const futureDate = new Date();
-      futureDate.setDate(futureDate.getDate() + daysAhead);
-
-      // Direct table query with case-insensitive matching for flexibility
-      const { data, error } = await supabase
-        .from('matches')
-        .select('id, match_id, league_id, sport_key, sport_title, league_name, home_team, away_team, commence_time, home_odds, draw_odds, away_odds, status')
-        .ilike('league_name', `%${leagueName}%`)
-        .gte('commence_time', now.toISOString())
-        .lte('commence_time', futureDate.toISOString())
-        .order('commence_time', { ascending: true })
-        .limit(50);
-
-      if (error) {
-        console.error('useLeagueMatches error:', error);
-        return [] as Match[];
-      }
-      
-      return (data ?? []) as Match[];
+    queryFn: async (): Promise<Match[]> => {
+      const { data } = await api.get('/sports/fixtures', {
+        params: { league: leagueName, days: daysAhead },
+      });
+      return (data.data ?? []) as Match[];
     },
-    staleTime: 60000, // Cache for 1 minute
-    gcTime: 300000, // Keep in cache for 5 minutes
+    staleTime: 10 * 60 * 1000,  // 10 min
+    gcTime:    60 * 60 * 1000,  // 1 hr
+    retry: 2,
   });
 };
-
 
 export const useSportMatches = (sportKey: string, daysAhead: number = 7) => {
   return useQuery({
     queryKey: ['sport-matches', sportKey, daysAhead],
-    queryFn: async () => {
-      const now = new Date();
-      const futureDate = new Date();
-      futureDate.setDate(futureDate.getDate() + daysAhead);
-
-      const { data, error } = await supabase
-        .from('matches')
-        .select('*')
-        .eq('sport_key', sportKey)
-        .gte('commence_time', now.toISOString())
-        .lte('commence_time', futureDate.toISOString())
-        .order('commence_time', { ascending: true });
-
-      if (error) {
-        console.error('useSportMatches error', { sportKey, daysAhead, now: now.toISOString(), future: futureDate.toISOString(), error });
-        throw error;
-      }
-      console.info('useSportMatches result', { sportKey, count: data?.length ?? 0, range: [now.toISOString(), futureDate.toISOString()] });
-      return (data ?? []) as Match[];
+    queryFn: async (): Promise<Match[]> => {
+      const { data } = await api.get('/sports/fixtures', {
+        params: { league: sportKey, days: daysAhead },
+      });
+      return (data.data ?? []) as Match[];
     },
-    refetchInterval: 60000,
+    staleTime: 10 * 60 * 1000,
+    gcTime:    60 * 60 * 1000,
+    refetchInterval: 15 * 60 * 1000,  // refresh every 15 min
+    retry: 2,
+  });
+};
+
+// Used by Football.tsx overview page - counts matches per league
+export const useLeagueMatchCounts = (leagueNames: string[], daysAhead: number = 7) => {
+  return useQuery({
+    queryKey: ['league-match-counts', leagueNames, daysAhead],
+    queryFn: async (): Promise<Record<string, number>> => {
+      const results = await Promise.allSettled(
+        leagueNames.map(async (name) => {
+          const { data } = await api.get('/sports/fixtures', {
+            params: { league: name, days: daysAhead },
+          });
+          return { name, count: (data.data ?? []).length as number };
+        })
+      );
+      const counts: Record<string, number> = {};
+      for (const r of results) {
+        if (r.status === 'fulfilled') counts[r.value.name] = r.value.count;
+      }
+      return counts;
+    },
+    staleTime: 15 * 60 * 1000,
+    gcTime:    60 * 60 * 1000,
+    retry: 1,
   });
 };

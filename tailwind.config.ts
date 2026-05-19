@@ -125,18 +125,18 @@ export default {
           }
         },
         "bounce-in": {
-          "0%": {
-            transform: "scale(0.3)",
-            opacity: "0"
-          },
-          "50%": {
-            transform: "scale(1.05)"
-          },
-          "100%": {
-            transform: "scale(1)",
-            opacity: "1"
-          }
-        }
+          "0%": { transform: "scale(0.3)", opacity: "0" },
+          "50%": { transform: "scale(1.05)" },
+          "100%": { transform: "scale(1)", opacity: "1" }
+        },
+        "ticker": {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" }
+        },
+        "shimmer": {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(200%)" }
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -145,7 +145,9 @@ export default {
         "scale-in": "scale-in 0.2s ease-out",
         "spin-slow": "spin-slow 3s linear infinite",
         "pulse-glow": "pulse-glow 2s ease-in-out infinite",
-        "bounce-in": "bounce-in 0.5s ease-out"
+        "bounce-in": "bounce-in 0.5s ease-out",
+        "ticker": "ticker 30s linear infinite",
+        "shimmer": "shimmer 2.5s linear infinite",
       },
     },
   },

@@ -1,110 +1,91 @@
-import { NavLink } from "@/components/NavLink";
-import { useLocation } from "react-router-dom";
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useAuthStore } from '@/store/authStore';
 import {
-  LayoutDashboard,
-  Users,
-  Ticket,
-  TrendingUp,
-  Database,
-  Webhook,
-  Settings,
-  BarChart3,
-  Shield,
-  DollarSign,
-  FileText,
-  Bell,
-  Zap,
-  Sparkles,
-  Globe,
-  Building2,
-} from "lucide-react";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from "@/components/ui/sidebar";
+  LayoutDashboard, Users, Activity, Calendar, DollarSign,
+  ShieldCheck, Brain, ClipboardList, Settings, LogOut, Zap, Workflow, Sparkles,
+  BarChart2, Gift, HeartHandshake, Key, Wallet, Trophy,
+} from 'lucide-react';
 
-const menuItems = [
-  {
-    title: "Overview",
-    items: [
-      { title: "Dashboard", url: "/admin/dashboard", icon: LayoutDashboard },
-      { title: "Super Admin", url: "/admin/super", icon: Globe, superAdminOnly: true },
-      { title: "Analytics", url: "/admin/analytics", icon: BarChart3 },
-    ],
-  },
-  {
-    title: "Management",
-    items: [
-      { title: "Users", url: "/admin/users", icon: Users },
-      { title: "Bets & Tickets", url: "/admin/bets", icon: Ticket },
-      { title: "Finances", url: "/admin/finances", icon: DollarSign },
-      { title: "Promotions", url: "/admin/promotions", icon: Zap },
-    ],
-  },
-  {
-    title: "Data & System",
-    items: [
-      { title: "Match Data", url: "/admin/data", icon: Database },
-      { title: "Seed Data", url: "/admin/seed", icon: TrendingUp },
-      { title: "Webhooks", url: "/admin/webhooks", icon: Webhook },
-      { title: "Audit Logs", url: "/admin/audit", icon: FileText },
-    ],
-  },
-  {
-    title: "Configuration",
-    items: [
-      { title: "AI Assets", url: "/admin/ai-assets", icon: Sparkles },
-      { title: "Settings", url: "/admin/settings", icon: Settings },
-      { title: "Security", url: "/admin/security", icon: Shield },
-      { title: "Escrow", url: "/admin/escrow", icon: Shield },
-      { title: "Notifications", url: "/admin/notifications", icon: Bell },
-    ],
-  },
+const NAV = [
+  { to: '/admin/dashboard',  icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/admin/users',      icon: Users,           label: 'Users' },
+  { to: '/admin/bets',       icon: Activity,        label: 'Bets' },
+  { to: '/admin/events',     icon: Calendar,        label: 'Events & Odds' },
+  { to: '/admin/finances',   icon: DollarSign,      label: 'Finances' },
+  { to: '/admin/payments',   icon: Wallet,          label: 'Payments' },
+  { to: '/admin/kyc',        icon: ShieldCheck,     label: 'KYC & Compliance' },
+  { to: '/admin/reports',    icon: BarChart2,       label: 'Reports' },
+  { to: '/admin/bonus',      icon: Gift,            label: 'Bonus Manager' },
+  { to: '/admin/rg',         icon: HeartHandshake,  label: 'Resp. Gambling' },
+  { to: '/admin/ai-control', icon: Brain,     label: 'AI Control' },
+  { to: '/admin/jackpot',    icon: Trophy,    label: 'Jackpot' },
+  { to: '/admin/ai',         icon: Sparkles,  label: 'AI Center' },
+  { to: '/admin/workflows',  icon: Workflow,        label: 'Automations' },
+  { to: '/admin/audit',      icon: ClipboardList,   label: 'Audit Log' },
+  { to: '/admin/credentials',icon: Key,             label: 'Credentials' },
+  { to: '/admin/settings',   icon: Settings,        label: 'Settings' },
 ];
 
 export const AdminSidebar = () => {
-  const { state } = useSidebar();
-  const location = useLocation();
-  const collapsed = state === "collapsed";
-  const currentPath = location.pathname;
+  const { logout, user } = useAuthStore();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/admin/login');
+  };
 
   return (
-    <Sidebar className={collapsed ? "w-14" : "w-64"} collapsible="icon">
-      <SidebarContent>
-        {menuItems.map((section) => {
-          return (
-            <SidebarGroup key={section.title}>
-              {!collapsed && <SidebarGroupLabel>{section.title}</SidebarGroupLabel>}
-              
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {section.items.map((item) => (
-                    <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton asChild>
-                        <NavLink
-                          to={item.url}
-                          className="hover:bg-muted/50"
-                          activeClassName="bg-muted text-primary font-medium"
-                        >
-                          <item.icon className={collapsed ? "h-5 w-5" : "mr-2 h-4 w-4"} />
-                          {!collapsed && <span>{item.title}</span>}
-                        </NavLink>
-                      </SidebarMenuButton>
-                    </SidebarMenuItem>
-                  ))}
-                </SidebarMenu>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          );
-        })}
-      </SidebarContent>
-    </Sidebar>
+    <aside className="w-60 flex-shrink-0 flex flex-col bg-[#111827] border-r border-[#1f2d3d] min-h-screen">
+      <div className="flex items-center gap-2 px-5 py-5 border-b border-[#1f2d3d]">
+        <div className="w-8 h-8 rounded-lg bg-[#00b15c] flex items-center justify-center">
+          <Zap className="w-5 h-5 text-white" />
+        </div>
+        <div>
+          <span className="text-white font-bold text-base leading-none">BetFuz</span>
+          <span className="block text-[10px] text-[#00b15c] font-semibold tracking-widest uppercase mt-0.5">Admin</span>
+        </div>
+      </div>
+
+      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+        {NAV.map(({ to, icon: Icon, label }) => (
+          <NavLink
+            key={to}
+            to={to}
+            className={({ isActive }: { isActive: boolean }) =>
+              `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                isActive
+                  ? 'bg-[#00b15c]/10 text-[#00b15c] border border-[#00b15c]/20'
+                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+              }`
+            }
+          >
+            <Icon className="w-4 h-4 flex-shrink-0" />
+            {label}
+          </NavLink>
+        ))}
+      </nav>
+
+      <div className="px-3 py-4 border-t border-[#1f2d3d] space-y-1">
+        <div className="flex items-center gap-3 px-3 py-2">
+          <div className="w-7 h-7 rounded-full bg-[#00b15c]/20 flex items-center justify-center">
+            <span className="text-[#00b15c] text-xs font-bold">
+              {user?.firstName?.[0] ?? user?.email?.[0]?.toUpperCase() ?? 'A'}
+            </span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-white text-xs font-medium truncate">{user?.firstName ?? user?.email}</p>
+            <p className="text-gray-500 text-[10px] uppercase tracking-wider">{user?.role?.toLowerCase()}</p>
+          </div>
+        </div>
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-red-400 hover:bg-red-500/5 transition-all"
+        >
+          <LogOut className="w-4 h-4" />
+          Sign Out
+        </button>
+      </div>
+    </aside>
   );
 };

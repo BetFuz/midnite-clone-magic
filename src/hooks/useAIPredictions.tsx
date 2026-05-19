@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuthStore } from '@/store/authStore';
 import { toast } from "sonner";
 
 export interface AIPrediction {
@@ -58,7 +58,7 @@ export const useAIPredictions = () => {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      // supabase_stub(channel);
     };
   }, []);
 

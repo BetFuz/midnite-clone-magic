@@ -99,9 +99,9 @@ export const SlotMachine = () => {
           <Slider
             value={[betAmount]}
             onValueChange={(value) => setBetAmount(value[0])}
-            min={5}
-            max={100}
-            step={5}
+            min={100}
+            max={10000}
+            step={100}
             disabled={isSpinning}
             className="w-full"
           />

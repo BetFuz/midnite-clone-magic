@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuthStore } from '@/store/authStore';
 import { toast } from "sonner";
 
 interface VRExperience {
@@ -28,7 +28,7 @@ export const useVRExperiences = () => {
 
   const loadExperiences = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = useAuthStore.getState().user;
 
       // Fetch all VR experiences
       const { data: experiencesData, error: experiencesError } = await supabase
@@ -63,7 +63,7 @@ export const useVRExperiences = () => {
 
   const startSession = async (experienceId: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = useAuthStore.getState().user;
       if (!user) {
         toast.error("Please login to start VR session");
         return null;
@@ -124,7 +124,7 @@ export const useVRExperiences = () => {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      // supabase_stub(channel);
     };
   }, []);
 

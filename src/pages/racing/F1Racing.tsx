@@ -2,244 +2,231 @@ import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import BetSlip from "@/components/BetSlip";
 import { useF1Racing } from "@/hooks/useF1Racing";
-import { useRacingBetting, RaceParticipant } from "@/hooks/useRacingBetting";
-import { Loader2, Trophy, Play, Flag, Wind, Volume2 } from "lucide-react";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import F1RaceVisuals from "@/components/F1RaceVisuals";
+import { useBetSlip } from "@/contexts/BetSlipContext";
+import { Play, Flag, Wind, Volume2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { useState } from "react";
-import F1RaceVisuals from "@/components/F1RaceVisuals";
+import { cn } from "@/lib/utils";
+
+const TEAM_COLORS: Record<string, string> = {
+  "Red Bull Racing": "bg-blue-700",
+  "Mercedes": "bg-cyan-500",
+  "Ferrari": "bg-red-600",
+  "McLaren": "bg-orange-500",
+  "Aston Martin": "bg-emerald-600",
+};
 
 const F1Racing = () => {
   const circuit = "Monaco";
-  const { 
-    drivers, 
-    scenario, 
-    commentary, 
-    raceVideo, 
-    heroImage, 
-    isLoading: isF1Loading, 
-    raceState: f1RaceState,
+
+  const {
+    drivers,
+    scenario,
+    commentary,
+    raceState,
     currentLap,
     totalLaps,
     liveRaceState,
+    isLoading,
     generateRaceScenario,
-    startRace: startF1Race
+    startRace,
   } = useF1Racing(circuit);
 
-  const [stakes, setStakes] = useState<Record<string, number>>({});
+  const { addSelection } = useBetSlip();
 
-  const participants: RaceParticipant[] = drivers.map(d => ({
-    id: d.id,
-    name: `${d.name} (${d.team})`,
-    odds: d.odds,
-    stats: {
-      wins: d.stats.wins,
-      races: d.stats.wins + d.stats.podiums,
-      winRate: `${((d.stats.wins / (d.stats.wins + d.stats.podiums)) * 100).toFixed(1)}%`
-    }
-  }));
+  const bet = (driverId: string, driverName: string, team: string, odds: number) => {
+    addSelection({
+      id: `f1-${circuit}-${driverId}-win`,
+      matchId: `f1-${circuit}`,
+      homeTeam: driverName,
+      awayTeam: `${circuit} Grand Prix`,
+      league: "Formula 1",
+      sport: "Racing",
+      selectionType: "home",
+      selectionValue: `${driverName} to Win`,
+      odds,
+      matchTime: new Date().toISOString(),
+    });
+  };
 
-  const { raceState, winner, balance, placeBet, startRace, isPlacingBet } = useRacingBetting({
-    raceType: 'F1 Racing',
-    raceId: `f1-${circuit.toLowerCase()}-001`,
-    participants
+  const visualDrivers = liveRaceState.racers.map(racer => {
+    const driver = drivers.find(d => d.id === racer.id);
+    return {
+      id: racer.id,
+      name: racer.name,
+      team: driver?.team ?? "Unknown",
+      color: ["#1E40AF", "#06B6D4", "#DC2626", "#EA580C", "#059669"][parseInt(racer.id) - 1] ?? "#6B7280",
+      position: racer.position - 1,
+      progress: racer.distance,
+    };
   });
 
-  const handleBetClick = (participant: RaceParticipant) => {
-    const stake = stakes[participant.id] || 1000;
-    
-    if (raceState === 'pre-race') {
-      placeBet({
-        participantId: participant.id,
-        participantName: participant.name,
-        betType: 'win',
-        odds: participant.odds,
-        stake
-      });
-    }
-  };
-
-  const handleStartRace = async () => {
-    await startF1Race();
-    startRace();
-  };
+  const isPreRace = raceState === "pre-race";
+  const isRacing = raceState === "racing";
+  const isFinished = raceState === "finished";
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <div className="flex">
-        <Sidebar />
-        <main className="flex-1 p-6 overflow-y-auto h-[calc(100vh-4rem)] pb-24 md:pb-6">
-          <h1 className="text-4xl font-bold mb-2">🏎️ Formula 1 Racing</h1>
-          <p className="text-muted-foreground mb-6">AI-Powered Grand Prix Simulation - {circuit}</p>
+        <Sidebar className="hidden md:flex" />
 
-          <div className="mb-6">
-            <div 
-              className="h-[400px] flex items-center justify-center bg-gradient-hero border border-border rounded-lg relative overflow-hidden"
-              style={{
-                backgroundImage: heroImage ? `url(${heroImage})` : undefined,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center'
-              }}
-            >
-              {!heroImage && (
-                <div className="text-center z-10">
-                  <h2 className="text-4xl font-bold text-white mb-4">🏎️ {circuit} Grand Prix</h2>
-                  <p className="text-white/90">Formula 1 Racing - Place Your Bets Now</p>
-                </div>
-              )}
+        <main className="flex-1 overflow-y-auto h-[calc(100vh-4rem)] pb-24 md:pb-6">
+
+          {/* Gradient header */}
+          <div className="bg-gradient-to-r from-slate-800 to-red-900 px-4 md:px-6 py-4">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">🏎️</span>
+              <div className="flex-1">
+                <h1 className="text-sm font-bold text-white">Formula 1 — {circuit} Grand Prix</h1>
+                <p className="text-[11px] text-white/70">AI-Powered Race Simulation</p>
+              </div>
+              <Badge className={cn(
+                "text-[10px] border-0",
+                isPreRace ? "bg-green-500/20 text-green-300" :
+                isRacing ? "bg-red-500/20 text-red-300 animate-pulse" :
+                "bg-muted text-muted-foreground"
+              )}>
+                {isPreRace ? "Betting Open" : isRacing ? "LIVE" : "Finished"}
+              </Badge>
             </div>
           </div>
 
-          {raceVideo && (
-            <Card className="p-6 mb-6 bg-card border-border">
-              <div className="flex items-center gap-2 mb-4">
-                <Play className="h-5 w-5 text-primary" />
-                <h2 className="text-xl font-bold">Race Highlights</h2>
+          {/* Status bar */}
+          <div className="flex items-center gap-3 px-4 md:px-6 py-2 border-b border-border bg-card">
+            {isRacing && (
+              <>
+                <Flag className="w-3.5 h-3.5 text-muted-foreground" />
+                <span className="text-xs font-semibold">Lap {currentLap} / {totalLaps}</span>
+                <Progress value={(currentLap / totalLaps) * 100} className="flex-1 h-1.5" />
+              </>
+            )}
+            {isPreRace && (
+              <div className="flex items-center gap-3 w-full">
+                <button
+                  onClick={generateRaceScenario}
+                  disabled={isLoading}
+                  className="text-xs font-semibold text-muted-foreground hover:text-foreground border border-border rounded px-3 py-1.5 transition-colors disabled:opacity-50"
+                >
+                  {isLoading ? "Loading…" : "Race Conditions"}
+                </button>
+                <button
+                  onClick={startRace}
+                  className="flex items-center gap-1.5 text-xs font-bold bg-primary text-primary-foreground px-3 py-1.5 rounded transition-colors hover:bg-primary/90 active:scale-95"
+                >
+                  <Play className="w-3 h-3" /> Start Race
+                </button>
               </div>
-              <video src={raceVideo} controls className="w-full rounded-lg" />
-            </Card>
-          )}
-
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-4">
-              <Badge variant={raceState === 'pre-race' ? 'default' : raceState === 'racing' ? 'destructive' : 'secondary'}>
-                {raceState === 'pre-race' ? 'Pre-Race Betting Open' : raceState === 'racing' ? 'Race In Progress' : 'Race Finished'}
-              </Badge>
-              {f1RaceState === 'racing' && (
-                <div className="flex items-center gap-2">
-                  <Flag className="h-4 w-4" />
-                  <span className="font-semibold">Lap {currentLap}/{totalLaps}</span>
-                </div>
-              )}
-            </div>
-            <div className="text-lg font-semibold">Balance: ₦{balance.toLocaleString()}</div>
-            {raceState === 'pre-race' && (
-              <div className="flex gap-2">
-                <Button onClick={generateRaceScenario} variant="outline" disabled={isF1Loading}>
-                  Generate Scenario
-                </Button>
-                <Button onClick={handleStartRace} className="gap-2">
-                  <Play className="h-4 w-4" />
-                  Start Race
-                </Button>
-              </div>
+            )}
+            {isFinished && (
+              <span className="text-xs font-semibold text-muted-foreground">Race complete — checkered flag 🏁</span>
             )}
           </div>
 
-          {f1RaceState === 'racing' && (
-            <>
+          <div className="px-4 md:px-6 py-3 space-y-3">
+
+            {/* Live race visuals */}
+            {isRacing && liveRaceState.isRunning && visualDrivers.length > 0 && (
               <F1RaceVisuals
                 currentLap={currentLap}
                 totalLaps={totalLaps}
-                drivers={liveRaceState.racers.map((racer) => {
-                  const driver = drivers.find(d => d.id === racer.id);
-                  return {
-                    id: racer.id,
-                    name: racer.name,
-                    team: driver?.team || 'Unknown',
-                    color: ['#1E40AF', '#06B6D4', '#DC2626', '#EA580C', '#059669'][parseInt(racer.id) - 1] || '#6B7280',
-                    position: racer.position - 1,
-                    progress: racer.distance,
-                  };
-                })}
-                isRacing={liveRaceState.isRunning}
+                drivers={visualDrivers}
+                isRacing={isRacing}
               />
+            )}
 
-              {commentary && (
-                <Card className="p-4 mb-6 bg-card border-border">
-                  <div className="flex items-start gap-3">
-                    <Volume2 className="h-5 w-5 text-primary mt-1" />
-                    <div>
-                      <div className="text-xs font-semibold text-primary mb-1">RACE COMMENTARY</div>
-                      <p className="text-sm italic">&quot;{commentary}&quot;</p>
-                    </div>
-                  </div>
-                </Card>
-              )}
-            </>
-          )}
-
-          {scenario && (
-            <Card className="p-6 mb-6 bg-card border-border">
-              <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                <Wind className="h-5 w-5" />
-                Race Conditions
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <h4 className="font-semibold mb-2">Weather</h4>
-                  <p className="text-sm text-muted-foreground">{scenario.weather}</p>
-                </div>
-                <div>
-                  <h4 className="font-semibold mb-2">Tire Strategies</h4>
-                  <p className="text-sm text-muted-foreground">{scenario.tireStrategies?.join(', ')}</p>
-                </div>
-                {scenario.raceNarrative && (
-                  <div className="md:col-span-2">
-                    <h4 className="font-semibold mb-2">Race Narrative</h4>
-                    <p className="text-sm text-muted-foreground">{scenario.raceNarrative}</p>
-                  </div>
-                )}
+            {/* Commentary */}
+            {commentary && (
+              <div className="flex items-start gap-2 bg-muted/40 border border-border rounded-lg px-3 py-2">
+                <Volume2 className="w-3.5 h-3.5 text-primary mt-0.5 flex-shrink-0" />
+                <p className="text-xs italic text-muted-foreground">"{commentary}"</p>
               </div>
-            </Card>
-          )}
+            )}
 
-          <div className="space-y-4">
-            {participants.map((participant, idx) => {
-              const driver = drivers[idx];
-              return (
-                <Card key={participant.id} className="p-6 bg-card border-border">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-bold">{driver.name}</h3>
-                        <Badge variant="outline">{driver.team}</Badge>
-                        {winner === participant.id && (
-                          <Trophy className="h-5 w-5 text-yellow-500" />
+            {/* Race scenario */}
+            {scenario && (
+              <div className="bg-card border border-border rounded-lg px-3 py-2.5">
+                <div className="flex items-center gap-2 mb-2">
+                  <Wind className="w-3.5 h-3.5 text-muted-foreground" />
+                  <span className="text-xs font-bold">Race Conditions</span>
+                </div>
+                <p className="text-xs text-muted-foreground mb-1">{scenario.weather}</p>
+                <p className="text-xs text-muted-foreground">{scenario.raceNarrative}</p>
+              </div>
+            )}
+
+            {/* Driver cards */}
+            <div className="space-y-2">
+              {drivers.map(driver => {
+                const liveDriver = liveRaceState.racers.find(r => r.id === driver.id);
+                const position = liveDriver?.position;
+                const hasCrashed = liveDriver?.hasCrashed;
+
+                return (
+                  <div
+                    key={driver.id}
+                    className={cn(
+                      "border border-border rounded-lg overflow-hidden bg-card",
+                      hasCrashed && "opacity-50"
+                    )}
+                  >
+                    {/* Driver header */}
+                    <div className="flex items-center gap-3 px-3 py-2.5 border-b border-border/40">
+                      {/* Position badge */}
+                      <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+                        {isRacing && position ? (
+                          <span className="text-xs font-bold">P{position}</span>
+                        ) : (
+                          <span className="text-sm">🏎️</span>
                         )}
                       </div>
-                      <div className="text-sm text-muted-foreground">
-                        {driver.stats.wins} wins • {driver.stats.podiums} podiums • {driver.stats.championships} championships
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs font-bold truncate">{driver.name}</span>
+                          {hasCrashed && <Badge className="bg-red-500/20 text-red-400 border-0 text-[9px] px-1">DNF</Badge>}
+                        </div>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <span className={cn("w-2 h-2 rounded-sm flex-shrink-0", TEAM_COLORS[driver.team] ?? "bg-muted")} />
+                          <span className="text-[10px] text-muted-foreground">{driver.team}</span>
+                        </div>
+                      </div>
+
+                      <div className="text-right flex-shrink-0">
+                        <div className="text-[9px] text-muted-foreground">Wins · Podiums</div>
+                        <div className="text-xs font-semibold">{driver.stats.wins} · {driver.stats.podiums}</div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <div className="text-center">
-                        <div className="text-sm text-muted-foreground mb-1">Odds</div>
-                        <div className="text-2xl font-bold text-primary">{participant.odds.toFixed(2)}</div>
-                      </div>
+
+                    {/* Bet row */}
+                    <div className="flex items-center justify-between px-3 py-2">
+                      <span className="text-[10px] text-muted-foreground">To Win</span>
+                      <button
+                        onClick={() => bet(driver.id, driver.name, driver.team, driver.odds)}
+                        disabled={isRacing || isFinished}
+                        className={cn(
+                          "flex flex-col items-center justify-center w-[60px] h-9 rounded border transition-colors active:scale-95",
+                          isPreRace
+                            ? "bg-muted hover:bg-primary/10 hover:border-primary border-transparent"
+                            : "bg-muted border-transparent opacity-50 cursor-not-allowed"
+                        )}
+                      >
+                        <span className="text-[9px] text-muted-foreground leading-none">WIN</span>
+                        <span className="text-xs font-bold text-primary leading-tight tabular-nums">
+                          {driver.odds.toFixed(2)}
+                        </span>
+                      </button>
                     </div>
                   </div>
-                  
-                  {raceState === 'pre-race' && (
-                    <div className="flex gap-2">
-                      <Input
-                        type="number"
-                        placeholder="Stake"
-                        value={stakes[participant.id] || 1000}
-                        onChange={(e) => setStakes({ ...stakes, [participant.id]: Number(e.target.value) })}
-                        className="w-32"
-                        min={100}
-                        step={100}
-                      />
-                      <Button
-                        onClick={() => handleBetClick(participant)}
-                        disabled={isPlacingBet}
-                        className="flex-1"
-                      >
-                        Bet on {driver.name}
-                      </Button>
-                    </div>
-                  )}
-                </Card>
-              );
-            })}
+                );
+              })}
+            </div>
+
           </div>
         </main>
-        <BetSlip />
+
+        <BetSlip className="hidden md:flex" />
       </div>
     </div>
   );

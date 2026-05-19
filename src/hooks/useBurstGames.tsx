@@ -1,3 +1,4 @@
+import { useCasinoBalance } from './useCasinoBalance';
 import { useState, useCallback, useEffect } from 'react';
 import { InstantGameEngine, CrashGameState } from '@/lib/simulation/instantGameEngine';
 import { toast } from '@/hooks/use-toast';
@@ -22,7 +23,7 @@ const BURST_GAMES: BurstGame[] = [
 export const useBurstGames = () => {
   const [engine] = useState(() => new InstantGameEngine());
   const [gameState, setGameState] = useState<CrashGameState | null>(null);
-  const [balance, setBalance] = useState(50000);
+  const { balance, setBalance, playRound } = useCasinoBalance();
   const [activeGame, setActiveGame] = useState<BurstGame | null>(null);
   const [stake, setStake] = useState(100);
   const [cashedOut, setCashedOut] = useState(false);
@@ -81,18 +82,22 @@ export const useBurstGames = () => {
 
   const cashOut = useCallback(() => {
     if (!gameState || cashedOut || gameState.crashed) return;
-    
+
     setCashedOut(true);
     const win = stake * gameState.multiplier;
     setWinAmount(win);
     setBalance(prev => prev + win);
     setResult({ won: true, amount: win });
-    
+
+    playRound('burst', stake, win).catch(() => {
+      setBalance(prev => prev + stake);
+    });
+
     toast({
       title: `Cashed out at ${gameState.multiplier.toFixed(2)}x!`,
       description: `Won ₦${win.toLocaleString()}`
     });
-  }, [gameState, stake, cashedOut]);
+  }, [gameState, stake, cashedOut, playRound, setBalance]);
 
   return {
     games: BURST_GAMES,

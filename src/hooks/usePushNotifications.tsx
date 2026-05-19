@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { PushNotifications, Token, PushNotificationSchema, ActionPerformed } from '@capacitor/push-notifications';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuthStore } from '@/store/authStore';
 import { useToast } from '@/hooks/use-toast';
 
 export interface PushNotificationState {

@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/store/authStore';
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -33,7 +34,6 @@ import {
   Building2, Plus, Settings, Users, Shield, 
   Calendar, Check, X, Edit, UserPlus
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 interface Tenant {
@@ -152,7 +152,7 @@ export const TenantManagement = () => {
         return;
       }
 
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = { data: { user: useAuthStore.getState().user ? { id: useAuthStore.getState().user!.id, email: useAuthStore.getState().user!.email } : null } };
 
       const { error } = await supabase
         .from('admin_tenant_assignments')

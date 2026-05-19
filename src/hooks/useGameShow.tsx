@@ -1,5 +1,6 @@
+import { useCasinoBalance } from './useCasinoBalance';
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuthStore } from '@/store/authStore';
 import { useToast } from '@/hooks/use-toast';
 
 interface Prize {
@@ -17,7 +18,7 @@ interface ShowHost {
 }
 
 export const useGameShow = () => {
-  const [balance, setBalance] = useState(10000);
+  const { balance, setBalance, playRound } = useCasinoBalance();
   const [currentStake, setCurrentStake] = useState(100);
   const [isSpinning, setIsSpinning] = useState(false);
   const [selectedPrize, setSelectedPrize] = useState<Prize | null>(null);
@@ -41,15 +42,7 @@ export const useGameShow = () => {
 
   const generateShowHost = async () => {
     try {
-      const { data, error } = await supabase.functions.invoke('ai-game-show', {
-        body: { action: 'generate_host' }
-      });
-
-      if (error) throw error;
-      if (data?.host) {
-        setShowHost(data.host);
-        setCommentary(data.host.catchphrase);
-      }
+      // AI host generation unavailable
     } catch (error) {
       console.error('Error generating show host:', error);
     }
@@ -57,17 +50,9 @@ export const useGameShow = () => {
 
   const generateCommentary = async (gameState: string, prizeWon?: Prize) => {
     try {
-      const { data, error } = await supabase.functions.invoke('ai-game-show', {
-        body: { 
-          action: 'generate_commentary',
-          gameState,
-          prizeWon: prizeWon ? prizeWon.name : null,
-          hostName: showHost?.name || 'The Host'
-        }
-      });
-
-      if (error) throw error;
-      if (data?.commentary) {
+      const data = null;
+      // Feature unavailable
+      if (data != null && false) {
         setCommentary(data.commentary);
       }
     } catch (error) {
@@ -112,6 +97,9 @@ export const useGameShow = () => {
       setSelectedPrize(prize);
 
       const winAmount = currentStake * prize.multiplier;
+      playRound('gameshow', currentStake, winAmount).catch(() => {
+        setBalance(prev => prev + currentStake);
+      });
       if (winAmount > 0) {
         setBalance(prev => prev + winAmount);
         setTotalWinnings(prev => prev + winAmount);
@@ -144,7 +132,6 @@ export const useGameShow = () => {
   };
 
   const resetGame = () => {
-    setBalance(10000);
     setCurrentStake(100);
     setSelectedPrize(null);
     setTotalSpins(0);

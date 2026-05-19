@@ -1,5 +1,6 @@
+import { useCasinoBalance } from './useCasinoBalance';
 import { useState, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuthStore } from '@/store/authStore';
 import { useToast } from '@/hooks/use-toast';
 
 export interface ScratchCardTheme {
@@ -19,7 +20,7 @@ interface RevealedCard {
 }
 
 export const useScratchCard = () => {
-  const [balance, setBalance] = useState(50000);
+  const { balance, setBalance, playRound } = useCasinoBalance();
   const [availableCards, setAvailableCards] = useState<ScratchCardTheme[]>([]);
   const [activeCard, setActiveCard] = useState<RevealedCard | null>(null);
   const [isScratching, setIsScratching] = useState(false);
@@ -93,18 +94,8 @@ export const useScratchCard = () => {
   const generateAIThemes = useCallback(async () => {
     setIsLoadingThemes(true);
     try {
-      const { data, error } = await supabase.functions.invoke('ai-scratch-card', {
-        body: { action: 'generateThemes', count: 2 }
-      });
-
-      if (error) throw error;
-
-      if (data?.themes) {
-        setAvailableCards([...defaultThemes, ...data.themes]);
-      } else {
-        setAvailableCards(defaultThemes);
-      }
-
+      // AI themes unavailable - use defaults
+      setAvailableCards(defaultThemes);
       toast({
         title: "Cards Loaded",
         description: "AI-powered themes ready to play!"
@@ -188,7 +179,9 @@ export const useScratchCard = () => {
 
     if (activeCard.prize > 0) {
       setBalance(prev => prev + activeCard.prize);
-      
+      playRound('scratch-card', activeCard.theme.price, activeCard.prize).catch(() => {
+        setBalance(prev => prev + activeCard.theme.price);
+      });
       toast({
         title: "🎉 Winner!",
         description: `You won ₦${activeCard.prize.toLocaleString()}!`

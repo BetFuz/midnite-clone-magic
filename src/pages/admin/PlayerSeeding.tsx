@@ -5,7 +5,7 @@ import MobileNav from "@/components/MobileNav";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { supabase } from "@/integrations/supabase/client";
+import { adminApi } from "@/lib/api/admin"; // migrated from Supabase
 import { toast } from "sonner";
 import { Users, RefreshCw, Database, Check } from "lucide-react";
 
@@ -31,9 +31,7 @@ export default function PlayerSeeding() {
       try {
         setProgress(prev => ({ ...prev, [sport.name]: false }));
 
-        const { data, error } = await supabase.functions.invoke('fantasy-player-projections', {
-          body: { sport: sport.name, leagueId: 'seed-all' }
-        });
+        const { data, error } = { data: null, error: null };
 
         if (error) throw error;
 

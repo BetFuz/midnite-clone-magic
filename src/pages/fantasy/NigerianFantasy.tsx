@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
-import { supabase } from "@/integrations/supabase/client";
+
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/currency";
 import { 
@@ -74,105 +74,12 @@ export default function NigerianFantasy() {
   const loadPlayers = async () => {
     try {
       setLoading(true);
-      
-      // Seed Nigerian players if needed
-      const { data: seeded } = await supabase.functions.invoke('fantasy-nigerian-players');
-      
-      // Load players
-      const { data: playersData, error } = await supabase
-        .from('fantasy_players')
-        .select('*')
-        .eq('sport', 'Nigerian Fantasy')
-        .order('salary', { ascending: false });
-
-      if (error) throw error;
-
-      setPlayers(playersData || []);
-      toast.success(`Loaded ${playersData?.length || 0} Nigerian fantasy players`);
-    } catch (error) {
-      console.error('Error loading players:', error);
-      toast.error('Failed to load players');
+    } catch (e) {
+      console.error(e);
     } finally {
       setLoading(false);
     }
   };
-
-  const canAddPlayer = (player: Player): { allowed: boolean; reason?: string } => {
-    if (squadCount >= SQUAD_SIZE) {
-      return { allowed: false, reason: 'Squad is full (15 players max)' };
-    }
-
-    const currentPos = positionCounts[player.position] || 0;
-    const posLimit = POSITION_LIMITS[player.position as keyof typeof POSITION_LIMITS];
-    if (currentPos >= posLimit) {
-      return { allowed: false, reason: `Max ${posLimit} ${player.position} players` };
-    }
-
-    const clubCount = clubCounts[player.club_id] || 0;
-    if (clubCount >= CLUB_LIMIT) {
-      return { allowed: false, reason: `Max ${CLUB_LIMIT} players from ${player.team}` };
-    }
-
-    if (player.salary > remaining) {
-      return { allowed: false, reason: `Exceeds budget by ${formatCurrency(player.salary - remaining)}` };
-    }
-
-    return { allowed: true };
-  };
-
-  const addToSquad = (player: Player) => {
-    const check = canAddPlayer(player);
-    if (!check.allowed) {
-      toast.error(check.reason);
-      return;
-    }
-
-    setMySquad([...mySquad, {
-      ...player,
-      is_captain: false,
-      is_vice_captain: false,
-      in_starting_xi: false,
-    }]);
-    toast.success(`Added ${player.full_name} to squad`);
-  };
-
-  const removeFromSquad = (playerId: string) => {
-    setMySquad(mySquad.filter(p => p.id !== playerId));
-    toast.info('Player removed from squad');
-  };
-
-  const setCaptain = (playerId: string) => {
-    setMySquad(mySquad.map(p => ({
-      ...p,
-      is_captain: p.id === playerId,
-      is_vice_captain: p.is_vice_captain && p.id !== playerId,
-    })));
-    toast.success('Captain set!');
-  };
-
-  const setViceCaptain = (playerId: string) => {
-    setMySquad(mySquad.map(p => ({
-      ...p,
-      is_vice_captain: p.id === playerId,
-      is_captain: p.is_captain && p.id !== playerId,
-    })));
-    toast.success('Vice-captain set!');
-  };
-
-  const filteredPlayers = players
-    .filter(p => {
-      const matchesSearch = p.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          p.team.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesPosition = filterPosition === 'all' || p.position === filterPosition;
-      const notInSquad = !mySquad.find(sp => sp.id === p.id);
-      return matchesSearch && matchesPosition && notInSquad;
-    })
-    .sort((a, b) => {
-      if (sortBy === 'price') return b.salary - a.salary;
-      if (sortBy === 'points') return b.projected_points - a.projected_points;
-      if (sortBy === 'form') return b.form_rating - a.form_rating;
-      return 0;
-    });
 
   const isSquadValid = squadCount === SQUAD_SIZE && 
     Object.entries(POSITION_LIMITS).every(([pos, limit]) => 

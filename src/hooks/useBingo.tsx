@@ -1,3 +1,4 @@
+import { useCasinoBalance } from './useCasinoBalance';
 import { useState, useCallback } from 'react';
 import { toast } from '@/hooks/use-toast';
 
@@ -53,7 +54,7 @@ const AVAILABLE_ROOMS: BingoRoom[] = [
 ];
 
 export const useBingo = () => {
-  const [balance, setBalance] = useState(50000);
+  const { balance, setBalance, playRound } = useCasinoBalance();
   const [rooms] = useState<BingoRoom[]>(AVAILABLE_ROOMS);
   const [activeRoom, setActiveRoom] = useState<BingoRoom | null>(null);
   const [cards, setCards] = useState<BingoCard[]>([]);

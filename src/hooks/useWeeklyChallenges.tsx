@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuthStore } from '@/store/authStore';
 import { useUserProfile } from "./useUserProfile";
 
 export interface WeeklyChallenge {
@@ -108,7 +108,7 @@ export const useWeeklyChallenges = () => {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      // supabase_stub(channel);
     };
   }, [user]);
 

@@ -1,4 +1,6 @@
-import { Search, LogIn, User, LogOut, Wallet, ArrowDownToLine, ArrowUpFromLine, CreditCard, History as HistoryIcon, Settings, Home, ChevronRight, ShoppingCart } from "lucide-react";
+import React from "react";
+import { Search, LogIn, User, LogOut, Wallet, ArrowDownToLine, ArrowUpFromLine, CreditCard, History as HistoryIcon, Settings, Home, ChevronRight, ShoppingCart, Crown, Gift, Shield, Users } from "lucide-react";
+import LiveTicker from "./LiveTicker";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -9,10 +11,10 @@ import BetSlip from "./BetSlip";
 import { cn } from "@/lib/utils";
 import MobileNav from "./MobileNav";
 import ThemeToggle from "./ThemeToggle";
-import { useUserProfile } from "@/hooks/useUserProfile";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuthStore } from "@/store/authStore";
 import { formatCurrency } from "@/lib/currency";
 import { toast } from "@/hooks/use-toast";
+import { useLang } from "@/contexts/LangContext";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,8 +27,23 @@ import {
 const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, profile } = useUserProfile();
+  const { user, logout } = useAuthStore();
   const { selections } = useBetSlip();
+  const { lang, setLang } = useLang();
+  const [headerBalance, setHeaderBalance] = React.useState(0);
+
+  React.useEffect(() => {
+    if (!user) { setHeaderBalance(0); return; }
+    import('@/lib/api/wallet').then(({ walletApi }) => {
+      walletApi.getBalance().then(d => setHeaderBalance(d?.balance ?? 0)).catch(() => {});
+    });
+    const interval = setInterval(() => {
+      import('@/lib/api/wallet').then(({ walletApi }) => {
+        walletApi.getBalance().then(d => setHeaderBalance(d?.balance ?? 0)).catch(() => {});
+      });
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [user?.id]);
 
   const navItems = [
     { label: "🏠 Home", path: "/", key: "home" },
@@ -46,12 +63,9 @@ const Header = () => {
     navigate("/auth");
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    toast({
-      title: "Logged Out",
-      description: "You have been successfully logged out",
-    });
+  const handleLogout = () => {
+    logout();
+    toast({ title: "Logged Out", description: "You have been successfully logged out" });
     navigate("/");
   };
 
@@ -76,28 +90,25 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <LiveTicker />
       <div className="flex h-16 items-center px-4 md:px-6">
-        <div className="flex items-center gap-2 md:gap-4">
+        <div className="flex items-center gap-2 md:gap-3">
           <MobileNav />
-          
-          {/* Home Button - Always Visible */}
-          <Button
-            variant="ghost"
-            size="sm"
-            className="gap-2 text-primary hover:text-primary hover:bg-primary/10"
-            onClick={() => navigate("/")}
-          >
-            <Home className="h-5 w-5" />
-            <span className="hidden sm:inline font-semibold">Home</span>
-          </Button>
 
-          {/* Breadcrumbs for context */}
+          {/* BetFuz Logo — two-tone, always visible on all screen sizes */}
+          <Link to="/" className="flex items-center flex-shrink-0 select-none">
+            <span className="text-xl md:text-2xl font-extrabold tracking-tight leading-none">
+              <span className="text-foreground">Bet</span><span className="text-primary">Fuz</span>
+            </span>
+          </Link>
+
+          {/* Breadcrumbs — desktop only */}
           {breadcrumbs.length > 0 && (
             <div className="hidden md:flex items-center gap-1 text-sm text-muted-foreground">
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-4 w-4 text-muted-foreground/40" />
               {breadcrumbs.map((crumb, index) => (
                 <div key={crumb.href} className="flex items-center gap-1">
-                  <Link 
+                  <Link
                     to={crumb.href}
                     className={cn(
                       "hover:text-primary transition-colors",
@@ -113,11 +124,18 @@ const Header = () => {
               ))}
             </div>
           )}
-          
-          <Link to="/" className="hidden md:flex items-center gap-2">
-            <div className="text-xl font-bold text-primary">Betfuz</div>
-          </Link>
-          
+
+          {/* Desktop home shortcut */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="hidden md:flex gap-2 text-muted-foreground hover:text-primary hover:bg-primary/10"
+            onClick={() => navigate("/")}
+          >
+            <Home className="h-4 w-4" />
+            <span className="font-semibold">Home</span>
+          </Button>
+
           <nav className="hidden lg:flex items-center gap-1">
             {navItems.map((item) => (
               <Button
@@ -155,6 +173,14 @@ const Header = () => {
             </SheetContent>
           </Sheet>
 
+          {/* Language toggle */}
+          <button
+            onClick={() => setLang(lang === 'en' ? 'fr' : 'en')}
+            className="hidden sm:flex items-center gap-1 text-xs font-bold text-muted-foreground hover:text-primary border border-border rounded-lg px-2 py-1 transition-colors"
+            title={lang === 'en' ? 'Switch to French' : 'Passer en anglais'}
+          >
+            {lang === 'en' ? '🇫🇷 FR' : '🇬🇧 EN'}
+          </button>
           <ThemeToggle />
           <div className="relative hidden md:block">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -169,7 +195,7 @@ const Header = () => {
               <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-primary/10 rounded-lg border border-primary/20">
                 <Wallet className="h-4 w-4 text-primary" />
                 <span className="text-sm font-bold text-primary">
-                  {formatCurrency(profile?.balance || 0)}
+                  {formatCurrency(headerBalance)}
                 </span>
               </div>
               
@@ -177,7 +203,7 @@ const Header = () => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm" className="gap-2">
                     <User className="h-4 w-4" />
-                    <span className="hidden sm:inline">{profile?.full_name || user.email?.split('@')[0]}</span>
+                    <span className="hidden sm:inline">{user.firstName} {user.lastName}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
@@ -208,6 +234,23 @@ const Header = () => {
                   <DropdownMenuItem onClick={() => navigate("/account/history")}>
                     <HistoryIcon className="mr-2 h-4 w-4" />
                     Betting History
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate("/account/vip")}>
+                    <Crown className="mr-2 h-4 w-4" />
+                    VIP Club
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/account/bonuses")}>
+                    <Gift className="mr-2 h-4 w-4" />
+                    Bonuses
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/account/referral")}>
+                    <Users className="mr-2 h-4 w-4" />
+                    Refer &amp; Earn
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/account/kyc")}>
+                    <Shield className="mr-2 h-4 w-4" />
+                    Verification
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => navigate("/account/settings")}>

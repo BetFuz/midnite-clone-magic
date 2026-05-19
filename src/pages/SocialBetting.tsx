@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/store/authStore';
 import { useState } from "react";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
@@ -8,7 +9,7 @@ import { useSocialBetting } from "@/hooks/useSocialBetting";
 import SocialBetCard from "@/components/social/SocialBetCard";
 import TopBettors from "@/components/social/TopBettors";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { supabase } from "@/integrations/supabase/client";
+
 import { useEffect } from "react";
 
 const SocialBetting = () => {
@@ -26,7 +27,7 @@ const SocialBetting = () => {
 
   useEffect(() => {
     const loadUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = useAuthStore.getState().user ? { id: useAuthStore.getState().user!.id, email: useAuthStore.getState().user!.email } : null;
       setCurrentUserId(user?.id);
     };
     loadUser();

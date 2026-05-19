@@ -1,4 +1,3 @@
-import { supabase } from "@/integrations/supabase/client";
 
 export class AudioRecorder {
   private stream: MediaStream | null = null;
@@ -73,7 +72,7 @@ export class RealtimeVoiceChat {
 
   async init() {
     try {
-      const { data: tokenData, error } = await supabase.functions.invoke("voice-betting-token");
+      const { data: tokenData, error } = { data: null, error: new Error('Not available') };
       
       if (error) throw error;
       
@@ -310,9 +309,7 @@ export class LiveDealerChat {
       this.onStatusChange('connecting');
       console.log('Initializing live dealer chat...');
 
-      const { data, error } = await supabase.functions.invoke('voice-betting-token', {
-        body: { dealer: dealerName, game: gameType }
-      });
+      const { data, error } = { data: null, error: new Error('Not available') };
 
       if (error) throw error;
       console.log('Got session token');

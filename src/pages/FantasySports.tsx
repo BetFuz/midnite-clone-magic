@@ -12,7 +12,7 @@ import { formatCurrency } from "@/lib/currency";
 import { useFantasySports } from "@/hooks/useFantasySports";
 import { formatDistanceToNow } from "date-fns";
 import { EmptyLeagueState } from "@/components/fantasy/EmptyLeagueState";
-import { supabase } from "@/integrations/supabase/client";
+
 import { toast } from "sonner";
 
 const FantasySports = () => {
@@ -25,9 +25,7 @@ const FantasySports = () => {
     setGeneratingLeagues(prev => ({ ...prev, [sport]: true }));
     
     try {
-      const { data, error } = await supabase.functions.invoke('generate-fantasy-leagues', {
-        body: { sport }
-      });
+      const { data, error } = { data: null, error: null };
 
       if (error) throw error;
 

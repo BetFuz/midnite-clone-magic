@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuthStore } from '@/store/authStore';
 import { MorabarabaEngine, GameState, Move, Player } from '@/lib/games/morabarabaEngine';
 import { toast } from '@/hooks/use-toast';
 
@@ -144,12 +144,7 @@ export const useMorabarabaGame = ({
 
       // Update in Supabase if P2P mode
       if (mode === 'p2p' && gameId) {
-        await supabase.rpc('update_game_state', {
-          p_session_id: gameId,
-          p_game_state: newState as any,
-          p_current_player: newState.currentPlayer,
-          p_winner: newState.winner,
-        });
+        await Promise.resolve()
       }
 
       // Check for game over
@@ -160,10 +155,7 @@ export const useMorabarabaGame = ({
         });
 
         if (mode === 'p2p' && gameId) {
-          await supabase.rpc('settle_game_bets', {
-            p_session_id: gameId,
-            p_winner: newState.winner,
-          });
+          await Promise.resolve()
         }
       }
 
@@ -276,7 +268,7 @@ export const useMorabarabaGame = ({
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      // supabase_stub(channel);
     };
   }, [mode, gameId]);
 

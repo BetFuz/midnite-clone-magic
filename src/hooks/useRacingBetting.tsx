@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuthStore } from '@/store/authStore';
 import { toast } from '@/hooks/use-toast';
 import { RacingEngine, RacerState } from '@/lib/racingEngine';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface RaceParticipant {
   id: string;
@@ -55,12 +56,12 @@ export const useRacingBetting = ({ raceType, raceId, participants }: UseRacingBe
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      // supabase_stub(channel);
     };
   }, [raceId]);
 
   const fetchBalance = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = useAuthStore.getState().user;
     if (!user) return;
 
     const { data } = await supabase
@@ -82,7 +83,7 @@ export const useRacingBetting = ({ raceType, raceId, participants }: UseRacingBe
       return;
     }
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = useAuthStore.getState().user;
     if (!user) {
       toast({
         title: "Authentication Required",
@@ -210,13 +211,7 @@ export const useRacingBetting = ({ raceType, raceId, participants }: UseRacingBe
     engine.start();
 
     // Get AI commentary
-    const { data, error } = await supabase.functions.invoke('racing-simulation', {
-      body: {
-        raceType,
-        raceId,
-        participants
-      }
-    });
+    const data = null; const error = null;
 
     if (error) {
       console.error('Race simulation error:', error);
@@ -224,7 +219,7 @@ export const useRacingBetting = ({ raceType, raceId, participants }: UseRacingBe
   };
 
   const settleBets = async (winnerId: string) => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = useAuthStore.getState().user;
     if (!user) return;
 
     for (const bet of activeBets) {

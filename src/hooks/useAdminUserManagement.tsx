@@ -1,121 +1,45 @@
-import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-
-export type AdminRole = 'user' | 'admin' | 'superadmin';
-
-export interface UserDetails {
-  profile: any;
-  roles: AdminRole[];
-  recentBets: any[];
-  statistics: any;
-  totalBets: number;
-  totalStaked: number;
-}
+import { useState, useEffect } from 'react';
+import { adminApi } from '@/lib/api/admin';
+import { useAdminAuth } from './useAdminAuth';
+import { useToast } from '@/hooks/use-toast';
 
 export const useAdminUserManagement = () => {
-  const [loading, setLoading] = useState(false);
+  const { isAdmin } = useAdminAuth();
+  const [users, setUsers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
-  const getUserDetails = async (userId: string): Promise<UserDetails | null> => {
+  const fetchUsers = async (params?: any) => {
+    if (!isAdmin) return;
+    setLoading(true);
     try {
-      setLoading(true);
-      const { data, error } = await supabase.functions.invoke('admin-user-management', {
-        body: { action: 'get_user_details', userId },
-      });
+      const data = await adminApi.getUsers(params);
+      setUsers(data?.users || data || []);
+    } catch { setUsers([]); }
+    finally { setLoading(false); }
+  };
 
-      if (error) throw error;
-      return data;
-    } catch (error) {
-      console.error('Error getting user details:', error);
-      toast.error('Failed to load user details');
-      return null;
-    } finally {
-      setLoading(false);
+  useEffect(() => { fetchUsers(); }, [isAdmin]);
+
+  const suspendUser = async (id: string, reason: string) => {
+    try {
+      await adminApi.suspendUser(id, reason);
+      toast({ title: 'User suspended' });
+      await fetchUsers();
+    } catch (error: any) {
+      toast({ title: 'Failed', description: error?.response?.data?.message, variant: 'destructive' });
     }
   };
 
-  const updateUserRole = async (userId: string, role: AdminRole): Promise<boolean> => {
+  const unsuspendUser = async (id: string) => {
     try {
-      setLoading(true);
-      const { data, error } = await supabase.functions.invoke('admin-user-management', {
-        body: { action: 'update_role', userId, role },
-      });
-
-      if (error) throw error;
-      toast.success(data.message || 'User role updated');
-      return true;
-    } catch (error) {
-      console.error('Error updating user role:', error);
-      toast.error('Failed to update user role');
-      return false;
-    } finally {
-      setLoading(false);
+      await adminApi.unsuspendUser(id);
+      toast({ title: 'User unsuspended' });
+      await fetchUsers();
+    } catch (error: any) {
+      toast({ title: 'Failed', description: error?.response?.data?.message, variant: 'destructive' });
     }
   };
 
-  const suspendUser = async (userId: string, reason: string): Promise<boolean> => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase.functions.invoke('admin-user-management', {
-        body: { action: 'suspend', userId, reason },
-      });
-
-      if (error) throw error;
-      toast.success(data.message || 'User suspended');
-      return true;
-    } catch (error) {
-      console.error('Error suspending user:', error);
-      toast.error('Failed to suspend user');
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const unsuspendUser = async (userId: string): Promise<boolean> => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase.functions.invoke('admin-user-management', {
-        body: { action: 'unsuspend', userId },
-      });
-
-      if (error) throw error;
-      toast.success(data.message || 'User unsuspended');
-      return true;
-    } catch (error) {
-      console.error('Error unsuspending user:', error);
-      toast.error('Failed to unsuspend user');
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const updateUserBalance = async (userId: string, balance: number): Promise<boolean> => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase.functions.invoke('admin-user-management', {
-        body: { action: 'update_balance', userId, balance },
-      });
-
-      if (error) throw error;
-      toast.success(data.message || 'Balance updated');
-      return true;
-    } catch (error) {
-      console.error('Error updating balance:', error);
-      toast.error('Failed to update balance');
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return {
-    loading,
-    getUserDetails,
-    updateUserRole,
-    suspendUser,
-    unsuspendUser,
-    updateUserBalance,
-  };
+  return { users, loading, fetchUsers, suspendUser, unsuspendUser };
 };

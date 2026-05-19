@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/store/authStore';
 import { useState } from "react";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
@@ -7,7 +8,7 @@ import { ShoppingCart, TrendingUp, Clock, Package } from "lucide-react";
 import { useBetMarketplace } from "@/hooks/useBetMarketplace";
 import ListingCard from "@/components/marketplace/ListingCard";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { supabase } from "@/integrations/supabase/client";
+
 import { useEffect } from "react";
 import {
   AlertDialog,
@@ -37,7 +38,7 @@ const BetMarketplace = () => {
 
   useEffect(() => {
     const loadUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = useAuthStore.getState().user ? { id: useAuthStore.getState().user!.id, email: useAuthStore.getState().user!.email } : null;
       setCurrentUserId(user?.id);
     };
     loadUser();

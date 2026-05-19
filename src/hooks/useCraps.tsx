@@ -1,5 +1,6 @@
+import { useCasinoBalance } from './useCasinoBalance';
 import { useState, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuthStore } from '@/store/authStore';
 import { useToast } from '@/hooks/use-toast';
 
 type GamePhase = 'come-out' | 'point';
@@ -17,7 +18,7 @@ interface DiceResult {
 }
 
 export const useCraps = () => {
-  const [balance, setBalance] = useState(50000);
+  const { balance, setBalance, playRound } = useCasinoBalance();
   const [phase, setPhase] = useState<GamePhase>('come-out');
   const [point, setPoint] = useState<number | null>(null);
   const [currentBets, setCurrentBets] = useState<Bet[]>([]);
@@ -69,19 +70,8 @@ export const useCraps = () => {
   const getStickmanCall = useCallback(async (result: DiceResult) => {
     setIsLoadingAI(true);
     try {
-      const { data, error } = await supabase.functions.invoke('ai-craps', {
-        body: { 
-          action: 'stickmanCall', 
-          roll: result,
-          phase,
-          point 
-        }
-      });
-
-      if (error) throw error;
-
-      setStickmanCall(data.call);
-      return data.call;
+      // AI feature unavailable
+      return 'Seven out! Next shooter!';
     } catch (error) {
       console.error('Stickman call error:', error);
       return getDefaultCall(result);
@@ -165,13 +155,15 @@ export const useCraps = () => {
 
     // Calculate winnings
     const winnings = calculateWinnings(result);
-    
+    const totalStaked = currentBets.reduce((s, b) => s + b.amount, 0);
+
+    playRound('craps', totalStaked, winnings).catch(() => {
+      setBalance(prev => prev + totalStaked);
+    });
+
     if (winnings > 0) {
       setBalance(prev => prev + winnings);
-      toast({
-        title: "Winner! 🎉",
-        description: `Won ₦${winnings.toLocaleString()}!`
-      });
+      toast({ title: "Winner! 🎉", description: `Won ₦${winnings.toLocaleString()}!` });
     }
 
     // Update game phase

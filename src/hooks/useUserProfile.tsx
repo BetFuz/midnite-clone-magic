@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { User } from "@supabase/supabase-js";
+import { useState, useEffect, useCallback } from "react";
+import { useAuthStore, BetFuzUser } from "@/store/authStore";
+import { userApi } from "@/lib/api/user";
+import { walletApi } from "@/lib/api/wallet";
 
 interface UserProfile {
   id: string;
@@ -14,56 +15,58 @@ interface UserProfile {
 }
 
 export const useUserProfile = () => {
-  const [user, setUser] = useState<User | null>(null);
+  const { user: authUser, setUser } = useAuthStore();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchProfile = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("id, email, full_name, phone, balance, currency_code, created_at, updated_at")
-        .eq("id", userId)
-        .maybeSingle();
-
-      if (error) throw error;
-      setProfile(data);
-    } catch (error) {
-      console.error("Error fetching profile:", error);
+  const fetchProfile = useCallback(async () => {
+    if (!authUser) {
+      setProfile(null);
+      setLoading(false);
+      return;
     }
-  };
+    try {
+      const [profileData, walletData] = await Promise.allSettled([
+        userApi.getProfile(),
+        walletApi.getBalance(),
+      ]);
+
+      const p = profileData.status === "fulfilled" ? profileData.value : null;
+      const w = walletData.status === "fulfilled" ? walletData.value : null;
+
+      if (p) {
+        setUser({ ...authUser, ...p });
+        setProfile({
+          id: p.id || authUser.id,
+          email: p.email || authUser.email,
+          full_name: `${p.firstName || authUser.firstName} ${p.lastName || authUser.lastName}`.trim() || null,
+          phone: p.phone || null,
+          balance: w?.balance ?? 0,
+          currency_code: w?.currency || "NGN",
+          created_at: p.createdAt || "",
+          updated_at: p.updatedAt || "",
+        });
+      }
+    } catch {
+      // silently ignore — user stays logged in even if profile fails
+    } finally {
+      setLoading(false);
+    }
+  }, [authUser?.id]);
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id);
-      }
-      setLoading(false);
-    });
+    fetchProfile();
+  }, [fetchProfile]);
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id);
-      } else {
-        setProfile(null);
-      }
-      setLoading(false);
-    });
+  // map BetFuzUser as a Supabase-compatible "user" shape so callers don't break
+  const supabaseCompatUser = authUser
+    ? { id: authUser.id, email: authUser.email }
+    : null;
 
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const refreshProfile = () => {
-    if (user) {
-      fetchProfile(user.id);
-    }
+  return {
+    user: supabaseCompatUser as any,
+    profile,
+    loading,
+    refreshProfile: fetchProfile,
   };
-
-  return { user, profile, loading, refreshProfile };
 };

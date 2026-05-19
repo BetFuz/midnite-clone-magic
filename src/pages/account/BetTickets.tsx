@@ -1,265 +1,264 @@
-import Header from "@/components/Header";
-import Sidebar from "@/components/Sidebar";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Clock, Trophy } from "lucide-react";
-import { formatCurrency } from "@/lib/currency";
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { toast } from "@/hooks/use-toast";
+import { useState, useEffect, useCallback } from 'react';
+import Header from '@/components/Header';
+import { api } from '@/lib/api/client';
+import { toast } from 'sonner';
+import {
+  Trophy, Clock, X, ChevronDown, ChevronUp, RefreshCw,
+  Zap, ArrowLeft, Share2, RotateCcw,
+} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-const BetTickets = () => {
+const STATUS_CFG: Record<string, { label: string; cls: string; dot: string }> = {
+  ACTIVE:   { label: 'Running', cls: 'bg-blue-500/10 text-blue-400 border-blue-500/20', dot: 'bg-blue-400 animate-pulse' },
+  WON:      { label: 'Won', cls: 'bg-green-500/10 text-green-400 border-green-500/20', dot: 'bg-green-400' },
+  LOST:     { label: 'Lost', cls: 'bg-red-500/10 text-red-400 border-red-500/20', dot: 'bg-red-400' },
+  PENDING:  { label: 'Pending', cls: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20', dot: 'bg-yellow-400' },
+  VOID:     { label: 'Void', cls: 'bg-gray-500/10 text-gray-400 border-gray-500/20', dot: 'bg-gray-400' },
+  CASHOUT:  { label: 'Cashed Out', cls: 'bg-purple-500/10 text-purple-400 border-purple-500/20', dot: 'bg-purple-400' },
+};
+
+const TABS = ['ALL', 'ACTIVE', 'WON', 'LOST'];
+
+const fmt = (n: number) => Number(n).toLocaleString();
+
+export default function BetTickets() {
   const navigate = useNavigate();
-  const [showWinModal, setShowWinModal] = useState(false);
-  const [selectedWin, setSelectedWin] = useState<any>(null);
+  const [bets, setBets]         = useState<any[]>([]);
+  const [loading, setLoading]   = useState(true);
+  const [tab, setTab]           = useState('ALL');
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [cashingOut, setCashingOut] = useState<string | null>(null);
+  const [cashoutValues, setCashoutValues] = useState<Record<string, number>>({});
+  const [page, setPage]         = useState(1);
+  const [hasMore, setHasMore]   = useState(false);
+  const LIMIT = 10;
 
-  const tickets = [
-    {
-      id: "159104",
-      type: "Multiple",
-      status: "won",
-      stake: 50000,
-      odds: 337.00,
-      bonus: 505497.30,
-      potentialWin: 17355407.30,
-      actualWin: 17355407.30,
-      date: "10/11 07:04",
-      selections: 8,
-      percentile: 97,
-    },
-    {
-      id: "158956",
-      type: "Multiple",
-      status: "running",
-      stake: 50000,
-      odds: 336.77,
-      bonus: 505155.00,
-      potentialWin: 17343655.00,
-      date: "09/11 19:31",
-      selections: 7,
-    },
-    {
-      id: "158723",
-      type: "Single",
-      status: "lost",
-      stake: 10000,
-      odds: 2.35,
-      potentialWin: 23500,
-      date: "08/11 14:20",
-      selections: 1,
-    },
-    {
-      id: "158601",
-      type: "Multiple",
-      status: "won",
-      stake: 25000,
-      odds: 45.60,
-      bonus: 114000.00,
-      potentialWin: 1254000.00,
-      actualWin: 1254000.00,
-      date: "07/11 18:45",
-      selections: 5,
-      percentile: 85,
-    },
-  ];
+  const load = useCallback(async (reset = false) => {
+    const p = reset ? 1 : page;
+    if (reset) setPage(1);
+    setLoading(true);
+    try {
+      const status = tab === 'ALL' ? '' : tab;
+      const res = await api.get(`/bet/my-bets?page=${p}&limit=${LIMIT}${status ? `&status=${status}` : ''}`);
+      const data = res.data.data ?? res.data ?? [];
+      const list = Array.isArray(data) ? data : data.bets ?? [];
+      setBets(prev => (reset || p === 1) ? list : [...prev, ...list]);
+      setHasMore(list.length === LIMIT);
 
-  const handleTicketClick = (ticket: any) => {
-    if (ticket.status === "won") {
-      setSelectedWin(ticket);
-      setShowWinModal(true);
-    } else {
-      navigate(`/bet-ticket/${ticket.id}`);
-    }
-  };
+      // Fetch cashout values for active bets
+      const activeBets = list.filter((b: any) => b.status === 'ACTIVE');
+      activeBets.forEach(async (bet: any) => {
+        try {
+          const co = await api.get(`/bet/cashout-value/${bet.id}`);
+          setCashoutValues(prev => ({ ...prev, [bet.id]: co.data.data?.cashoutValue ?? 0 }));
+        } catch { /* no cashout available */ }
+      });
+    } catch { /* silent */ }
+    finally { setLoading(false); }
+  }, [tab, page]);
 
-  const handleRebet = (ticketId: string) => {
-    toast({
-      title: "Bet Copied",
-      description: `Ticket #${ticketId} selections added to bet slip`,
+  useEffect(() => { load(true); }, [tab]);
+
+  const toggleExpand = (id: string) => {
+    setExpanded(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
     });
   };
 
-  const filterTickets = (status: string) => {
-    if (status === "all") return tickets;
-    return tickets.filter(t => t.status === status);
+  const handleCashout = async (bet: any) => {
+    setCashingOut(bet.id);
+    try {
+      const res = await api.post('/bet/cashout', { betId: bet.id });
+      const { cashoutAmount } = res.data.data ?? {};
+      toast.success(`Cashed out ${fmt(cashoutAmount)} successfully!`);
+      load(true);
+    } catch (e: any) {
+      toast.error(e?.response?.data?.error ?? 'Cashout failed');
+    } finally { setCashingOut(null); }
   };
 
+  const handleShare = (bet: any) => {
+    const text = bet.status === 'WON'
+      ? `I just won ${fmt(bet.actualPayout)} on BetFuz! 🏆 Odds: ${Number(bet.totalOdds).toFixed(2)}`
+      : `Watching my bet on BetFuz — ${Number(bet.totalOdds).toFixed(2)} odds, ${fmt(bet.stake)} staked!`;
+    if (navigator.share) {
+      navigator.share({ title: 'BetFuz', text });
+    } else {
+      navigator.clipboard.writeText(text);
+      toast.success('Copied to clipboard!');
+    }
+  };
+
+  const filtered = bets;
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#0a0f1a]">
       <Header />
-      <div className="flex">
-        <Sidebar />
-        <main className="flex-1 p-6 overflow-y-auto h-[calc(100vh-4rem)]">
-          <h1 className="text-3xl font-bold text-foreground mb-6">My Bet Tickets</h1>
-          
-          <Tabs defaultValue="all" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 mb-6">
-              <TabsTrigger value="all">All Bets</TabsTrigger>
-              <TabsTrigger value="running">Running</TabsTrigger>
-              <TabsTrigger value="won">Won</TabsTrigger>
-              <TabsTrigger value="lost">Lost</TabsTrigger>
-            </TabsList>
+      <div className="max-w-2xl mx-auto px-4 py-6">
 
-            {["all", "running", "won", "lost"].map((status) => (
-              <TabsContent key={status} value={status} className="space-y-4">
-                {filterTickets(status).map((ticket) => (
-                  <Card 
-                    key={ticket.id}
-                    className="p-5 bg-card border-border hover:border-primary/50 transition-colors cursor-pointer"
-                    onClick={() => handleTicketClick(ticket)}
-                  >
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-sm text-muted-foreground">Ticket ID: {ticket.id}</span>
-                          <Badge 
-                            className={
-                              ticket.status === "won" 
-                                ? "bg-success text-success-foreground" 
-                                : ticket.status === "running"
-                                ? "bg-primary/20 text-primary border-primary/30"
-                                : "bg-destructive/20 text-destructive border-destructive/30"
-                            }
-                          >
-                            {ticket.status === "won" && <Trophy className="h-3 w-3 mr-1" />}
-                            {ticket.status.toUpperCase()}
-                          </Badge>
-                        </div>
-                        <div className="text-xs text-muted-foreground mb-1">{ticket.date}</div>
-                        <div className="text-lg font-bold text-foreground">{ticket.type}</div>
-                        <div className="text-sm text-muted-foreground">{ticket.selections} selections</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-sm text-muted-foreground mb-1">Total Stake</div>
-                        <div className="text-2xl font-bold text-foreground">{formatCurrency(ticket.stake)}</div>
-                      </div>
-                    </div>
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-5">
+          <button onClick={() => navigate(-1)} className="text-gray-400 hover:text-white transition-colors">
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <h1 className="text-white font-bold text-xl">My Bet Tickets</h1>
+        </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-4 border-t border-b border-border">
-                      <div>
-                        <div className="text-xs text-muted-foreground mb-1">Total Odds</div>
-                        <div className="text-lg font-bold text-odds">{ticket.odds.toFixed(2)}</div>
-                      </div>
-                      {ticket.bonus && (
-                        <div>
-                          <div className="text-xs text-muted-foreground mb-1">Max Bonus</div>
-                          <div className="text-lg font-bold text-primary">{formatCurrency(ticket.bonus)}</div>
-                        </div>
-                      )}
-                      <div>
-                        <div className="text-xs text-muted-foreground mb-1">
-                          {ticket.status === "won" ? "Total Won" : "Pot. Win"}
-                        </div>
-                        <div className={`text-lg font-bold ${ticket.status === "won" ? "text-success" : "text-foreground"}`}>
-                          {formatCurrency(ticket.status === "won" ? ticket.actualWin : ticket.potentialWin)}
-                        </div>
-                      </div>
-                    </div>
+        {/* Tabs */}
+        <div className="flex gap-1 bg-[#111827] border border-[#1f2d3d] rounded-xl p-1 mb-5">
+          {TABS.map(t => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${
+                tab === t ? 'bg-[#00b15c] text-white' : 'text-gray-500 hover:text-gray-300'
+              }`}
+            >
+              {t === 'ACTIVE' ? 'Running' : t === 'ALL' ? 'All' : t.charAt(0) + t.slice(1).toLowerCase()}
+            </button>
+          ))}
+        </div>
 
-                    <div className="flex gap-2 mt-4">
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/bet-ticket/${ticket.id}`);
-                        }}
-                      >
-                        View Details
-                      </Button>
-                      <Button 
-                        size="sm" 
-                        className="bg-success text-success-foreground hover:bg-success/90"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleRebet(ticket.id);
-                        }}
-                      >
-                        Rebet
-                      </Button>
-                    </div>
-                  </Card>
-                ))}
-              </TabsContent>
+        {/* Bet list */}
+        {loading && bets.length === 0 ? (
+          <div className="space-y-3">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="bg-[#111827] border border-[#1f2d3d] rounded-xl p-5 animate-pulse h-28" />
             ))}
-          </Tabs>
-        </main>
-      </div>
-
-      {/* Win Celebration Modal */}
-      <Dialog open={showWinModal} onOpenChange={setShowWinModal}>
-        <DialogContent className="max-w-md p-0 overflow-hidden bg-gradient-to-b from-background via-primary/5 to-primary/10">
-          <DialogHeader className="sr-only">
-            <DialogTitle>Congratulations on Your Win!</DialogTitle>
-            <DialogDescription>You've won more than most users</DialogDescription>
-          </DialogHeader>
-          <div className="relative p-8 text-center">
-            <div className="mb-4">
-              <p className="text-sm text-muted-foreground mb-2">
-                You have won more than <span className="text-success font-bold text-lg">{selectedWin?.percentile}%</span> of all users.
-              </p>
-              <h2 className="text-5xl font-black text-foreground mb-4 tracking-tight">
-                YOU WON
-              </h2>
-              <div className="text-4xl font-black text-success mb-6">
-                {selectedWin && formatCurrency(selectedWin.actualWin)}
-              </div>
-            </div>
-
-            {/* Trophy Icon */}
-            <div className="relative mb-8 flex justify-center">
-              <div className="relative">
-                <div className="absolute inset-0 bg-primary/20 rounded-full blur-3xl animate-pulse" />
-                <Trophy className="h-32 w-32 text-primary relative z-10" strokeWidth={1.5} />
-              </div>
-            </div>
-
-            <p className="text-sm text-muted-foreground mb-6">
-              Verify Code: <span className="text-success font-semibold">Bet Details</span>
-            </p>
-
-            <div className="flex gap-3">
-              <Button 
-                variant="outline" 
-                className="flex-1"
-                onClick={() => {
-                  setShowWinModal(false);
-                  navigate(`/bet-ticket/${selectedWin?.id}`);
-                }}
-              >
-                Details
-              </Button>
-              <Button 
-                className="flex-1 bg-success text-success-foreground hover:bg-success/90"
-                onClick={() => {
-                  // Ready for n8n integration - social media sharing
-                  const shareText = `I just won ${formatCurrency(selectedWin?.actualWin)} on Betfuz! 🏆💰\nBetter than ${selectedWin?.percentile}% of all users!`;
-                  
-                  if (navigator.share) {
-                    navigator.share({
-                      title: 'My Betfuz Win!',
-                      text: shareText,
-                    });
-                  } else {
-                    navigator.clipboard.writeText(shareText);
-                    toast({
-                      title: "Copied!",
-                      description: "Win details copied - ready to share!",
-                    });
-                  }
-                }}
-              >
-                Show Off
-              </Button>
-            </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-16">
+            <Trophy className="w-12 h-12 text-gray-700 mx-auto mb-3" />
+            <p className="text-gray-500">No bets found</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {filtered.map((bet: any) => {
+              const cfg = STATUS_CFG[bet.status] ?? STATUS_CFG.PENDING;
+              const isExpanded = expanded.has(bet.id);
+              const coValue = cashoutValues[bet.id];
+              const canCashout = bet.status === 'ACTIVE' && coValue > 0;
+
+              return (
+                <div key={bet.id} className="bg-[#111827] border border-[#1f2d3d] rounded-xl overflow-hidden">
+                  {/* Main row */}
+                  <div className="px-5 py-4">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <span className={`w-2 h-2 rounded-full ${cfg.dot}`} />
+                        <span className={`text-[11px] px-2 py-0.5 rounded-full border font-medium ${cfg.cls}`}>{cfg.label}</span>
+                        <span className="text-gray-500 text-xs">{bet.betType ?? 'Single'}</span>
+                      </div>
+                      <span className="text-gray-500 text-xs">{new Date(bet.createdAt).toLocaleDateString()}</span>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-3 mb-3">
+                      <div>
+                        <p className="text-gray-500 text-xs mb-0.5">Stake</p>
+                        <p className="text-white font-bold">{fmt(bet.stake)}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500 text-xs mb-0.5">Odds</p>
+                        <p className="text-[#00b15c] font-bold">{Number(bet.totalOdds ?? bet.odds ?? 0).toFixed(2)}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500 text-xs mb-0.5">
+                          {bet.status === 'WON' ? 'Won' : bet.status === 'CASHOUT' ? 'Cashed Out' : 'Potential'}
+                        </p>
+                        <p className={`font-bold ${bet.status === 'WON' ? 'text-green-400' : bet.status === 'LOST' ? 'text-red-400' : 'text-white'}`}>
+                          {fmt(bet.status === 'WON' ? (bet.actualPayout ?? bet.potentialPayout) : bet.status === 'CASHOUT' ? bet.actualPayout : bet.potentialPayout)}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Cashout bar */}
+                    {canCashout && (
+                      <div className="bg-purple-500/10 border border-purple-500/20 rounded-xl p-3 mb-3 flex items-center justify-between">
+                        <div>
+                          <p className="text-purple-400 text-xs font-medium">Cash Out Available</p>
+                          <p className="text-white font-bold text-lg">{fmt(coValue)}</p>
+                        </div>
+                        <button
+                          onClick={() => handleCashout(bet)}
+                          disabled={cashingOut === bet.id}
+                          className="flex items-center gap-1.5 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+                        >
+                          {cashingOut === bet.id
+                            ? <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> Processing…</>
+                            : <><Zap className="w-3.5 h-3.5" /> Cash Out</>
+                          }
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Win celebration */}
+                    {bet.status === 'WON' && (
+                      <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-3 mb-3 flex items-center gap-2">
+                        <Trophy className="w-5 h-5 text-green-400 flex-shrink-0" />
+                        <p className="text-green-400 text-sm font-semibold">🎉 You won {fmt(bet.actualPayout ?? bet.potentialPayout)}!</p>
+                      </div>
+                    )}
+
+                    {/* Actions */}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => toggleExpand(bet.id)}
+                        className="flex items-center gap-1.5 text-gray-400 hover:text-white text-xs transition-colors"
+                      >
+                        {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                        {isExpanded ? 'Hide' : 'Selections'}
+                        {bet.selections?.length ? ` (${bet.selections.length})` : ''}
+                      </button>
+                      <button
+                        onClick={() => handleShare(bet)}
+                        className="flex items-center gap-1.5 text-gray-400 hover:text-white text-xs transition-colors ml-auto"
+                      >
+                        <Share2 className="w-3.5 h-3.5" /> Share
+                      </button>
+                      <button
+                        onClick={() => toast.info('Rebet — place same selections again')}
+                        className="flex items-center gap-1.5 text-gray-400 hover:text-white text-xs transition-colors"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" /> Rebet
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Expanded selections */}
+                  {isExpanded && bet.selections?.length > 0 && (
+                    <div className="border-t border-[#1f2d3d] bg-[#0d1520]">
+                      {bet.selections.map((sel: any, i: number) => (
+                        <div key={i} className="flex items-center justify-between px-5 py-2.5 border-b border-[#1f2d3d]/30 last:border-0">
+                          <div>
+                            <p className="text-white text-xs font-medium">{sel.teamHome ?? sel.event ?? `Selection ${i + 1}`}</p>
+                            <p className="text-gray-500 text-xs">{sel.market ?? sel.betType ?? ''} · {sel.selection ?? ''}</p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[#00b15c] font-bold text-sm">{Number(sel.odds ?? 0).toFixed(2)}</span>
+                            <span className={`w-1.5 h-1.5 rounded-full ${sel.status === 'WON' ? 'bg-green-400' : sel.status === 'LOST' ? 'bg-red-400' : 'bg-yellow-400'}`} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+
+            {hasMore && (
+              <button
+                onClick={() => { setPage(p => p + 1); load(); }}
+                disabled={loading}
+                className="w-full py-3 border border-[#1f2d3d] text-gray-400 hover:text-white rounded-xl text-sm transition-colors flex items-center justify-center gap-2"
+              >
+                {loading ? <><RefreshCw className="w-4 h-4 animate-spin" /> Loading…</> : 'Load More'}
+              </button>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
-};
-
-export default BetTickets;
+}

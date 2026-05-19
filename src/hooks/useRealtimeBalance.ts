@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useUserProfile } from './useUserProfile';
+import { useEffect, useState, useCallback } from 'react';
+import { useAuthStore } from '@/store/authStore';
+import { walletApi } from '@/lib/api/wallet';
 
 interface BalanceUpdate {
   old_balance: number;
@@ -11,92 +11,50 @@ interface BalanceUpdate {
 }
 
 export const useRealtimeBalance = () => {
-  const { user, profile, refreshProfile } = useUserProfile();
+  const { user } = useAuthStore();
+  const [balance, setBalance] = useState(0);
   const [balanceUpdates, setBalanceUpdates] = useState<BalanceUpdate[]>([]);
   const [isConnected, setIsConnected] = useState(false);
 
-  useEffect(() => {
-    if (!user) {
-      console.log('No user, skipping balance subscription');
-      return;
-    }
-
-    console.log('Setting up realtime balance subscription for user:', user.id);
-
-    // Subscribe to broadcast channel for balance changes
-    const channel = supabase
-      .channel(`user:${user.id}`)
-      .on(
-        'broadcast',
-        { event: 'balance_change' },
-        (payload) => {
-          console.log('Received balance change:', payload);
-
-          const update: BalanceUpdate = {
-            old_balance: payload.payload.old_balance || 0,
-            new_balance: payload.payload.new_balance || 0,
-            change: payload.payload.change || 0,
-            reason: payload.payload.reason || 'Unknown',
-            timestamp: payload.payload.timestamp || new Date().toISOString(),
-          };
-
-          setBalanceUpdates(prev => [...prev.slice(-9), update]);
-
-          // Refresh profile to get latest balance
-          refreshProfile();
-
-          console.log('Balance updated:', update);
+  const fetchBalance = useCallback(async () => {
+    if (!user) return;
+    try {
+      const data = await walletApi.getBalance();
+      setBalance(prev => {
+        if (prev !== 0 && data.balance !== prev) {
+          setBalanceUpdates(arr => [...arr.slice(-9), {
+            old_balance: prev,
+            new_balance: data.balance,
+            change: data.balance - prev,
+            reason: 'Balance update',
+            timestamp: new Date().toISOString(),
+          }]);
         }
-      )
-      .subscribe((status) => {
-        console.log('Balance channel status:', status);
-        setIsConnected(status === 'SUBSCRIBED');
+        return data.balance;
       });
-
-    // Also subscribe to profiles table changes
-    const profileChannel = supabase
-      .channel('profiles-balance-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'profiles',
-          filter: `id=eq.${user.id}`,
-        },
-        (payload) => {
-          console.log('Profile balance updated via database:', payload);
-          
-          const oldData = payload.old as any;
-          const newData = payload.new as any;
-
-          if (oldData.balance !== newData.balance) {
-            const update: BalanceUpdate = {
-              old_balance: oldData.balance || 0,
-              new_balance: newData.balance || 0,
-              change: (newData.balance || 0) - (oldData.balance || 0),
-              reason: 'Database update',
-              timestamp: new Date().toISOString(),
-            };
-
-            setBalanceUpdates(prev => [...prev.slice(-9), update]);
-            refreshProfile();
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      console.log('Cleaning up balance subscriptions');
-      supabase.removeChannel(channel);
-      supabase.removeChannel(profileChannel);
-    };
+      setIsConnected(true);
+    } catch {
+      setIsConnected(false);
+    }
   }, [user?.id]);
 
+  useEffect(() => {
+    if (!user) return;
+    fetchBalance();
+    const interval = setInterval(fetchBalance, 15000);
+    return () => clearInterval(interval);
+  }, [user?.id, fetchBalance]);
+
+  const profile = { balance };
+  const refreshProfile = fetchBalance;
+
   return {
-    currentBalance: profile?.balance || 0,
+    currentBalance: balance,
     balanceUpdates,
     isConnected,
     clearUpdates: () => setBalanceUpdates([]),
+    user: user ? { id: user.id, email: user.email } : null,
+    profile,
+    refreshProfile,
   };
 };

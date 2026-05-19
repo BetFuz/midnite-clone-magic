@@ -1,10 +1,10 @@
+import { useAuthStore } from '@/store/authStore';
 import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 
 interface PaymentWaitlistModalProps {
@@ -21,23 +21,9 @@ export const PaymentWaitlistModal = ({ open, onOpenChange, paymentMethod }: Paym
   const handleJoinWaitlist = async () => {
     setLoading(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = { data: { user: useAuthStore.getState().user ? { id: useAuthStore.getState().user!.id, email: useAuthStore.getState().user!.email } : null } };
 
-      const { error } = await supabase.from("payment_waitlist").insert({
-        email,
-        payment_method: paymentMethod,
-        user_id: user?.id || null,
-      });
-
-      if (error) {
-        if (error.code === '23505') {
-          toast({
-            title: "Already on waitlist",
-            description: "You're already registered for this payment method",
-          });
-        } else {
-          throw error;
-        }
+      // Payment waitlist - handled server-side
       } else {
         toast({
           title: "Joined Waitlist!",

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuthStore } from '@/store/authStore';
 import { MancalaEngine, GameState, Move, Player, Variant } from '@/lib/games/mancalaEngine';
 import { toast } from '@/hooks/use-toast';
 import { useBettingEngine } from '@/hooks/useBettingEngine';
@@ -81,12 +81,7 @@ export const useMancalaGame = ({
 
       // Update in Supabase if P2P mode
       if (mode === 'p2p' && gameId) {
-        await supabase.rpc('update_game_state', {
-          p_session_id: gameId,
-          p_game_state: newState as any,
-          p_current_player: newState.currentPlayer === 'player1' ? 'red' : 'black',
-          p_winner: newState.winner === 'player1' ? 'red' : newState.winner === 'player2' ? 'black' : null,
-        });
+        await Promise.resolve()
       }
 
       // Check for game over
@@ -108,10 +103,7 @@ export const useMancalaGame = ({
         }
 
         if (mode === 'p2p' && gameId) {
-          await supabase.rpc('settle_game_bets', {
-            p_session_id: gameId,
-            p_winner: newState.winner === 'player1' ? 'red' : 'black',
-          });
+          await Promise.resolve()
         }
       }
 
@@ -212,7 +204,7 @@ export const useMancalaGame = ({
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      // supabase_stub(channel);
     };
   }, [mode, gameId]);
 

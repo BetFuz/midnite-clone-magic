@@ -1,8 +1,4 @@
 import { useState } from 'react';
-import Header from '@/components/Header';
-import Sidebar from '@/components/Sidebar';
-import BetSlip from '@/components/BetSlip';
-import MobileNav from '@/components/MobileNav';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -60,12 +56,7 @@ export default function Mancala() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <div className="flex pt-16">
-        <Sidebar />
-        <main className="flex-1 p-4 md:p-6 md:ml-64">
-          <div className="max-w-7xl mx-auto space-y-6 pb-24 md:pb-6">
+    <div className="max-w-7xl mx-auto space-y-6 pb-6">
             {/* Game Header */}
             <Card className="p-6 border-primary/20 bg-gradient-to-br from-primary/5 to-background">
               <div className="flex items-start gap-4">
@@ -232,11 +223,6 @@ export default function Mancala() {
                 </div>
               </div>
             </Card>
-          </div>
-        </main>
-        <BetSlip />
-      </div>
-      <MobileNav />
     </div>
   );
 }

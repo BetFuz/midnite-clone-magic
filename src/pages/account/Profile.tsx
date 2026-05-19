@@ -9,24 +9,28 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { useUserProfile } from "@/hooks/useUserProfile";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuthStore } from "@/store/authStore";
 import { formatCurrency } from "@/lib/currency";
 import { useNavigate } from "react-router-dom";
-import { 
-  Loader2, 
-  Wallet, 
-  History, 
-  Bell, 
-  HelpCircle, 
-  Info, 
-  Phone, 
+import {
+  Loader2,
+  Wallet,
+  History,
+  Bell,
+  HelpCircle,
+  Info,
+  Phone,
   MessageCircle,
-  FileText, 
-  Shield, 
+  FileText,
+  Shield,
   LogOut,
   ChevronRight,
   Settings,
-  Gamepad2
+  Gamepad2,
+  Crown,
+  Gift,
+  Users,
+  ShieldCheck,
 } from "lucide-react";
 
 interface MenuItemProps {
@@ -56,24 +60,14 @@ const MenuItem = ({ icon, label, onClick, hasArrow = false, rightElement }: Menu
 
 const Profile = () => {
   const { user, profile, loading } = useUserProfile();
+  const { logout } = useAuthStore();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const navigate = useNavigate();
 
-  const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-      toast({
-        title: "Logged Out",
-        description: "You have been successfully logged out.",
-      });
-      navigate("/");
-    } catch (error: any) {
-      toast({
-        title: "Logout Failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
+  const handleLogout = () => {
+    logout();
+    toast({ title: "Logged Out", description: "You have been successfully logged out." });
+    navigate("/");
   };
 
   const handleNotificationToggle = (enabled: boolean) => {
@@ -168,6 +162,30 @@ const Profile = () => {
                 label="Transaction History"
                 hasArrow
                 onClick={() => navigate("/account/transactions")}
+              />
+              <MenuItem
+                icon={<Crown className="h-5 w-5 text-yellow-400" />}
+                label="VIP Club"
+                hasArrow
+                onClick={() => navigate("/account/vip")}
+              />
+              <MenuItem
+                icon={<Gift className="h-5 w-5 text-green-400" />}
+                label="My Bonuses"
+                hasArrow
+                onClick={() => navigate("/account/bonuses")}
+              />
+              <MenuItem
+                icon={<Users className="h-5 w-5 text-blue-400" />}
+                label="Refer &amp; Earn"
+                hasArrow
+                onClick={() => navigate("/account/referral")}
+              />
+              <MenuItem
+                icon={<ShieldCheck className="h-5 w-5 text-cyan-400" />}
+                label="ID Verification (KYC)"
+                hasArrow
+                onClick={() => navigate("/account/kyc")}
               />
               <MenuItem
                 icon={<Bell className="h-5 w-5" />}

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
+
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/currency";
 import { Trophy, TrendingUp, Users, ArrowLeft, Medal, Crown } from "lucide-react";

@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { useCasinoBalance } from './useCasinoBalance';
 
 export type Suit = '♠' | '♥' | '♦' | '♣';
 export type Rank = '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '10' | 'J' | 'Q' | 'K' | 'A';
@@ -25,13 +25,14 @@ export type GamePhase = 'waiting' | 'preflop' | 'flop' | 'turn' | 'river' | 'sho
 export type HandRank = 'High Card' | 'Pair' | 'Two Pair' | 'Three of a Kind' | 'Straight' | 'Flush' | 'Full House' | 'Four of a Kind' | 'Straight Flush' | 'Royal Flush';
 
 export function usePoker() {
+  const { balance: walletBalance, playRound } = useCasinoBalance();
   const [players, setPlayers] = useState<Player[]>([]);
   const [communityCards, setCommunityCards] = useState<Card[]>([]);
   const [deck, setDeck] = useState<Card[]>([]);
   const [pot, setPot] = useState(0);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [phase, setPhase] = useState<GamePhase>('waiting');
-  const [minBet, setMinBet] = useState(100);
+  const [minBet, setMinBet] = useState(500);
   const [isLoading, setIsLoading] = useState(false);
   const [handAnalysis, setHandAnalysis] = useState<string>('');
 
@@ -52,38 +53,23 @@ export function usePoker() {
   const startGame = useCallback(async () => {
     setIsLoading(true);
     try {
-      console.log('Starting poker game, creating AI opponents...');
-      
-      // Create AI opponents with timeout
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Request timed out after 10 seconds')), 10000)
-      );
-      
-      const invokePromise = supabase.functions.invoke('ai-poker', {
-        body: { action: 'create_opponents', count: 3 },
-      });
-      
-      const { data, error } = await Promise.race([invokePromise, timeoutPromise]) as any;
-      
-      console.log('AI opponents response:', { data, error });
-
-      if (error) {
-        console.error('Error from edge function:', error);
-        throw error;
-      }
-
       const newDeck = createDeck();
       const humanPlayer: Player = {
         id: 'human',
         name: 'You',
-        chips: 10000,
+        chips: Math.max(walletBalance, 5000),
         holeCards: [newDeck.pop()!, newDeck.pop()!],
         currentBet: 0,
         folded: false,
         isAI: false,
       };
 
-      const aiPlayers: Player[] = data.opponents.map((opp: any, idx: number) => ({
+      const defaultOpponents = [
+        { name: 'Chidi', personality: 'aggressive' },
+        { name: 'Emeka', personality: 'conservative' },
+        { name: 'Ngozi', personality: 'balanced' },
+      ];
+      const aiPlayers: Player[] = defaultOpponents.map((opp, idx) => ({
         id: `ai-${idx}`,
         name: opp.name,
         chips: 10000,
@@ -236,7 +222,9 @@ export function usePoker() {
 
     evaluations.sort((a, b) => b.hand.value - a.hand.value);
     const winner = evaluations[0].player;
-    
+    const humanWon = winner.id === 'human';
+    const humanStake = players.find(p => p.id === 'human')?.currentBet ?? 0;
+
     setPlayers(prev => {
       const updated = [...prev];
       const winnerIdx = updated.findIndex(p => p.id === winner.id);
@@ -244,11 +232,16 @@ export function usePoker() {
       return updated;
     });
 
+    // Sync poker result with real wallet
+    if (humanStake > 0) {
+      playRound('poker', humanStake, humanWon ? pot : 0).catch(() => {});
+    }
+
     toast({
-      title: `${winner.name} Wins!`,
-      description: `${evaluations[0].hand.rank} - ₦${pot.toLocaleString()}`,
+      title: humanWon ? `🏆 You Win!` : `${winner.name} Wins!`,
+      description: `${evaluations[0].hand.rank} — ₦${pot.toLocaleString()} pot`,
     });
-  }, [players, communityCards, pot, evaluateHand]);
+  }, [players, communityCards, pot, evaluateHand, playRound]);
 
   const getAIAdvice = useCallback(async () => {
     const humanPlayer = players.find(p => p.id === 'human');
@@ -256,19 +249,11 @@ export function usePoker() {
 
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('ai-poker', {
-        body: {
-          action: 'advice',
-          holeCards: humanPlayer.holeCards,
-          communityCards,
-          pot,
-          phase,
-          yourChips: humanPlayer.chips,
-        },
-      });
+      const data = null; const error = null;
 
       if (error) throw error;
-      setHandAnalysis(data.advice);
+      // AI feature unavailable - graceful no-op
+      if (!data) return;
       toast({ title: 'AI Advisor', description: 'Strategy suggestion ready' });
     } catch (error) {
       console.error('AI advice error:', error);

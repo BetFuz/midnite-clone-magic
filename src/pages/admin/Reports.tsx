@@ -1,285 +1,187 @@
-import { useState, useEffect } from "react";
-import { AdminGuard } from "@/components/admin/AdminGuard";
-import { AdminLayout } from "@/components/admin/AdminLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { FileText, Download, TrendingUp, Users, Activity } from "lucide-react";
-import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useState, useEffect, useCallback } from 'react';
+import { AdminGuard } from '@/components/admin/AdminGuard';
+import { AdminLayout } from '@/components/admin/AdminLayout';
+import { AdminHeader } from '@/components/admin/AdminHeader';
+import { adminApi } from '@/lib/api/adminApi';
+import {
+  AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis,
+  CartesianGrid, Tooltip, ResponsiveContainer, Legend,
+} from 'recharts';
+import { TrendingUp, TrendingDown, RefreshCw } from 'lucide-react';
 
-interface ReportData {
-  totalRevenue: number;
-  totalBets: number;
-  totalUsers: number;
-  pendingBets: number;
-  wonBets: number;
-  lostBets: number;
-  avgBetAmount: number;
-}
+const fmtK = (n: number) => n >= 1000000 ? `XAF ${(n/1000000).toFixed(1)}M` : n >= 1000 ? `XAF ${(n/1000).toFixed(0)}K` : `XAF ${n}`;
+const SPORT_COLORS = ['#00b15c','#7c3aed','#0891b2','#f97316','#ec4899','#eab308','#6366f1','#14b8a6'];
 
-export default function Reports() {
-  const [startDate, setStartDate] = useState(
-    new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+const ChartTip = ({ active, payload, label }: any) => {
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="bg-[#0d1520] border border-[#1f2d3d] rounded-lg p-3 text-xs">
+      <p className="text-gray-400 mb-1.5">{label}</p>
+      {payload.map((p: any) => <p key={p.name} style={{ color: p.color }} className="font-medium">{p.name}: {typeof p.value === 'number' && p.value > 100 ? fmtK(p.value) : (p.value ?? 0).toLocaleString()}</p>)}
+    </div>
   );
-  const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
-  const [reportData, setReportData] = useState<ReportData>({
-    totalRevenue: 0,
-    totalBets: 0,
-    totalUsers: 0,
-    pendingBets: 0,
-    wonBets: 0,
-    lostBets: 0,
-    avgBetAmount: 0,
-  });
-  const [loading, setLoading] = useState(true);
+};
 
-  useEffect(() => {
-    fetchReportData();
-  }, [startDate, endDate]);
+const KPICard = ({ label, value, change, sub }: any) => (
+  <div className="bg-[#111827] border border-[#1f2d3d] rounded-xl p-5">
+    <p className="text-gray-400 text-xs uppercase tracking-wider mb-2">{label}</p>
+    <p className="text-white font-bold text-2xl mb-1">{value}</p>
+    <div className="flex items-center gap-1.5">
+      {change >= 0 ? <TrendingUp className="w-3.5 h-3.5 text-green-400" /> : <TrendingDown className="w-3.5 h-3.5 text-red-400" />}
+      <span className={`text-xs font-medium ${change >= 0 ? 'text-green-400' : 'text-red-400'}`}>{change >= 0 ? '+' : ''}{change}% vs last month</span>
+    </div>
+    {sub && <p className="text-gray-600 text-xs mt-0.5">{sub}</p>}
+  </div>
+);
 
-  const fetchReportData = async () => {
+export default function AdminReports() {
+  const [weekly, setWeekly]     = useState<any[]>([]);
+  const [sports, setSports]     = useState<any[]>([]);
+  const [topUsers, setTopUsers] = useState<any[]>([]);
+  const [summary, setSummary]   = useState<any>(null);
+  const [loading, setLoading]   = useState(true);
+
+  const load = useCallback(async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const startDateTime = new Date(startDate).toISOString();
-      const endDateTime = new Date(endDate + 'T23:59:59').toISOString();
+      const [w, s, t, sum] = await Promise.all([
+        adminApi.getWeeklyAnalytics(),
+        adminApi.getSportsBreakdown(),
+        adminApi.getTopUsers(),
+        adminApi.getAnalyticsSummary(),
+      ]);
+      setWeekly(w?.days ?? []);
+      setSports(s?.sports ?? []);
+      setTopUsers(t?.topBettors ?? []);
+      setSummary(sum);
+    } catch { /* silent */ }
+    finally { setLoading(false); }
+  }, []);
 
-      // Fetch bet statistics
-      const { data: bets, error: betsError } = await supabase
-        .from('bet_slips')
-        .select('total_stake, status')
-        .gte('created_at', startDateTime)
-        .lte('created_at', endDateTime);
+  useEffect(() => { load(); }, [load]);
 
-      if (betsError) throw betsError;
-
-      // Fetch user count
-      const { count: userCount, error: userError } = await supabase
-        .from('profiles')
-        .select('*', { count: 'exact', head: true })
-        .gte('created_at', startDateTime)
-        .lte('created_at', endDateTime);
-
-      if (userError) throw userError;
-
-      // Calculate statistics
-      const totalBets = bets?.length || 0;
-      const totalRevenue = bets?.reduce((sum, bet) => sum + Number(bet.total_stake), 0) || 0;
-      const pendingBets = bets?.filter(bet => bet.status === 'pending').length || 0;
-      const wonBets = bets?.filter(bet => bet.status === 'won').length || 0;
-      const lostBets = bets?.filter(bet => bet.status === 'lost').length || 0;
-      const avgBetAmount = totalBets > 0 ? totalRevenue / totalBets : 0;
-
-      setReportData({
-        totalRevenue,
-        totalBets,
-        totalUsers: userCount || 0,
-        pendingBets,
-        wonBets,
-        lostBets,
-        avgBetAmount,
-      });
-    } catch (error) {
-      console.error('Error fetching report data:', error);
-      toast.error('Failed to load report data');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGenerateReport = async (reportType: string) => {
-    try {
-      toast.loading(`Generating ${reportType} report...`);
-      
-      // In production, this would call an edge function to generate PDF
-      // For now, download data as CSV
-      const csvData = `Report Type,${reportType}\nDate Range,${startDate} to ${endDate}\nTotal Revenue,₦${reportData.totalRevenue.toLocaleString()}\nTotal Bets,${reportData.totalBets}\nTotal Users,${reportData.totalUsers}\nPending Bets,${reportData.pendingBets}\nWon Bets,${reportData.wonBets}\nLost Bets,${reportData.lostBets}\nAvg Bet Amount,₦${reportData.avgBetAmount.toFixed(2)}`;
-      
-      const blob = new Blob([csvData], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${reportType.toLowerCase().replace(' ', '-')}-report-${startDate}-${endDate}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-      
-      toast.success(`${reportType} report downloaded`);
-    } catch (error) {
-      console.error('Error generating report:', error);
-      toast.error('Failed to generate report');
-    }
-  };
+  const chartData = weekly.map(d => ({
+    date: new Date(d.date).toLocaleDateString('en', { weekday: 'short', day: 'numeric' }),
+    Deposits: d.deposits, Withdrawals: d.withdrawals, 'Net Revenue': d.netRevenue,
+    Bets: d.bets, 'New Users': d.newUsers,
+  }));
 
   return (
     <AdminGuard>
       <AdminLayout>
-        <div className="space-y-6">
-          <div>
-            <h1 className="text-3xl font-bold">Reports & Analytics</h1>
-            <p className="text-muted-foreground">Generate comprehensive platform reports</p>
-          </div>
+        <AdminHeader title="Analytics & Reports" onRefresh={load} />
+        <div className="p-6 space-y-6">
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Date Range</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Start Date</Label>
-                  <Input
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    max={endDate}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>End Date</Label>
-                  <Input
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    min={startDate}
-                    max={new Date().toISOString().split('T')[0]}
-                  />
-                </div>
+          {loading ? (
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">{[...Array(5)].map((_,i) => <div key={i} className="bg-[#111827] border border-[#1f2d3d] rounded-xl p-5 h-28 animate-pulse" />)}</div>
+          ) : summary && (
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+              <KPICard label="Deposits"    value={fmtK(summary.thisMonth?.deposits ?? 0)}    change={summary.changes?.deposits ?? 0} sub="this month" />
+              <KPICard label="Withdrawals" value={fmtK(summary.thisMonth?.withdrawals ?? 0)} change={summary.changes?.withdrawals ?? 0} />
+              <KPICard label="Net Revenue" value={fmtK(summary.thisMonth?.netRevenue ?? 0)}  change={summary.changes?.netRevenue ?? 0} />
+              <KPICard label="Bets Placed" value={(summary.thisMonth?.bets ?? 0).toLocaleString()} change={summary.changes?.bets ?? 0} />
+              <KPICard label="New Users"   value={(summary.thisMonth?.newUsers ?? 0).toLocaleString()} change={summary.changes?.newUsers ?? 0} />
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div className="bg-[#111827] border border-[#1f2d3d] rounded-xl p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-white font-semibold text-sm">7-Day Revenue Trend</h3>
+                <button onClick={load} className="p-1.5 text-gray-500 hover:text-white transition-all"><RefreshCw className="w-3.5 h-3.5" /></button>
               </div>
-            </CardContent>
-          </Card>
+              {loading ? <div className="h-52 bg-[#1f2d3d]/30 rounded-lg animate-pulse" /> : (
+                <ResponsiveContainer width="100%" height={200}>
+                  <AreaChart data={chartData}>
+                    <defs>
+                      <linearGradient id="rGd" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#00b15c" stopOpacity={0.3}/><stop offset="95%" stopColor="#00b15c" stopOpacity={0}/></linearGradient>
+                      <linearGradient id="rGw" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#f97316" stopOpacity={0.3}/><stop offset="95%" stopColor="#f97316" stopOpacity={0}/></linearGradient>
+                      <linearGradient id="rGn" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#0891b2" stopOpacity={0.3}/><stop offset="95%" stopColor="#0891b2" stopOpacity={0}/></linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1f2d3d" />
+                    <XAxis dataKey="date" tick={{ fill:'#6b7280', fontSize:10 }} axisLine={false} tickLine={false} />
+                    <YAxis tickFormatter={fmtK} tick={{ fill:'#6b7280', fontSize:10 }} axisLine={false} tickLine={false} width={55} />
+                    <Tooltip content={<ChartTip />} />
+                    <Legend wrapperStyle={{ fontSize:11, color:'#9ca3af' }} />
+                    <Area type="monotone" dataKey="Deposits"    stroke="#00b15c" strokeWidth={2} fill="url(#rGd)" dot={false} />
+                    <Area type="monotone" dataKey="Withdrawals" stroke="#f97316" strokeWidth={2} fill="url(#rGw)" dot={false} />
+                    <Area type="monotone" dataKey="Net Revenue" stroke="#0891b2" strokeWidth={2} fill="url(#rGn)" dot={false} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              )}
+            </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-primary" />
-                  Total Revenue
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {loading ? '...' : `₦${reportData.totalRevenue.toLocaleString()}`}
-                </div>
-                <p className="text-xs text-muted-foreground">From {reportData.totalBets} bets</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <Activity className="h-4 w-4 text-green-500" />
-                  Bet Statistics
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-green-500">
-                  {loading ? '...' : reportData.wonBets}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Won / {reportData.lostBets} Lost / {reportData.pendingBets} Pending
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <Users className="h-4 w-4 text-blue-500" />
-                  New Users
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-blue-500">
-                  {loading ? '...' : reportData.totalUsers}
-                </div>
-                <p className="text-xs text-muted-foreground">In selected period</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-orange-500" />
-                  Avg Bet Amount
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-orange-500">
-                  {loading ? '...' : `₦${reportData.avgBetAmount.toFixed(0)}`}
-                </div>
-                <p className="text-xs text-muted-foreground">Per bet placed</p>
-              </CardContent>
-            </Card>
+            <div className="bg-[#111827] border border-[#1f2d3d] rounded-xl p-5">
+              <h3 className="text-white font-semibold text-sm mb-4">Daily Bets & New Users</h3>
+              {loading ? <div className="h-52 bg-[#1f2d3d]/30 rounded-lg animate-pulse" /> : (
+                <ResponsiveContainer width="100%" height={200}>
+                  <BarChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#1f2d3d" />
+                    <XAxis dataKey="date" tick={{ fill:'#6b7280', fontSize:10 }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fill:'#6b7280', fontSize:10 }} axisLine={false} tickLine={false} width={30} />
+                    <Tooltip content={<ChartTip />} />
+                    <Legend wrapperStyle={{ fontSize:11, color:'#9ca3af' }} />
+                    <Bar dataKey="Bets" fill="#7c3aed" radius={[3,3,0,0]} />
+                    <Bar dataKey="New Users" fill="#0891b2" radius={[3,3,0,0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+            </div>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <Card className="hover:bg-accent/50 cursor-pointer transition-colors">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-primary/10 rounded-full">
-                    <FileText className="h-6 w-6 text-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold">Revenue Report</h3>
-                    <p className="text-sm text-muted-foreground">GGR, NGR, deposits</p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div className="bg-[#111827] border border-[#1f2d3d] rounded-xl p-5">
+              <h3 className="text-white font-semibold text-sm mb-4">Bets by Sport (30 days)</h3>
+              {loading ? <div className="h-52 bg-[#1f2d3d]/30 rounded-lg animate-pulse" /> : sports.length === 0 ? (
+                <div className="h-52 flex items-center justify-center text-gray-600 text-sm">No sports data yet</div>
+              ) : (
+                <div className="flex items-center gap-5">
+                  <ResponsiveContainer width={160} height={160}>
+                    <PieChart>
+                      <Pie data={sports} cx="50%" cy="50%" innerRadius={45} outerRadius={75} dataKey="count" paddingAngle={2}>
+                        {sports.map((_: any, i: number) => <Cell key={i} fill={SPORT_COLORS[i % SPORT_COLORS.length]} />)}
+                      </Pie>
+                      <Tooltip formatter={(v: any) => [v.toLocaleString(), 'Bets']} contentStyle={{ background:'#0d1520', border:'1px solid #1f2d3d', borderRadius:8, fontSize:12 }} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="flex-1 space-y-1.5">
+                    {sports.map((s: any, i: number) => (
+                      <div key={s.sport} className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 rounded-sm" style={{ background: SPORT_COLORS[i % SPORT_COLORS.length] }} />
+                          <span className="text-gray-300 text-sm">{s.sport}</span>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-white text-sm font-medium">{s.count.toLocaleString()}</span>
+                          <p className="text-gray-500 text-[10px]">{fmtK(s.volume ?? 0)}</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-                <Button
-                  className="w-full mt-4"
-                  onClick={() => handleGenerateReport("Revenue")}
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Generate
-                </Button>
-              </CardContent>
-            </Card>
+              )}
+            </div>
 
-            <Card className="hover:bg-accent/50 cursor-pointer transition-colors">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-primary/10 rounded-full">
-                    <FileText className="h-6 w-6 text-primary" />
+            <div className="bg-[#111827] border border-[#1f2d3d] rounded-xl overflow-hidden">
+              <div className="px-5 py-4 border-b border-[#1f2d3d]">
+                <h3 className="text-white font-semibold text-sm">Top Bettors</h3>
+                <p className="text-gray-500 text-xs">By total stake volume (all time)</p>
+              </div>
+              {loading ? <div className="p-4 space-y-2">{[...Array(6)].map((_,i) => <div key={i} className="h-10 bg-[#1f2d3d] rounded animate-pulse" />)}</div>
+              : topUsers.length === 0 ? <div className="text-center text-gray-600 py-10 text-sm">No data</div>
+              : topUsers.map((b: any, i: number) => (
+                <div key={i} className="flex items-center gap-3 px-5 py-3 border-b border-[#1f2d3d]/50 hover:bg-white/2 transition-colors">
+                  <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${i === 0 ? 'bg-yellow-500/20 text-yellow-400' : i === 1 ? 'bg-gray-400/20 text-gray-300' : i === 2 ? 'bg-orange-500/20 text-orange-400' : 'bg-[#1f2d3d] text-gray-500'}`}>{i+1}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white text-sm truncate">{b.user?.email ?? 'Unknown'}</p>
+                    <p className="text-gray-500 text-xs">{b.betCount} bets · {b.user?.kycTier ?? ''}</p>
                   </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold">User Activity</h3>
-                    <p className="text-sm text-muted-foreground">DAU, MAU, retention</p>
-                  </div>
+                  <p className="text-[#00b15c] font-bold text-sm">{fmtK(b.totalStake ?? 0)}</p>
                 </div>
-                <Button
-                  className="w-full mt-4"
-                  onClick={() => handleGenerateReport("User Activity")}
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Generate
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:bg-accent/50 cursor-pointer transition-colors">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 bg-primary/10 rounded-full">
-                    <FileText className="h-6 w-6 text-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold">Bet Analysis</h3>
-                    <p className="text-sm text-muted-foreground">Win rate, liability</p>
-                  </div>
-                </div>
-                <Button
-                  className="w-full mt-4"
-                  onClick={() => handleGenerateReport("Bet Analysis")}
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Generate
-                </Button>
-              </CardContent>
-            </Card>
+              ))}
+            </div>
           </div>
+
         </div>
       </AdminLayout>
     </AdminGuard>

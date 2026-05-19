@@ -1,424 +1,87 @@
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import BetSlip from "@/components/BetSlip";
-import HeroBanner from "@/components/HeroBanner";
-import MatchCard from "@/components/MatchCard";
-import BoostCard from "@/components/BoostCard";
-import QuickBetBuilder from "@/components/QuickBetBuilder";
+import { PromoBannerCarousel } from "@/components/home/PromoBannerCarousel";
+import { SportsQuickNav } from "@/components/home/SportsQuickNav";
+import { LiveScoreTicker } from "@/components/home/LiveScoreTicker";
+import { LiveMatchesBanner } from "@/components/home/LiveMatchesBanner";
+import { TodaysMatches } from "@/components/home/TodaysMatches";
+import { JackpotBanner } from "@/components/home/JackpotBanner";
+import { PopularLeaguesBar } from "@/components/home/PopularLeaguesBar";
+import { CasinoPreview } from "@/components/home/CasinoPreview";
+import { OddsBoostsSection } from "@/components/home/OddsBoostsSection";
+import { PromoStripBanner } from "@/components/home/PromoStripBanner";
 import PopularBetsWidget from "@/components/PopularBetsWidget";
-import { buttonVariants } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { ChevronRight, Award, TrendingUp as TrendingUpIcon } from "lucide-react";
-import { useFeaturedMatches } from "@/hooks/useFeaturedMatches";
-import { Skeleton } from "@/components/ui/skeleton";
+import QuickBetBuilder from "@/components/QuickBetBuilder";
+import PersonalizedSuggestions from "@/components/PersonalizedSuggestions";
+import FlashOdds from "@/components/FlashOdds";
 
-// Import league logos
-import premierLeagueLogo from "@/assets/leagues/premier-league.png";
-import championsLeagueLogo from "@/assets/leagues/champions-league.png";
-import laLigaLogo from "@/assets/leagues/la-liga.png";
-import serieALogo from "@/assets/leagues/serie-a.png";
-import bundesligaLogo from "@/assets/leagues/bundesliga.png";
-import nbaLogo from "@/assets/leagues/nba.png";
-import nflLogo from "@/assets/leagues/nfl.png";
-import atpLogo from "@/assets/leagues/atp.png";
-import ligue1Logo from "@/assets/leagues/ligue-1.png";
-import eredivisieLogo from "@/assets/leagues/eredivisie.png";
-import mlsLogo from "@/assets/leagues/mls.png";
-import wnbaLogo from "@/assets/leagues/wnba.png";
-import euroleagueLogo from "@/assets/leagues/euroleague.png";
-import iplLogo from "@/assets/leagues/ipl.png";
+const Index = () => (
+  <div className="min-h-screen bg-background">
+    <Header />
+    <div className="flex">
+      <Sidebar className="hidden md:flex" />
 
-// Import team logos
-import manUnitedLogo from "@/assets/teams/man-united.png";
-import liverpoolLogo from "@/assets/teams/liverpool.png";
-import barcelonaLogo from "@/assets/teams/barcelona.png";
-import realMadridLogo from "@/assets/teams/real-madrid.png";
-import chelseaLogo from "@/assets/teams/chelsea.png";
-import arsenalLogo from "@/assets/teams/arsenal.png";
-import bayernLogo from "@/assets/teams/bayern.png";
-import psgLogo from "@/assets/teams/psg.png";
-import manCityLogo from "@/assets/teams/man-city.png";
-import tottenhamLogo from "@/assets/teams/tottenham.png";
-import acMilanLogo from "@/assets/teams/ac-milan.png";
-import interMilanLogo from "@/assets/teams/inter-milan.png";
-import juventusLogo from "@/assets/teams/juventus.png";
-import atleticoMadridLogo from "@/assets/teams/atletico-madrid.png";
-import dortmundLogo from "@/assets/teams/dortmund.png";
-import ajaxLogo from "@/assets/teams/ajax.png";
+      <main className="flex-1 overflow-y-auto h-[calc(100vh-4rem)] pb-24 md:pb-6">
+        {/* ── Live Score Ticker ── */}
+        <div className="px-4 md:px-6 pt-3">
+          <LiveScoreTicker />
+        </div>
 
-// Import promotional banners
-import championsPromo from "@/assets/promos/champions-league-promo.jpg";
-import nbaPromo from "@/assets/promos/nba-promo.jpg";
-import betBuilderPromo from "@/assets/promos/bet-builder-promo.jpg";
-import welcomePromo from "@/assets/promos/welcome-bonus-promo.jpg";
-import afconHero from "@/assets/promos/afcon-hero.jpg";
-import afconBetting from "@/assets/promos/afcon-betting.jpg";
-import worldCupHero from "@/assets/promos/world-cup-hero.jpg";
-import worldCupBetting from "@/assets/promos/world-cup-betting.jpg";
-import premierLeagueBoost from "@/assets/promos/premier-league-boost.jpg";
-import laLigaSpecials from "@/assets/promos/la-liga-specials.jpg";
+        <div className="px-4 md:px-6 space-y-0">
+          {/* ── Sports Quick Nav ── */}
+          <SportsQuickNav />
 
-// Import sport balls
-import footballBall from "@/assets/sports/football-ball.png";
-import basketballBall from "@/assets/sports/basketball-ball.png";
-import tennisBall from "@/assets/sports/tennis-ball.png";
-import americanFootballBall from "@/assets/sports/american-football-ball.png";
-import cricketBall from "@/assets/sports/cricket-ball.png";
-import rugbyBall from "@/assets/sports/rugby-ball.png";
-import volleyballBall from "@/assets/sports/volleyball-ball.png";
-import hockeyPuck from "@/assets/sports/hockey-puck.png";
-import baseballBall from "@/assets/sports/baseball-ball.png";
-import tabletennisPaddle from "@/assets/sports/tabletennis-paddle.png";
-import handballBall from "@/assets/sports/handball-ball.png";
-import dartsBoard from "@/assets/sports/darts-board.png";
-import snookerBalls from "@/assets/sports/snooker-balls.png";
-import badmintonShuttlecock from "@/assets/sports/badminton-shuttlecock.png";
-import golfBall from "@/assets/sports/golf-ball.png";
-import futsalBall from "@/assets/sports/futsal-ball.png";
-import cyclingWheel from "@/assets/sports/cycling-wheel.png";
-import motorsportsHelmet from "@/assets/sports/motorsports-helmet.png";
-import beachvolleyballBall from "@/assets/sports/beachvolleyball-ball.png";
-import esportsController from "@/assets/sports/esports-controller.png";
-import virtualSports from "@/assets/sports/virtual-sports.png";
+          {/* ── Hero Promo Carousel ── */}
+          <PromoBannerCarousel />
 
-const Index = () => {
-  const {
-    data: featuredMatches = [],
-    isLoading: matchesLoading,
-    isError: matchesIsError,
-    error: matchesError,
-    refetch: refetchFeaturedMatches,
-  } = useFeaturedMatches();
+          {/* ── Promo Strip ── */}
+          <PromoStripBanner />
 
-  const promoCards = [
-    { title: "AFCON 2027", image: afconHero, url: "/football/african-cup-of-nations" },
-    { title: "World Cup 2026", image: worldCupHero, url: "/football/world-cup" },
-    { title: "Welcome Bonus", image: welcomePromo, url: "/promotions/welcome" },
-    { title: "Premier League Boost", image: premierLeagueBoost, url: "/football/premier-league" },
-    { title: "La Liga Specials", image: laLigaSpecials, url: "/football/la-liga" },
-    { title: "UEFA Champions League", image: championsPromo, url: "/football/champions-league" },
-    { title: "NBA Basketball", image: nbaPromo, url: "/basketball/nba" },
-    { title: "Bet Builder", image: betBuilderPromo, url: "/promotions" },
-    { title: "Bet on AFCON", image: afconBetting, url: "/football/african-cup-of-nations" },
-    { title: "World Cup Markets", image: worldCupBetting, url: "/football/world-cup" },
-  ];
+          {/* ── FuzJackpot Banner ── */}
+          <JackpotBanner />
 
-  const mainSports = [
-    { name: "Football", image: footballBall, url: "/sports/football" },
-    { name: "Basketball", image: basketballBall, url: "/sports/basketball" },
-    { name: "Tennis", image: tennisBall, url: "/sports/tennis" },
-    { name: "Cricket", image: cricketBall, url: "/sports/cricket" },
-    { name: "Rugby", image: rugbyBall, url: "/sports/rugby" },
-    { name: "Volleyball", image: volleyballBall, url: "/sports/volleyball" },
-    { name: "Ice Hockey", image: hockeyPuck, url: "/sports/ice-hockey" },
-    { name: "Baseball", image: baseballBall, url: "/sports/baseball" },
-    { name: "NFL", image: americanFootballBall, url: "/sports/american-football" },
-  ];
+          {/* ── Live Matches ── */}
+          <LiveMatchesBanner />
 
-  const minorSports = [
-    { name: "Table Tennis", image: tabletennisPaddle, url: "/sports/table-tennis" },
-    { name: "Handball", image: handballBall, url: "/sports/handball" },
-    { name: "Darts", image: dartsBoard, url: "/sports/darts" },
-    { name: "Snooker", image: snookerBalls, url: "/sports/snooker" },
-    { name: "Badminton", image: badmintonShuttlecock, url: "/sports/badminton" },
-    { name: "Golf", image: golfBall, url: "/sports/golf" },
-    { name: "Futsal", image: futsalBall, url: "/sports/futsal" },
-    { name: "Cycling", image: cyclingWheel, url: "/sports/cycling" },
-    { name: "Motor Sports", image: motorsportsHelmet, url: "/sports/motor-sports" },
-    { name: "Beach Volleyball", image: beachvolleyballBall, url: "/sports/beach-volleyball" },
-  ];
+          {/* ── Flash Odds ── */}
+          <FlashOdds />
 
-  const esportsVirtual = [
-    { name: "eSports", image: esportsController, url: "/sports/esports" },
-    { name: "Virtual Sports", image: virtualSports, url: "/virtuals" },
-  ];
+          {/* ── Today's / Upcoming Matches (grouped by league) ── */}
+          <TodaysMatches />
 
-  const categories = [
-    { label: "Football", url: "/sports/football" },
-    { label: "Premier League", url: "/football/premier-league" },
-    { label: "Champions League", url: "/football/champions-league" },
-    { label: "American Football", url: "/sports/american-football" },
-    { label: "Basketball", url: "/sports/basketball" },
-  ];
+          {/* ── Popular Leagues with live match counts ── */}
+          <PopularLeaguesBar />
 
-  const leagues = [
-    { name: "Premier League", url: "/football/premier-league", logo: premierLeagueLogo, matches: 10, country: "England" },
-    { name: "Champions League", url: "/football/champions-league", logo: championsLeagueLogo, matches: 8, country: "Europe" },
-    { name: "La Liga", url: "/football/la-liga", logo: laLigaLogo, matches: 10, country: "Spain" },
-    { name: "Serie A", url: "/football/serie-a", logo: serieALogo, matches: 10, country: "Italy" },
-    { name: "Bundesliga", url: "/football/bundesliga", logo: bundesligaLogo, matches: 9, country: "Germany" },
-    { name: "Ligue 1", url: "/football/ligue-1", logo: ligue1Logo, matches: 10, country: "France" },
-    { name: "Eredivisie", url: "/sports/football", logo: eredivisieLogo, matches: 9, country: "Netherlands" },
-    { name: "MLS", url: "/sports/football", logo: mlsLogo, matches: 12, country: "USA" },
-    { name: "NBA", url: "/basketball/nba", logo: nbaLogo, matches: 12, country: "USA" },
-    { name: "WNBA", url: "/basketball/wnba", logo: wnbaLogo, matches: 10, country: "USA" },
-    { name: "EuroLeague", url: "/basketball/euroleague", logo: euroleagueLogo, matches: 8, country: "Europe" },
-    { name: "NFL", url: "/sports/american-football", logo: nflLogo, matches: 16, country: "USA" },
-    { name: "ATP Masters", url: "/tennis/atp-masters-1000", logo: atpLogo, matches: 8, country: "International" },
-    { name: "IPL", url: "/sports/cricket", logo: iplLogo, matches: 14, country: "India" },
-  ];
+          {/* ── AI Bet Recommendations ── */}
+          <div className="mb-4">
+            <h2 className="text-base font-bold mb-3">🤖 AI Bet Picks</h2>
+            <PersonalizedSuggestions />
+          </div>
 
-  const teams = [
-    { name: "Man United", url: "/football/premier-league", logo: manUnitedLogo },
-    { name: "Man City", url: "/football/premier-league", logo: manCityLogo },
-    { name: "Liverpool", url: "/football/premier-league", logo: liverpoolLogo },
-    { name: "Chelsea", url: "/football/premier-league", logo: chelseaLogo },
-    { name: "Arsenal", url: "/football/premier-league", logo: arsenalLogo },
-    { name: "Tottenham", url: "/football/premier-league", logo: tottenhamLogo },
-    { name: "Real Madrid", url: "/football/la-liga", logo: realMadridLogo },
-    { name: "Barcelona", url: "/football/la-liga", logo: barcelonaLogo },
-    { name: "Atletico Madrid", url: "/football/la-liga", logo: atleticoMadridLogo },
-    { name: "Bayern Munich", url: "/football/bundesliga", logo: bayernLogo },
-    { name: "Dortmund", url: "/football/bundesliga", logo: dortmundLogo },
-    { name: "AC Milan", url: "/football/serie-a", logo: acMilanLogo },
-    { name: "Inter Milan", url: "/football/serie-a", logo: interMilanLogo },
-    { name: "Juventus", url: "/football/serie-a", logo: juventusLogo },
-    { name: "PSG", url: "/football/ligue-1", logo: psgLogo },
-    { name: "Ajax", url: "/sports/football", logo: ajaxLogo },
-  ];
+          {/* ── Odds Boosts ── */}
+          <OddsBoostsSection />
 
-  // Group matches by sport
-  const footballMatches = featuredMatches.filter(m => m.sport === "Football");
-  const basketballMatches = featuredMatches.filter(m => m.sport === "Basketball");
-  const americanFootballMatches = featuredMatches.filter(m => m.sport === "American Football");
-  const tennisMatches = featuredMatches.filter(m => m.sport === "Tennis");
-
-  const boosts = [
-    {
-      title: "Triple Treble Boost",
-      description: "Featured Bet Builder - Premier League • Today 15:00",
-      wasOdds: "3/1",
-      nowOdds: "4/1",
-    },
-    {
-      title: "Champions League Special",
-      description: "Featured Acca - Champions League • Tomorrow 20:45",
-      wasOdds: "5/2",
-      nowOdds: "3/1",
-    },
-    {
-      title: "Weekend Accumulator",
-      description: "Featured Double - Top Leagues • Tomorrow 14:45",
-      wasOdds: "6/4",
-      nowOdds: "2/1",
-    },
-  ];
-
-  return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <div className="flex">
-        <Sidebar className="hidden md:flex" />
-        
-        <main className="flex-1 p-4 md:p-6 overflow-y-auto h-[calc(100vh-4rem)] pb-24 md:pb-6">
-          {/* Promotional Carousel - SportyBet Style */}
-          <section className="mb-6 -mx-4 md:mx-0">
-            <div className="flex gap-3 overflow-x-auto px-4 md:px-0 pb-2 scrollbar-hide snap-x snap-mandatory">
-              {promoCards.map((promo, index) => (
-                <Link
-                  key={index}
-                  to={promo.url}
-                  className="relative flex-shrink-0 w-[280px] md:w-[320px] h-[140px] md:h-[160px] rounded-xl overflow-hidden group snap-start"
-                >
-                  <img 
-                    src={promo.image} 
-                    alt={promo.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                  <div className="absolute bottom-3 left-3 text-white font-bold text-sm">{promo.title}</div>
-                </Link>
-              ))}
-            </div>
-          </section>
-
-
-          {/* Popular Leagues - SportyBet Style: Mobile-first horizontal scroll */}
-          <section className="mb-6">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-semibold text-foreground">Popular Leagues</h2>
-              <Link to="/sports/football" className="text-xs text-primary hover:underline">View All</Link>
-            </div>
-            <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-hide">
-              {leagues.map((league) => (
-                <Link
-                  key={league.name}
-                  to={league.url}
-                  className="flex flex-col items-center gap-1.5 p-2 rounded-lg border border-border bg-card hover:border-primary hover:shadow-md transition-all group min-w-[85px] flex-shrink-0"
-                >
-                  <div className="w-12 h-12 flex items-center justify-center">
-                    <img 
-                      src={league.logo} 
-                      alt={league.name} 
-                      className="w-full h-full object-contain opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all" 
-                    />
-                  </div>
-                  <p className="text-[10px] font-medium text-foreground text-center leading-tight w-full truncate px-1">{league.name}</p>
-                </Link>
-              ))}
-            </div>
-          </section>
-
-          {/* Popular Teams - SportyBet Style: Mobile-first horizontal scroll */}
-          <section className="mb-6">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-lg font-semibold text-foreground">Popular Teams</h2>
-              <Link to="/sports/football" className="text-xs text-primary hover:underline">View All</Link>
-            </div>
-            <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-hide">
-              {teams.map((team) => (
-                <Link
-                  key={team.name}
-                  to={team.url}
-                  className="flex flex-col items-center gap-1.5 p-2 rounded-lg border border-border bg-card hover:border-primary hover:shadow-md transition-all group min-w-[85px] flex-shrink-0"
-                >
-                  <div className="w-12 h-12 flex items-center justify-center">
-                    <img 
-                      src={team.logo} 
-                      alt={team.name} 
-                      className="w-full h-full object-contain opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all" 
-                    />
-                  </div>
-                  <p className="text-[10px] font-medium text-foreground text-center leading-tight w-full truncate px-1">{team.name}</p>
-                </Link>
-              ))}
-            </div>
-          </section>
-
-          {/* Featured Matches - Fanatics Style: Clean section headers */}
-          <section className="mb-6">
-            <h2 className="text-lg font-semibold text-foreground mb-3">Featured Matches</h2>
-            
-            {matchesLoading ? (
-              <div className="grid gap-3">
-                {[1, 2, 3, 4].map((i) => (
-                  <Skeleton key={i} className="h-24 w-full rounded-lg" />
-                ))}
-              </div>
-            ) : matchesIsError ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <p className="mb-3">Couldn’t load featured matches. Please retry.</p>
-                {matchesError ? (
-                  <p className="mb-4 text-xs opacity-80">
-                    {matchesError instanceof Error ? matchesError.message : String(matchesError)}
-                  </p>
-                ) : null}
-                <button
-                  type="button"
-                  onClick={() => refetchFeaturedMatches()}
-                  className={buttonVariants({ variant: "secondary", size: "sm" })}
-                >
-                  Retry
-                </button>
-              </div>
-            ) : featuredMatches.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                No upcoming matches available. Check back soon!
-              </div>
-            ) : (
-              <>
-                {/* Football Matches */}
-                {footballMatches.length > 0 && (
-                  <div className="mb-5">
-                    <h3 className="text-base font-semibold text-foreground mb-2.5">⚽ Football</h3>
-                    <div className="grid gap-3">
-                      {footballMatches.slice(0, 4).map((match) => (
-                        <MatchCard key={match.id} {...match} />
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Basketball Matches */}
-                {basketballMatches.length > 0 && (
-                  <div className="mb-5">
-                    <h3 className="text-base font-semibold text-foreground mb-2.5">🏀 Basketball</h3>
-                    <div className="grid gap-3">
-                      {basketballMatches.slice(0, 4).map((match) => (
-                        <MatchCard key={match.id} {...match} />
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* NFL Matches */}
-                {americanFootballMatches.length > 0 && (
-                  <div className="mb-5">
-                    <h3 className="text-base font-semibold text-foreground mb-2.5">🏈 American Football</h3>
-                    <div className="grid gap-3">
-                      {americanFootballMatches.slice(0, 4).map((match) => (
-                        <MatchCard key={match.id} {...match} />
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Tennis Matches */}
-                {tennisMatches.length > 0 && (
-                  <div className="mb-5">
-                    <h3 className="text-base font-semibold text-foreground mb-2.5">🎾 Tennis</h3>
-                    <div className="grid gap-3">
-                      {tennisMatches.slice(0, 4).map((match) => (
-                        <MatchCard key={match.id} {...match} />
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
-          </section>
-
-          {/* Quick Bet Builder - SportyBet Style */}
-          <section className="mb-6">
-            <QuickBetBuilder />
-          </section>
-
-          {/* Popular Bets Widget - SportyBet Style */}
-          <section className="mb-6">
+          {/* ── Popular / Trending Bets ── */}
+          <div className="mb-4">
+            <h2 className="text-base font-bold mb-3">🔥 Trending Bets</h2>
             <PopularBetsWidget />
-          </section>
+          </div>
 
-          {/* Boosts Section - Betano Style: Electrifying promotions */}
-          <section>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="rounded-full bg-gradient-to-r from-yellow-500 to-orange-500 p-1.5">
-                <TrendingUp className="h-4 w-4 text-white" />
-              </div>
-              <h2 className="text-lg font-semibold text-foreground">Odds Boosts</h2>
-              <span className="ml-auto text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-medium">Hot 🔥</span>
-            </div>
-            <div className="grid gap-3">
-              {boosts.map((boost, index) => (
-                <BoostCard key={index} {...boost} />
-              ))}
-            </div>
-          </section>
-        </main>
+          {/* ── Casino + Virtual Sports Preview ── */}
+          <CasinoPreview />
 
-        <BetSlip className="hidden md:flex" />
-      </div>
+          {/* ── Quick Bet Builder ── */}
+          <div className="mb-4">
+            <h2 className="text-base font-bold mb-3">⚡ Quick Bet Builder</h2>
+            <QuickBetBuilder />
+          </div>
+        </div>
+      </main>
+
+      <BetSlip className="hidden md:flex" />
     </div>
-  );
-};
+  </div>
+);
 
 export default Index;
-
-function TrendingUp(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      {...props}
-    >
-      <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
-      <polyline points="16 7 22 7 22 13" />
-    </svg>
-  );
-}

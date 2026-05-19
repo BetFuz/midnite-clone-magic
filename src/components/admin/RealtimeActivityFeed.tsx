@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { supabase } from "@/integrations/supabase/client";
 import { formatCurrency } from "@/lib/currency";
 import { 
   Activity, 
@@ -289,10 +288,10 @@ export const RealtimeActivityFeed = () => {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(betChannel);
-      supabase.removeChannel(userChannel);
-      supabase.removeChannel(auditChannel);
-      supabase.removeChannel(matchChannel);
+      // supabase_stub(betChannel);
+      // supabase_stub(userChannel);
+      // supabase_stub(auditChannel);
+      // supabase_stub(matchChannel);
     };
   }, []);
 

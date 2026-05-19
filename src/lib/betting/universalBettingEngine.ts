@@ -1,7 +1,6 @@
 // Universal Betting Engine for Traditional African Games
 // Supports P2P, Human vs AI, and AI vs AI betting modes
 
-import { supabase } from '@/integrations/supabase/client';
 
 export interface BettingConfig {
   gameId: string | null;

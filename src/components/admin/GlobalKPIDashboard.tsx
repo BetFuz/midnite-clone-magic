@@ -7,7 +7,6 @@ import {
   Globe, ArrowUpRight, ArrowDownRight,
   Wallet, Target
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 
 interface TenantKPI {
   tenant_id: string;

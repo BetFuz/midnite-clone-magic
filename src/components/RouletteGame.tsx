@@ -22,6 +22,7 @@ const RouletteGame = () => {
     getAIStrategy,
   } = useRoulette();
 
+  const [selectedChip, setSelectedChip] = React.useState(500);
   const totalBet = bets.reduce((sum, bet) => sum + bet.amount, 0);
 
   const renderWheel = () => {
@@ -74,9 +75,7 @@ const RouletteGame = () => {
   };
 
   const renderBettingGrid = () => {
-    const chipAmounts = [100, 500, 1000, 5000];
-    const [selectedChip, setSelectedChip] = React.useState(100);
-
+    const chipAmounts = [500, 1000, 5000, 10000];
     return (
       <div className="space-y-4">
         <div className="flex gap-2 justify-center mb-4">

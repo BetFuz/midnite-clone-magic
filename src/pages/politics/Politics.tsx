@@ -1,185 +1,150 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import Sidebar from '@/components/Sidebar';
-import PoliticalMarketCard from '@/components/politics/PoliticalMarketCard';
-import { Vote, Building2, Globe2, Scale, Trophy } from 'lucide-react';
+import MobileNav from '@/components/MobileNav';
+import { PredictionMarketCard } from '@/components/prediction/PredictionMarketCard';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Landmark, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { predictionsApi } from '@/lib/api/predictions';
+import { useToast } from '@/hooks/use-toast';
+import { formatDistanceToNow } from 'date-fns';
 
-const Politics = () => {
-  const elections = [
-    {
-      id: '1',
-      title: '2024 US Presidential Election',
-      category: 'Presidential Election',
-      deadline: '2024-11-05T00:00:00',
-      markets: [
-        { outcome: 'Democrat Win', odds: 1.85 },
-        { outcome: 'Republican Win', odds: 2.10 },
-        { outcome: 'Independent Win', odds: 15.00 },
-      ],
-    },
-    {
-      id: '2',
-      title: 'Nigerian Presidential Election 2027',
-      category: 'Presidential Election',
-      deadline: '2027-02-25T00:00:00',
-      markets: [
-        { outcome: 'APC Victory', odds: 2.20 },
-        { outcome: 'PDP Victory', odds: 2.50 },
-        { outcome: 'Labour Party Victory', odds: 4.50 },
-        { outcome: 'Other Party', odds: 12.00 },
-      ],
-    },
-    {
-      id: '3',
-      title: 'UK General Election 2024',
-      category: 'Parliamentary Election',
-      deadline: '2024-12-31T00:00:00',
-      markets: [
-        { outcome: 'Labour Majority', odds: 1.55 },
-        { outcome: 'Conservative Majority', odds: 4.20 },
-        { outcome: 'Coalition Government', odds: 3.80 },
-      ],
-    },
-  ];
+export default function Politics() {
+  const { toast } = useToast();
+  const qc = useQueryClient();
+  const [placingId, setPlacingId] = useState<string | null>(null);
 
-  const globalEvents = [
-    {
-      id: '4',
-      title: 'UN Security Council Reform 2025',
-      category: 'UN Resolution',
-      deadline: '2025-06-30T00:00:00',
-      markets: [
-        { outcome: 'Reform Passes', odds: 3.50 },
-        { outcome: 'Reform Rejected', odds: 1.40 },
-      ],
-    },
-    {
-      id: '5',
-      title: 'African Union Summit Outcome',
-      category: 'AU Resolution',
-      deadline: '2024-07-15T00:00:00',
-      markets: [
-        { outcome: 'New Peace Agreement', odds: 2.10 },
-        { outcome: 'No Agreement', odds: 1.95 },
-      ],
-    },
-  ];
+  const { data: markets = [], isLoading } = useQuery({
+    queryKey: ['politics-markets'],
+    queryFn: predictionsApi.getPoliticsMarkets,
+    refetchInterval: 5 * 60 * 1000,
+  });
 
-  const governance = [
-    {
-      id: '6',
-      title: 'Federal Reserve Interest Rate Decision',
-      category: 'Policy Decision',
-      deadline: '2024-03-20T00:00:00',
-      markets: [
-        { outcome: 'Rate Cut 0.25%', odds: 2.30 },
-        { outcome: 'Rate Hold', odds: 1.80 },
-        { outcome: 'Rate Increase', odds: 5.50 },
-      ],
-    },
-    {
-      id: '7',
-      title: 'UK Supreme Court Ruling on Brexit Deal',
-      category: 'Court Ruling',
-      deadline: '2024-05-10T00:00:00',
-      markets: [
-        { outcome: 'Ruling in Favor', odds: 1.65 },
-        { outcome: 'Ruling Against', odds: 2.40 },
-      ],
-    },
-  ];
+  const { data: myBets = [], isLoading: betsLoading } = useQuery({
+    queryKey: ['politics-my-bets'],
+    queryFn: predictionsApi.getMyPoliticsBets,
+  });
 
-  const leadership = [
-    {
-      id: '8',
-      title: 'Next AU Chairperson 2025',
-      category: 'Political Leadership',
-      deadline: '2025-02-01T00:00:00',
-      markets: [
-        { outcome: 'East Africa Candidate', odds: 2.00 },
-        { outcome: 'West Africa Candidate', odds: 2.20 },
-        { outcome: 'North Africa Candidate', odds: 3.50 },
-        { outcome: 'Southern Africa Candidate', odds: 4.00 },
-      ],
-    },
-  ];
+  const placeBet = async (marketId: string, selectionId: string, _name: string, _odds: number, stake: number) => {
+    setPlacingId(marketId);
+    try {
+      await predictionsApi.placePoliticsBet(marketId, selectionId, stake);
+      toast({ title: 'Bet placed!', description: `₦${stake.toLocaleString()} bet accepted.` });
+      qc.invalidateQueries({ queryKey: ['politics-my-bets'] });
+    } catch (err: any) {
+      toast({ title: 'Failed', description: err.response?.data?.error || err.message, variant: 'destructive' });
+    } finally {
+      setPlacingId(null);
+    }
+  };
+
+  const typeLabels: Record<string, string> = {
+    ELECTION_WINNER: 'Election',
+    APPROVAL_RATING: 'Approval',
+    GOVERNMENT_EVENT: 'Politics',
+    LEGISLATION: 'Legislation',
+  };
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <div className="flex">
-        <Sidebar className="hidden md:flex" />
-        
-        <main className="flex-1 p-4 md:p-6 overflow-y-auto h-[calc(100vh-4rem)] pb-24 md:pb-6">
-          <div className="max-w-7xl mx-auto">
-            <div className="mb-6">
-              <div className="flex items-center gap-3 mb-2">
-                <Vote className="h-8 w-8 text-primary" />
-                <h1 className="text-3xl font-bold">FuzPolitics</h1>
+      <MobileNav />
+      <div className="flex pt-16">
+        <Sidebar />
+        <main className="flex-1 md:ml-56 pb-20 md:pb-6">
+          <div className="max-w-4xl mx-auto p-4 md:p-6 space-y-6">
+
+            {/* Page header */}
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                <Landmark className="w-5 h-5 text-white" />
               </div>
-              <p className="text-muted-foreground">
-                Bet on global political events, elections, and governance decisions
-              </p>
+              <div>
+                <h1 className="text-2xl font-bold">FuzPolitics</h1>
+                <p className="text-sm text-muted-foreground">Bet on Nigerian political outcomes. Markets refresh every 6 hours.</p>
+              </div>
+              <Badge variant="outline" className="ml-auto border-blue-500/30 text-blue-500 text-xs">Nigeria Focus</Badge>
             </div>
 
-            <Tabs defaultValue="elections" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 mb-6">
-                <TabsTrigger value="elections">
-                  <Vote className="h-4 w-4 mr-2" />
-                  Elections
-                </TabsTrigger>
-                <TabsTrigger value="global">
-                  <Globe2 className="h-4 w-4 mr-2" />
-                  Global Events
-                </TabsTrigger>
-                <TabsTrigger value="governance">
-                  <Building2 className="h-4 w-4 mr-2" />
-                  Governance
-                </TabsTrigger>
-                <TabsTrigger value="leadership">
-                  <Trophy className="h-4 w-4 mr-2" />
-                  Leadership
-                </TabsTrigger>
+            <Tabs defaultValue="markets">
+              <TabsList>
+                <TabsTrigger value="markets">Open Markets</TabsTrigger>
+                <TabsTrigger value="my-bets">My Bets ({myBets.length})</TabsTrigger>
               </TabsList>
 
-              <TabsContent value="elections" className="space-y-4">
-                <div className="flex items-center gap-2 mb-4">
-                  <Scale className="h-5 w-5 text-primary" />
-                  <h2 className="text-xl font-semibold">Elections & Referendums</h2>
-                </div>
-                {elections.map(market => (
-                  <PoliticalMarketCard key={market.id} market={market} />
-                ))}
+              <TabsContent value="markets" className="space-y-3 mt-4">
+                {isLoading ? (
+                  Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-36 w-full" />)
+                ) : markets.length === 0 ? (
+                  <Card className="p-10 text-center text-muted-foreground">
+                    <Landmark className="w-10 h-10 mx-auto mb-3 opacity-40" />
+                    <p className="font-medium">No open markets right now</p>
+                    <p className="text-sm mt-1">Markets auto-generate from live Nigerian news every 6 hours</p>
+                  </Card>
+                ) : (
+                  markets.map((market: any) => (
+                    <PredictionMarketCard
+                      key={market.id}
+                      market={{
+                        id: market.id,
+                        title: market.title,
+                        description: market.description,
+                        closeDate: market.endTime,
+                        outcomes: (market.selections || []).map((s: any) => ({
+                          id: s.id,
+                          name: s.name,
+                          odds: Number(s.odds),
+                        })),
+                      }}
+                      categoryColor="blue"
+                      categoryLabel={typeLabels[market.type] || 'Politics'}
+                      onPlaceBet={(selectionId, name, odds, stake) =>
+                        placeBet(market.id, selectionId, name, odds, stake)
+                      }
+                      isPlacing={placingId === market.id}
+                    />
+                  ))
+                )}
               </TabsContent>
 
-              <TabsContent value="global" className="space-y-4">
-                <div className="flex items-center gap-2 mb-4">
-                  <Globe2 className="h-5 w-5 text-primary" />
-                  <h2 className="text-xl font-semibold">Global Political Events</h2>
-                </div>
-                {globalEvents.map(market => (
-                  <PoliticalMarketCard key={market.id} market={market} />
-                ))}
-              </TabsContent>
-
-              <TabsContent value="governance" className="space-y-4">
-                <div className="flex items-center gap-2 mb-4">
-                  <Building2 className="h-5 w-5 text-primary" />
-                  <h2 className="text-xl font-semibold">Policy & Court Decisions</h2>
-                </div>
-                {governance.map(market => (
-                  <PoliticalMarketCard key={market.id} market={market} />
-                ))}
-              </TabsContent>
-
-              <TabsContent value="leadership" className="space-y-4">
-                <div className="flex items-center gap-2 mb-4">
-                  <Trophy className="h-5 w-5 text-primary" />
-                  <h2 className="text-xl font-semibold">Political Leadership</h2>
-                </div>
-                {leadership.map(market => (
-                  <PoliticalMarketCard key={market.id} market={market} />
-                ))}
+              <TabsContent value="my-bets" className="mt-4">
+                {betsLoading ? (
+                  Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-20 w-full mb-2" />)
+                ) : myBets.length === 0 ? (
+                  <Card className="p-10 text-center text-muted-foreground">
+                    <p>No bets placed yet. Pick a market above to get started.</p>
+                  </Card>
+                ) : (
+                  <div className="space-y-2">
+                    {myBets.map((bet: any) => (
+                      <Card key={bet.id} className="p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium line-clamp-1">{bet.politicalMarket?.title}</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">
+                              Picked: <strong>{(bet.politicalMarket?.selections || []).find((s: any) => s.id === bet.selectionId)?.name || '—'}</strong>
+                              &nbsp;@ {Number(bet.odds).toFixed(2)}
+                            </p>
+                          </div>
+                          <div className="text-right flex-shrink-0">
+                            <Badge className={
+                              bet.status === 'WON' ? 'bg-green-500/20 text-green-500' :
+                              bet.status === 'LOST' ? 'bg-red-500/20 text-red-500' :
+                              'bg-muted text-muted-foreground'
+                            }>
+                              {bet.status}
+                            </Badge>
+                            <p className="text-xs text-muted-foreground mt-1">₦{Number(bet.stake).toLocaleString()}</p>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                )}
               </TabsContent>
             </Tabs>
           </div>
@@ -187,6 +152,4 @@ const Politics = () => {
       </div>
     </div>
   );
-};
-
-export default Politics;
+}

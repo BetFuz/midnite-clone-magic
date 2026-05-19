@@ -1,43 +1,27 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-
-interface LeagueCount {
-  league_name: string;
-  count: number;
-}
+import { api } from '@/lib/api/client';
 
 export const useLeagueMatchCounts = (leagueNames: string[], daysAhead: number = 14) => {
   return useQuery({
     queryKey: ['league-match-counts', leagueNames, daysAhead],
-    queryFn: async () => {
-      const now = new Date();
-      const futureDate = new Date();
-      futureDate.setDate(futureDate.getDate() + daysAhead);
-
-      // Get counts for all leagues in a single query
-      const { data, error } = await supabase
-        .from('matches')
-        .select('league_name')
-        .gte('commence_time', now.toISOString())
-        .lte('commence_time', futureDate.toISOString());
-
-      if (error) {
-        console.error('useLeagueMatchCounts error:', error);
-        return {} as Record<string, number>;
-      }
-
-      // Count matches per league with case-insensitive matching
+    queryFn: async (): Promise<Record<string, number>> => {
+      const results = await Promise.allSettled(
+        leagueNames.map(async (name) => {
+          const { data } = await api.get('/sports/fixtures', {
+            params: { league: name, days: daysAhead },
+          });
+          return { name, count: (data.data ?? []).length as number };
+        })
+      );
       const counts: Record<string, number> = {};
-      for (const name of leagueNames) {
-        const lowerName = name.toLowerCase();
-        counts[name] = (data ?? []).filter(
-          m => m.league_name?.toLowerCase().includes(lowerName)
-        ).length;
-      }
-      
+      leagueNames.forEach((name, i) => {
+        const r = results[i];
+        counts[name] = r?.status === 'fulfilled' ? r.value.count : 0;
+      });
       return counts;
     },
-    staleTime: 60000,
-    gcTime: 300000,
+    staleTime: 15 * 60 * 1000,
+    gcTime:    60 * 60 * 1000,
+    retry: 1,
   });
 };

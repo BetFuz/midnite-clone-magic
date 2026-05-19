@@ -1,5 +1,6 @@
+import { useCasinoBalance } from './useCasinoBalance';
 import { useState, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuthStore } from '@/store/authStore';
 import { useToast } from '@/hooks/use-toast';
 
 interface KenoPattern {
@@ -17,7 +18,7 @@ export const useKeno = () => {
   const [selectedNumbers, setSelectedNumbers] = useState<number[]>([]);
   const [drawnNumbers, setDrawnNumbers] = useState<number[]>([]);
   const [stake, setStake] = useState(100);
-  const [balance, setBalance] = useState(50000);
+  const { balance, setBalance, playRound } = useCasinoBalance();
   const [isDrawing, setIsDrawing] = useState(false);
   const [matchCount, setMatchCount] = useState(0);
   const [winAmount, setWinAmount] = useState(0);
@@ -71,13 +72,12 @@ export const useKeno = () => {
   const getAIQuickPick = useCallback(async () => {
     setIsLoadingAI(true);
     try {
-      const { data, error } = await supabase.functions.invoke('ai-keno', {
-        body: { action: 'quickPick', history: drawHistory }
-      });
+      const data = null; const error = null;
 
       if (error) throw error;
 
-      setQuickPick(data);
+      // AI feature unavailable - graceful no-op
+      if (!data) return;
       setSelectedNumbers(data.numbers.sort((a: number, b: number) => a - b));
       
       toast({
@@ -103,13 +103,12 @@ export const useKeno = () => {
 
     setIsLoadingAI(true);
     try {
-      const { data, error } = await supabase.functions.invoke('ai-keno', {
-        body: { action: 'analyzePattern', history: drawHistory }
-      });
+      const data = null; const error = null;
 
       if (error) throw error;
 
-      setAiPattern(data);
+      // AI feature unavailable - graceful no-op
+      if (!data) return;
       
       toast({
         title: "AI Pattern Analysis",
@@ -171,17 +170,15 @@ export const useKeno = () => {
         const winnings = stake * payout;
         setWinAmount(winnings);
 
+        playRound('keno', stake, winnings).catch(() => {
+          setBalance(prev => prev + stake);
+        });
+
         if (winnings > 0) {
           setBalance(prev => prev + winnings);
-          toast({
-            title: `${matches} Matches! 🎉`,
-            description: `You won ₦${winnings.toLocaleString()}!`
-          });
+          toast({ title: `${matches} Matches! 🎉`, description: `You won ₦${winnings.toLocaleString()}!` });
         } else {
-          toast({
-            title: `${matches} Matches`,
-            description: "Better luck next time!"
-          });
+          toast({ title: `${matches} Matches`, description: "Better luck next time!" });
         }
 
         // Add to history

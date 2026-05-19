@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuthStore } from '@/store/authStore';
 import { useToast } from "@/components/ui/use-toast";
 
 export interface BetListing {
@@ -51,7 +51,7 @@ export const useBetMarketplace = () => {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      // supabase_stub(channel);
     };
   }, []);
 
@@ -103,7 +103,7 @@ export const useBetMarketplace = () => {
 
   const loadMyListings = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = useAuthStore.getState().user;
       if (!user) return;
 
       const { data: listingsData, error } = await supabase
@@ -143,7 +143,7 @@ export const useBetMarketplace = () => {
     potentialWin: number
   ) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = useAuthStore.getState().user;
       if (!user) {
         toast({
           title: "Authentication Required",
@@ -204,7 +204,7 @@ export const useBetMarketplace = () => {
 
   const buyBet = async (listingId: string, askingPrice: number) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = useAuthStore.getState().user;
       if (!user) {
         toast({
           title: "Authentication Required",

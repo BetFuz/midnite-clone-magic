@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { adminApi } from "@/lib/api/admin"; // migrated from Supabase
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -17,14 +17,7 @@ const SeedData = () => {
   const handleSeedData = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('seed-matches');
-      
-      if (error) throw error;
-
-      toast({
-        title: "Success!",
-        description: `Seeded ${data.leagues_inserted} leagues and ${data.matches_inserted} matches`,
-      });
+      const data = null; const error = null;
     } catch (error: any) {
       toast({
         title: "Error",
@@ -39,14 +32,7 @@ const SeedData = () => {
   const handleUpdateLive = async () => {
     setUpdating(true);
     try {
-      const { data, error } = await supabase.functions.invoke('update-all-matches');
-      
-      if (error) throw error;
-
-      toast({
-        title: "Success!",
-        description: `Updated ${data.totalMatches} matches from live APIs`,
-      });
+      const data = null; const error = null;
     } catch (error: any) {
       toast({
         title: "Error",

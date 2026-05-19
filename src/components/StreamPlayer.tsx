@@ -1,9 +1,9 @@
+import { useAuthStore } from '@/store/authStore';
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Play, Maximize, Volume2, Users, Lock } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
 interface StreamPlayerProps {
@@ -24,7 +24,7 @@ const StreamPlayer = ({ title, viewers, isLive = true, thumbnail, matchId }: Str
   }, [matchId]);
 
   const checkStreamAccess = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = { data: { user: useAuthStore.getState().user ? { id: useAuthStore.getState().user!.id, email: useAuthStore.getState().user!.email } : null } };
     if (user) {
       // Check if user has placed a bet on this match for "watch & bet" compliance
       const { data: bets } = await supabase
@@ -40,7 +40,7 @@ const StreamPlayer = ({ title, viewers, isLive = true, thumbnail, matchId }: Str
   const handleStreamRequest = async () => {
     setIsLoading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = { data: { session: useAuthStore.getState().user ? { user: { id: useAuthStore.getState().user!.id } } : null } };
       
       if (!session) {
         toast({
@@ -52,9 +52,7 @@ const StreamPlayer = ({ title, viewers, isLive = true, thumbnail, matchId }: Str
         return;
       }
 
-      const { data, error } = await supabase.functions.invoke('streaming-token', {
-        body: { matchId }
-      });
+      const { data, error } = { data: null, error: new Error('Feature not available in self-hosted mode') };
 
       if (error) throw error;
 

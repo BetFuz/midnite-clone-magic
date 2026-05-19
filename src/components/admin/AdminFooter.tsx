@@ -7,7 +7,7 @@ export const AdminFooter = () => {
       <div className="flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="text-sm text-muted-foreground">
           <p>© 2025 BetFuz Admin. All rights reserved.</p>
-          <p className="text-xs">Powered by Lovable Cloud & n8n Integration</p>
+          <p className="text-xs">Powered by BetFuz Platform & n8n Integration</p>
         </div>
 
         <div className="flex items-center gap-4">

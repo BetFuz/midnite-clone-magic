@@ -1,91 +1,48 @@
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LeagueMatchSchedule } from "./LeagueMatchSchedule";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Database } from "@/integrations/supabase/types";
 
-type SportsLeague = Database['public']['Tables']['sports_leagues']['Row'];
+interface SportGroup {
+  sport_key: string;
+  sport_title: string;
+  league_name: string;
+  confederation?: string;
+}
+
+const SPORTS: SportGroup[] = [
+  { sport_key: "soccer_epl",                 sport_title: "Football", league_name: "Premier League",           confederation: "England" },
+  { sport_key: "soccer_uefa_champs_league",  sport_title: "Football", league_name: "Champions League",         confederation: "UEFA" },
+  { sport_key: "soccer_spain_la_liga",       sport_title: "Football", league_name: "La Liga",                  confederation: "Spain" },
+  { sport_key: "soccer_germany_bundesliga",  sport_title: "Football", league_name: "Bundesliga",               confederation: "Germany" },
+  { sport_key: "soccer_italy_serie_a",       sport_title: "Football", league_name: "Serie A",                  confederation: "Italy" },
+  { sport_key: "soccer_france_ligue_one",    sport_title: "Football", league_name: "Ligue 1",                  confederation: "France" },
+  { sport_key: "soccer_uefa_europa_league",  sport_title: "Football", league_name: "Europa League",            confederation: "UEFA" },
+  { sport_key: "soccer_england_championship",sport_title: "Football", league_name: "Championship",             confederation: "England" },
+  { sport_key: "afcon",                      sport_title: "Football", league_name: "AFCON",                    confederation: "Africa" },
+  { sport_key: "caf_cl",                     sport_title: "Football", league_name: "CAF Champions League",     confederation: "Africa" },
+  { sport_key: "basketball_nba",             sport_title: "Basketball", league_name: "NBA",                    confederation: "USA" },
+  { sport_key: "basketball_euroleague",      sport_title: "Basketball", league_name: "EuroLeague",             confederation: "Europe" },
+  { sport_key: "americanfootball_nfl",       sport_title: "NFL",       league_name: "NFL",                    confederation: "USA" },
+  { sport_key: "tennis_atp",                 sport_title: "Tennis",    league_name: "ATP Masters 1000",        confederation: "ATP" },
+  { sport_key: "icehockey_nhl",              sport_title: "Ice Hockey",league_name: "NHL",                    confederation: "USA" },
+  { sport_key: "mma_mixed_martial_arts",     sport_title: "MMA",       league_name: "MMA",                    confederation: "Global" },
+];
 
 export const AllLeaguesSchedule = () => {
-  const [leagues, setLeagues] = useState<SportsLeague[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchLeagues();
-  }, []);
-
-  const fetchLeagues = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('sports_leagues')
-        .select('*')
-        .order('sport_title');
-
-      if (error) throw error;
-      setLeagues(data || []);
-    } catch (error) {
-      console.error('Error fetching leagues:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="space-y-4">
-        <Skeleton className="h-10 w-full" />
-        <Skeleton className="h-64 w-full" />
-      </div>
-    );
-  }
-
-  if (leagues.length === 0) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-muted-foreground">No leagues available</p>
-      </div>
-    );
-  }
-
   return (
-    <Tabs defaultValue={leagues[0]?.sport_key} className="w-full">
-      <TabsList className="w-full flex-wrap h-auto">
-        {leagues.map((league) => (
-          <TabsTrigger key={league.sport_key} value={league.sport_key}>
-            {league.confederation ? `[${league.confederation}] ` : ''}{league.sport_title}
+    <Tabs defaultValue={SPORTS[0].sport_key} className="w-full">
+      <TabsList className="w-full flex-wrap h-auto gap-1 p-2">
+        {SPORTS.map((s) => (
+          <TabsTrigger key={s.sport_key} value={s.sport_key} className="text-xs">
+            {s.confederation ? `${s.confederation} • ` : ""}{s.league_name}
           </TabsTrigger>
         ))}
       </TabsList>
 
-      {leagues.map((league) => {
-        const leaguesList = Array.isArray(league.leagues) 
-          ? league.leagues 
-          : [];
-        
-        return (
-          <TabsContent key={league.sport_key} value={league.sport_key}>
-            <div className="space-y-6">
-              {leaguesList.length > 0 ? (
-                leaguesList.map((leagueInfo: any, idx: number) => (
-                  <div key={`${league.sport_key}-${idx}`}>
-                    <h3 className="text-xl font-bold mb-4">{leagueInfo.name || league.sport_title}</h3>
-                    <LeagueMatchSchedule 
-                      leagueName={leagueInfo.name || league.sport_title}
-                      daysAhead={14}
-                    />
-                  </div>
-                ))
-              ) : (
-                <LeagueMatchSchedule 
-                  leagueName={league.sport_title}
-                  daysAhead={14}
-                />
-              )}
-            </div>
-          </TabsContent>
-        );
-      })}
+      {SPORTS.map((s) => (
+        <TabsContent key={s.sport_key} value={s.sport_key}>
+          <LeagueMatchSchedule leagueName={s.league_name} daysAhead={14} />
+        </TabsContent>
+      ))}
     </Tabs>
   );
 };

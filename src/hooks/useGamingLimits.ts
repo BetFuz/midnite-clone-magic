@@ -1,139 +1,59 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-
-interface GamingLimits {
-  id: string;
-  user_id: string;
-  daily_stake_limit: number;
-  daily_loss_limit: number;
-  session_time_limit: number;
-  cooling_off_until: string | null;
-  self_excluded_until: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-interface DailyUsage {
-  total_stake: number;
-  total_loss: number;
-}
+import { userApi } from '@/lib/api/user';
+import { useAuthStore } from '@/store/authStore';
+import { toast } from 'sonner';
 
 export const useGamingLimits = () => {
-  const [limits, setLimits] = useState<GamingLimits | null>(null);
-  const [usage, setUsage] = useState<DailyUsage | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [updating, setUpdating] = useState(false);
-  const { toast } = useToast();
+  const { user } = useAuthStore();
+  const [limits, setLimits]         = useState<any[]>([]);
+  const [exclusions, setExclusions] = useState<any[]>([]);
+  const [loading, setLoading]       = useState(true);
+  const [updating, setUpdating]     = useState(false);
 
   const fetchLimits = async () => {
+    if (!user) { setLoading(false); return; }
     try {
-      setLoading(true);
-      
-      // Get user limits
-      const { data: limitsData, error: limitsError } = await supabase
-        .from('responsible_gaming_limits')
-        .select('*')
-        .single();
-
-      if (limitsError && limitsError.code !== 'PGRST116') {
-        throw limitsError;
-      }
-
-      setLimits(limitsData);
-
-      // Get daily usage
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: usageData, error: usageError } = await supabase
-          .rpc('get_daily_usage', { p_user_id: user.id })
-          .single();
-
-        if (usageError) {
-          console.error('Error fetching usage:', usageError);
-        } else {
-          setUsage(usageData);
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching gaming limits:', error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch gaming limits",
-        variant: "destructive",
-      });
+      const data = await userApi.getRgLimits();
+      setLimits(data?.limits ?? []);
+      setExclusions(data?.exclusions ?? []);
+    } catch {
+      setLimits([]);
+      setExclusions([]);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchLimits();
-  }, []);
+  useEffect(() => { fetchLimits(); }, [user?.id]);
 
-  const updateLimits = async (newLimits: {
-    daily_stake_limit?: number;
-    daily_loss_limit?: number;
-    session_time_limit?: number;
-    cooling_off_days?: number;
-    self_exclusion_days?: number;
-  }) => {
+  const setLimit = async (type: string, amount: number, periodDays: number) => {
     setUpdating(true);
     try {
-      const { data, error } = await supabase.functions.invoke('set-gaming-limits', {
-        body: newLimits
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Limits Updated",
-        description: "Your responsible gaming limits have been updated.",
-      });
-
+      await userApi.setRgLimit({ type, amount, periodDays });
+      toast.success('Limit updated');
       await fetchLimits();
-      return { success: true, data };
-    } catch (error: any) {
-      console.error('Error updating limits:', error);
-      toast({
-        title: "Update Failed",
-        description: error.message || "Failed to update gaming limits",
-        variant: "destructive",
-      });
-      return { success: false, error };
+    } catch (e: any) {
+      toast.error(e?.response?.data?.error ?? 'Update failed');
     } finally {
       setUpdating(false);
     }
   };
 
-  const isLimitExceeded = () => {
-    if (!limits || !usage) return false;
-
-    return (
-      usage.total_stake >= limits.daily_stake_limit ||
-      usage.total_loss >= limits.daily_loss_limit
-    );
+  const selfExclude = async (type: string, days?: number, reason?: string) => {
+    setUpdating(true);
+    try {
+      await userApi.selfExclude({ type, days, reason });
+      toast.success(type === 'PERMANENT' ? 'Account self-excluded permanently' : `Self-exclusion set for ${days} days`);
+      await fetchLimits();
+    } catch (e: any) {
+      toast.error(e?.response?.data?.error ?? 'Self-exclusion failed');
+    } finally {
+      setUpdating(false);
+    }
   };
 
-  const isSelfExcluded = () => {
-    if (!limits) return false;
-    return limits.self_excluded_until && new Date(limits.self_excluded_until) > new Date();
-  };
+  const getLimitByType = (type: string) => limits.find(l => l.type === type);
+  const isExcluded = exclusions.some(e => e.isActive && (!e.endDate || new Date(e.endDate) > new Date()));
 
-  const isCoolingOff = () => {
-    if (!limits) return false;
-    return limits.cooling_off_until && new Date(limits.cooling_off_until) > new Date();
-  };
-
-  return {
-    limits,
-    usage,
-    loading,
-    updating,
-    updateLimits,
-    refreshLimits: fetchLimits,
-    isLimitExceeded,
-    isSelfExcluded,
-    isCoolingOff
-  };
+  return { limits, exclusions, loading, updating, setLimit, selfExclude, getLimitByType, isExcluded, fetchLimits };
 };

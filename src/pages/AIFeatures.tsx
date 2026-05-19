@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useAuthStore } from '@/store/authStore';
+import { useState } from "react";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import MobileNav from "@/components/MobileNav";
@@ -8,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Bot, Mic, TrendingUp, Users, ShoppingCart } from "lucide-react";
 import { useSocialBetting } from "@/hooks/useSocialBetting";
 import SocialBetCard from "@/components/social/SocialBetCard";
-import { supabase } from "@/integrations/supabase/client";
+
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAIPredictions } from "@/hooks/useAIPredictions";
 import { useBetMarketplace } from "@/hooks/useBetMarketplace";
@@ -19,17 +20,12 @@ import ListingCard from "@/components/marketplace/ListingCard";
 
 const AIFeatures = () => {
   const [activeTab, setActiveTab] = useState("chat");
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  
+  const { user: authUser } = useAuthStore();
+  const currentUserId = authUser?.id ?? null;
+
   const { socialBets, isLoading: socialLoading, followingIds, followUser, unfollowUser, likeBet, unlikeBet, copyBet } = useSocialBetting();
   const { predictions, isLoading: predictionsLoading } = useAIPredictions();
   const { listings, isLoading: marketplaceLoading, buyBet } = useBetMarketplace();
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) setCurrentUserId(user.id);
-    });
-  }, []);
 
   return (
     <div className="min-h-screen bg-background">

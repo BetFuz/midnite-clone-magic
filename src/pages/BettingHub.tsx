@@ -188,49 +188,49 @@ const BettingHub = () => {
         <Sidebar className="hidden md:flex" />
         
         <main className="flex-1 overflow-y-auto h-[calc(100vh-4rem)] pb-24 md:pb-6">
-          <div className="p-4 md:p-6 max-w-[1800px] mx-auto">
-            {/* Header Section */}
-            <div className="mb-6">
-              <div className="flex items-center gap-3 mb-2">
-                <TrendingUp className="h-8 w-8 text-primary" />
-                <h1 className="text-3xl font-bold">Betting Hub</h1>
-                <Badge variant="secondary" className="ml-2">
-                  <Flame className="h-3 w-3 mr-1" />
-                  234 Live
-                </Badge>
+          {/* Gradient Header */}
+          <div className="bg-gradient-to-r from-primary to-primary/70 px-4 md:px-6 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-white" />
+              <div>
+                <h1 className="text-sm font-bold text-white">Betting Hub</h1>
+                <p className="text-[11px] text-white/70">Complete trading terminal</p>
               </div>
-              <p className="text-muted-foreground">
-                Your complete trading terminal for all betting markets
-              </p>
             </div>
+            <Badge className="bg-white/20 text-white border-white/30 text-[10px] gap-1">
+              <Flame className="w-3 h-3" />
+              234 Live
+            </Badge>
+          </div>
 
+          {/* Flat Tab Bar */}
+          <div className="flex gap-0 overflow-x-auto scrollbar-hide border-b border-border bg-card">
+            {[
+              { value: "live",     label: "Live",     icon: Flame },
+              { value: "sports",   label: "Sports",   icon: Trophy },
+              { value: "specials", label: "Specials", icon: Crown },
+              { value: "features", label: "Features", icon: Zap },
+              { value: "casino",   label: "Casino",   icon: Gamepad2 },
+              { value: "promos",   label: "Promos",   icon: Gift },
+            ].map(tab => (
+              <button
+                key={tab.value}
+                onClick={() => setActiveTab(tab.value)}
+                className={`flex-shrink-0 flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold transition-colors border-b-2 ${
+                  activeTab === tab.value
+                    ? "border-primary text-primary"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <tab.icon className="w-3.5 h-3.5" />
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="p-4 md:p-6 max-w-[1800px] mx-auto">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 mb-6">
-                <TabsTrigger value="live">
-                  <Flame className="h-4 w-4 mr-2" />
-                  Live
-                </TabsTrigger>
-                <TabsTrigger value="sports">
-                  <Trophy className="h-4 w-4 mr-2" />
-                  Sports
-                </TabsTrigger>
-                <TabsTrigger value="specials">
-                  <Crown className="h-4 w-4 mr-2" />
-                  Specials
-                </TabsTrigger>
-                <TabsTrigger value="features">
-                  <Zap className="h-4 w-4 mr-2" />
-                  Features
-                </TabsTrigger>
-                <TabsTrigger value="casino">
-                  <Gamepad2 className="h-4 w-4 mr-2" />
-                  Casino
-                </TabsTrigger>
-                <TabsTrigger value="promos">
-                  <Gift className="h-4 w-4 mr-2" />
-                  Promos
-                </TabsTrigger>
-              </TabsList>
+              <TabsList className="hidden" />
 
               {/* LIVE TAB */}
               <TabsContent value="live" className="space-y-6">

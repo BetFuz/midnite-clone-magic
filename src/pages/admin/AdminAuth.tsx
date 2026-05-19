@@ -1,242 +1,124 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "@/hooks/use-toast";
-import { Shield, Lock, Mail, Eye, EyeOff } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '@/store/authStore';
+import { Eye, EyeOff, Zap, Lock, Mail, AlertCircle } from 'lucide-react';
 
 export default function AdminAuth() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const { login, user } = useAuthStore();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [resetMode, setResetMode] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    // Check if user is already logged in and is admin
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        const { data } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", session.user.id)
-          .in("role", ["admin", "superadmin"])
-          .maybeSingle();
-
-        if (data) {
-          navigate("/admin/dashboard");
-        }
-      }
-    };
-    checkSession();
-  }, [navigate]);
-
-  const handleResetPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/admin/auth`,
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Password reset email sent! Check your inbox.",
-      });
-      setResetMode(false);
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to send reset email",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
+    const role = user?.role?.toLowerCase();
+    if (user && (role === 'admin' || role === 'superadmin' || role === 'super_admin')) {
+      navigate('/admin/dashboard', { replace: true });
     }
-  };
+  }, [user, navigate]);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     setLoading(true);
-
     try {
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (authError) throw authError;
-
-      // Check if user has admin role
-      const { data: roleData } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", authData.user.id)
-        .in("role", ["admin", "superadmin"]);
-
-      if (!roleData || roleData.length === 0) {
-        await supabase.auth.signOut();
-        throw new Error("Access denied. Admin privileges required.");
+      await login(email.trim().toLowerCase(), password);
+      const fresh = useAuthStore.getState().user;
+      const role  = fresh?.role?.toLowerCase();
+      if (!fresh || (role !== 'admin' && role !== 'superadmin' && role !== 'super_admin')) {
+        useAuthStore.getState().logout();
+        setError('Access denied — admin privileges required.');
+        return;
       }
-
-      toast({
-        title: "Success",
-        description: "Welcome back, Admin!",
-      });
-      navigate("/admin/dashboard");
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Authentication failed",
-        variant: "destructive",
-      });
+      navigate('/admin/dashboard', { replace: true });
+    } catch (err: any) {
+      const msg = err?.response?.data?.error || err?.message || 'Login failed';
+      setError(msg);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4">
-      <Card className="w-full max-w-md border-border/50 shadow-2xl">
-        <CardHeader className="space-y-4 text-center">
-          <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-            <Shield className="w-8 h-8 text-primary" />
+    <div className="min-h-screen bg-[#0d1520] flex items-center justify-center p-4">
+      <div className="w-full max-w-sm">
+        {/* Logo */}
+        <div className="flex items-center justify-center gap-3 mb-8">
+          <div className="w-10 h-10 rounded-xl bg-[#00b15c] flex items-center justify-center">
+            <Zap className="w-6 h-6 text-white" />
           </div>
           <div>
-            <CardTitle className="text-3xl font-bold">
-              {resetMode ? "Reset Password" : "Admin Portal"}
-            </CardTitle>
-            <CardDescription className="text-base mt-2">
-              {resetMode 
-                ? "Enter your email to receive reset instructions"
-                : "Secure access for administrators only"
-              }
-            </CardDescription>
+            <p className="text-white font-bold text-xl leading-none">BetFuz</p>
+            <p className="text-[#00b15c] text-xs font-semibold tracking-widest uppercase">Admin Portal</p>
           </div>
-        </CardHeader>
+        </div>
 
-        <CardContent>
-          <Alert className="mb-6 border-primary/20 bg-primary/5">
-            <Shield className="h-4 w-4 text-primary" />
-            <AlertDescription className="text-sm">
-              This is a restricted area. Only authorized admin accounts can access this portal.
-            </AlertDescription>
-          </Alert>
+        {/* Card */}
+        <div className="bg-[#111827] border border-[#1f2d3d] rounded-2xl p-8">
+          <h2 className="text-white font-bold text-xl mb-1">Sign In</h2>
+          <p className="text-gray-500 text-sm mb-6">Restricted to authorized administrators</p>
 
-          <form onSubmit={resetMode ? handleResetPassword : handleLogin} className="space-y-5">
-            <div className="space-y-2">
-              <Label htmlFor="admin-email" className="text-sm font-medium">
-                Admin Email
-              </Label>
+          {error && (
+            <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2.5 mb-4">
+              <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
+              <p className="text-red-400 text-sm">{error}</p>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-1.5 block">Email</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="admin-email"
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                <input
                   type="email"
-                  placeholder="admin@betfuz.com"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={e => setEmail(e.target.value)}
                   required
-                  className="pl-10"
                   disabled={loading}
+                  placeholder="admin@betfuz.com"
+                  className="w-full bg-[#0d1520] border border-[#1f2d3d] rounded-lg pl-10 pr-4 py-2.5 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-[#00b15c]/50 transition-colors"
                 />
               </div>
             </div>
 
-            {!resetMode && (
-              <div className="space-y-2">
-                <Label htmlFor="admin-password" className="text-sm font-medium">
-                  Password
-                </Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="admin-password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="pl-10 pr-10"
-                    disabled={loading}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {!resetMode && (
-              <div className="text-right">
-                <button
-                  type="button"
-                  onClick={() => setResetMode(true)}
-                  className="text-sm text-primary hover:underline"
-                >
-                  Forgot password?
+            <div>
+              <label className="text-gray-400 text-xs font-medium uppercase tracking-wider mb-1.5 block">Password</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                <input
+                  type={show ? 'text' : 'password'}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  required
+                  disabled={loading}
+                  placeholder="••••••••"
+                  className="w-full bg-[#0d1520] border border-[#1f2d3d] rounded-lg pl-10 pr-10 py-2.5 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-[#00b15c]/50 transition-colors"
+                />
+                <button type="button" onClick={() => setShow(!show)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
+                  {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-            )}
+            </div>
 
-            <Button
+            <button
               type="submit"
-              className="w-full h-11 text-base font-semibold"
               disabled={loading}
+              className="w-full bg-[#00b15c] hover:bg-[#00963f] text-white font-semibold py-2.5 rounded-lg text-sm transition-colors disabled:opacity-50 flex items-center justify-center gap-2 mt-2"
             >
               {loading ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-background border-t-transparent rounded-full animate-spin mr-2" />
-                  {resetMode ? "Sending..." : "Authenticating..."}
-                </>
-              ) : (
-                <>
-                  <Shield className="mr-2 h-4 w-4" />
-                  {resetMode ? "Send Reset Email" : "Access Admin Panel"}
-                </>
-              )}
-            </Button>
-
-            {resetMode && (
-              <Button
-                type="button"
-                variant="ghost"
-                className="w-full"
-                onClick={() => setResetMode(false)}
-              >
-                Back to Login
-              </Button>
-            )}
+                <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />Signing in...</>
+              ) : 'Access Admin Portal'}
+            </button>
           </form>
+        </div>
 
-          <div className="mt-6 pt-6 border-t border-border text-center">
-            <Button
-              variant="ghost"
-              onClick={() => navigate("/")}
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              Return to Main Site
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+        <p className="text-center text-gray-600 text-xs mt-4">
+          Unauthorized access attempts are logged and prosecuted.
+        </p>
+      </div>
     </div>
   );
 }

@@ -1,10 +1,11 @@
+import { useAuthStore } from '@/store/authStore';
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { supabase } from "@/integrations/supabase/client";
+
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/currency";
 import { Trophy, Calendar, TrendingUp, Award, BarChart, ArrowLeft } from "lucide-react";
@@ -39,7 +40,7 @@ export default function ContestHistory() {
   const loadHistory = async () => {
     try {
       setLoading(true);
-      const { data: user } = await supabase.auth.getUser();
+      const user = { user: useAuthStore.getState().user ? { id: useAuthStore.getState().user!.id } : null };
       if (!user.user) throw new Error("Not authenticated");
 
       const { data, error } = await supabase

@@ -4,7 +4,6 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Trophy, TrendingUp, Target } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 
 interface TopBettor {
   user_id: string;

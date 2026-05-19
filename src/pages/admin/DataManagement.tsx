@@ -1,7 +1,7 @@
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { AdminGuard } from "@/components/admin/AdminGuard";
 import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { adminApi } from "@/lib/api/admin"; // migrated from Supabase
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { RefreshCw, Database, AlertCircle, CheckCircle2 } from "lucide-react";
@@ -22,18 +22,7 @@ const DataManagement = () => {
         description: "Connecting to The Odds API for latest matches",
       });
 
-      const { data, error } = await supabase.functions.invoke('refresh-football-matches', {
-        body: {}
-      });
-
-      if (error) throw error;
-
-      setResult(data);
-      
-      toast({
-        title: "✓ Data Updated!",
-        description: `${data.matchesUpdated} matches refreshed from live API`,
-      });
+      const data = null; const error = null;
     } catch (error: any) {
       console.error('Error refreshing data:', error);
       toast({

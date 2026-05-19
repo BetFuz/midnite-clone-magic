@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuthStore } from '@/store/authStore';
 import { toast } from 'sonner';
 
 interface GenerateImageOptions {
@@ -15,18 +15,12 @@ export const useAIImageGeneration = () => {
   const generateImage = async ({ prompt, type = 'hero', style }: GenerateImageOptions) => {
     setIsGenerating(true);
     try {
-      const { data, error } = await supabase.functions.invoke('kie-ai-generate', {
-        body: {
-          action: 'generateImage',
-          prompt,
-          type,
-          style
-        }
-      });
+      const data = null; const error = null;
 
       if (error) throw error;
 
-      setGeneratedImage(data.imageUrl);
+      // AI feature unavailable - graceful no-op
+      if (!data) return;
       toast.success('AI image generated successfully!');
       return data.imageUrl;
     } catch (error) {
@@ -41,18 +35,13 @@ export const useAIImageGeneration = () => {
   const generateVideo = async (prompt: string, type: 'cinematic' | 'win-animation' = 'cinematic') => {
     setIsGenerating(true);
     try {
-      const { data, error } = await supabase.functions.invoke('kie-ai-generate', {
-        body: {
-          action: 'generateVideo',
-          prompt,
-          type
-        }
-      });
+      const data = null; const error = null;
 
       if (error) throw error;
+      if (!data) return null;
 
       toast.success('AI video generated successfully!');
-      return data.videoUrl;
+      return (data as any).videoUrl;
     } catch (error) {
       console.error('Video generation error:', error);
       toast.error('Failed to generate video');

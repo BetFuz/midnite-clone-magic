@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuthStore } from '@/store/authStore';
 import { toast } from '@/hooks/use-toast';
 import { RacingEngine, RacerState, RaceEvent } from '@/lib/racingEngine';
 
@@ -130,19 +130,7 @@ export const useF1Racing = (circuit: string) => {
  
    const generateRaceVideo = async () => {
      try {
-       const { data, error } = await supabase.functions.invoke('f1-racing-ai', {
-         body: {
-           action: 'generateRaceVideo',
-           circuit,
-         },
-       });
- 
-       if (error) throw error;
- 
-       if (data?.videoUrl) {
-         setRaceVideo(data.videoUrl);
-         localStorage.setItem(`f1-${circuit}-video`, data.videoUrl);
-       }
+       // AI video generation unavailable
      } catch (error) {
        console.error('Race video generation error:', error);
        toast({

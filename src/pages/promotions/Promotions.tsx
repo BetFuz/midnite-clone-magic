@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import { Card } from "@/components/ui/card";
@@ -5,10 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
 import { Gift, TrendingUp, Target, Trophy, Calendar, Zap, ArrowRight } from "lucide-react";
-import { formatCurrency } from "@/lib/currency";
+
+const CATEGORY_TABS = ["All", "Sports", "Casino", "VIP"];
 
 const Promotions = () => {
   const navigate = useNavigate();
+  const [activeCategory, setActiveCategory] = useState("All");
 
   const promotions = [
     {
@@ -21,6 +24,7 @@ const Promotions = () => {
       badgeColor: "bg-primary",
       gradient: "from-primary via-accent to-primary",
       path: "/promotions/welcome",
+      category: "Sports",
     },
     {
       id: "acca-boost",
@@ -32,6 +36,7 @@ const Promotions = () => {
       badgeColor: "bg-success",
       gradient: "from-success via-green-600 to-success",
       path: "/promotions/acca-boost",
+      category: "Sports",
     },
     {
       id: "weekend",
@@ -43,6 +48,7 @@ const Promotions = () => {
       badgeColor: "bg-orange-500",
       gradient: "from-orange-500 via-orange-600 to-orange-500",
       path: "/promotions/weekend-specials",
+      category: "Sports",
     },
     {
       id: "cashback",
@@ -54,30 +60,47 @@ const Promotions = () => {
       badgeColor: "bg-blue-500",
       gradient: "from-blue-500 via-blue-600 to-blue-500",
       path: "/promotions/cashback",
+      category: "Casino",
     },
     {
       id: "loyalty",
       icon: Zap,
-      title: "Loyalty Rewards",
-      description: "Earn points with every bet",
+      title: "VIP Club",
+      description: "Earn points with every bet, unlock exclusive rewards",
       tagline: "Unlock VIP Rewards",
       badge: "VIP",
       badgeColor: "bg-purple-500",
       gradient: "from-purple-500 via-purple-600 to-purple-500",
-      path: "/promotions/loyalty-rewards",
+      path: "/account/vip",
+      category: "VIP",
+    },
+    {
+      id: "bonuses",
+      icon: Gift,
+      title: "Claim Bonuses",
+      description: "View and claim all available bonuses",
+      tagline: "Free Bonuses Waiting",
+      badge: "Live",
+      badgeColor: "bg-green-500",
+      gradient: "from-green-500 via-green-600 to-green-500",
+      path: "/account/bonuses",
+      category: "Sports",
     },
     {
       id: "referral",
       icon: Calendar,
       title: "Refer a Friend",
-      description: "Earn ₦5,000 for each friend",
+      description: "5% commission on every bet your friends place",
       tagline: "Share & Earn",
-      badge: "Limited",
+      badge: "Ongoing",
       badgeColor: "bg-pink-500",
       gradient: "from-pink-500 via-pink-600 to-pink-500",
-      path: "/promotions/refer-friend",
+      path: "/account/referral",
+      category: "Sports",
     },
   ];
+
+  const filtered = activeCategory === "All" ? promotions : promotions.filter(p => p.category === activeCategory);
 
   return (
     <div className="min-h-screen bg-background">
@@ -87,26 +110,35 @@ const Promotions = () => {
         <main className="flex-1 p-6 overflow-y-auto h-[calc(100vh-4rem)]">
           <div className="max-w-6xl mx-auto">
             {/* Hero Header */}
-            <div className="mb-8">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-3 bg-primary/10 rounded-full">
-                  <Gift className="h-8 w-8 text-primary" />
-                </div>
-                <div>
-                  <h1 className="text-4xl font-bold text-foreground">Promotions</h1>
-                  <p className="text-muted-foreground">Boost your winnings with exclusive offers</p>
-                </div>
+            <div className="bg-gradient-to-r from-primary to-accent rounded-xl p-6 mb-6 flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-bold text-white mb-1">Promotions & Offers</h1>
+                <p className="text-white/80 text-sm">Exclusive bonuses, boosts & rewards</p>
               </div>
+              <Gift className="h-10 w-10 text-white/60" />
+            </div>
+
+            {/* Category Filter */}
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide mb-6">
+              {CATEGORY_TABS.map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold transition-colors ${
+                    activeCategory === cat
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground hover:bg-muted/80"
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
             </div>
 
             {/* Active Promotions */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
-                <Zap className="h-6 w-6 text-success" />
-                Active Now
-              </h2>
               <div className="grid md:grid-cols-2 gap-6">
-                {promotions.slice(0, 2).map((promo) => (
+                {filtered.slice(0, 2).map((promo) => (
                   <Card 
                     key={promo.id} 
                     className="overflow-hidden border-2 border-border hover:border-primary/50 transition-all hover:shadow-xl group cursor-pointer"
@@ -136,12 +168,8 @@ const Promotions = () => {
 
             {/* More Promotions */}
             <div>
-              <h2 className="text-2xl font-bold text-foreground mb-4 flex items-center gap-2">
-                <Calendar className="h-6 w-6 text-primary" />
-                More Offers
-              </h2>
               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {promotions.slice(2).map((promo) => (
+                {filtered.slice(2).map((promo) => (
                   <Card 
                     key={promo.id} 
                     className="p-6 bg-card border-border hover:border-primary/30 transition-all hover:shadow-lg group cursor-pointer"

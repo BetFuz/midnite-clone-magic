@@ -22,3 +22,47 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# === added by connect_to_github.sh ===
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_ed25519
+id_*_rsa
+id_*_ed25519
+*.crt.key
+.secrets/
+.credentials/
+*.kdbx
+*_token
+*_secret
+*.bak
+# OAuth/service-account JSON
+**/youtube_token*.json
+**/google_oauth*.json
+**/service_account*.json
+**/credentials*.json
+*.disabled.env
+**/secrets_disabled/
+# git worktrees (they have their own .git ref)
+.claude/worktrees/
+# Node / Python / build artifacts (universally not committed)
+node_modules/
+**/node_modules/
+__pycache__/
+*.pyc
+.next/
+dist/
+build/
+coverage/
+.venv/
+venv/
+# === end connect_to_github.sh ===
+youtube_auth*.json

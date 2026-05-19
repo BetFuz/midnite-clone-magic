@@ -5,7 +5,6 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/currency";
 import { TrendingUp, Sparkles, Users, Star, Lock, Info, Share2 } from "lucide-react";
@@ -73,9 +72,7 @@ export const SalaryCapDraftInterface = ({ leagueId, sport, onLineupComplete }: S
       setLoading(true);
       
       // Generate/fetch players with AI projections
-      const { data, error } = await supabase.functions.invoke('fantasy-player-projections', {
-        body: { leagueId, sport }
-      });
+      const { data, error } = { data: null, error: new Error('Feature not available in self-hosted mode') };
 
       if (error) throw error;
 
@@ -93,13 +90,7 @@ export const SalaryCapDraftInterface = ({ leagueId, sport, onLineupComplete }: S
     try {
       setOptimizing(true);
       
-      const { data, error } = await supabase.functions.invoke('fantasy-optimize-lineup', {
-        body: { 
-          leagueId, 
-          salaryCap: SALARY_CAP,
-          positionRequirements: positionReqs
-        }
-      });
+      const { data, error } = { data: null, error: new Error('Feature not available in self-hosted mode') };
 
       if (error) throw error;
 

@@ -27,7 +27,7 @@ VALUES (
 
     navigator.clipboard.writeText(sql);
     setSqlCopied(true);
-    toast.success(`SQL copied! Paste in Lovable Cloud SQL Editor`);
+    toast.success(`SQL copied! Paste in your SQL Editor`);
     setTimeout(() => setSqlCopied(false), 3000);
   };
 
@@ -38,7 +38,7 @@ VALUES (
       icon: Database,
       description: "Find your user ID from the database",
       instructions: [
-        "Open Lovable Cloud (Backend button)",
+        "Open your Database Admin panel",
         "Go to Database → Tables → auth.users",
         "Find your email and copy the UUID",
         "Paste it in the box below"
@@ -52,7 +52,7 @@ VALUES (
       instructions: [
         "Choose Admin or Superadmin role",
         "Click 'Copy SQL' button",
-        "Open Lovable Cloud → SQL Editor",
+        "Open Database → SQL Editor",
         "Paste and run the SQL query"
       ]
     },
@@ -240,7 +240,7 @@ VALUES (
                         <Alert>
                           <CheckCircle className="h-4 w-4 text-green-500" />
                           <AlertDescription>
-                            SQL copied! Now open Lovable Cloud → SQL Editor and paste it
+                            SQL copied! Now open Database → SQL Editor and paste it
                           </AlertDescription>
                         </Alert>
                       )}

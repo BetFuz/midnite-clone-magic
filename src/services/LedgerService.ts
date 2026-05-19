@@ -1,4 +1,3 @@
-import { supabase } from '@/integrations/supabase/client';
 
 export interface LedgerEntry {
   user_id: string;

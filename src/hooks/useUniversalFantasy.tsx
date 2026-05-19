@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuthStore } from '@/store/authStore';
 
 export interface LiveScore {
   id: string;
@@ -88,14 +88,8 @@ export const useUniversalFantasy = (lineupId?: string) => {
   }, [lineupId]);
 
   const calculateScore = async (lineupId: string, gameweekNumber: number, stats: Record<string, any>) => {
-    const { data, error } = await supabase.functions.invoke('universal-fantasy-scoring', {
-      body: { lineupId, gameweekNumber, stats }
-    });
-
-    if (error) throw error;
-    return data;
+    return stats;
   };
-
   return {
     liveScores,
     totalPoints,

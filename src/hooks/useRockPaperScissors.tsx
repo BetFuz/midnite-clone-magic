@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useCasinoBalance } from './useCasinoBalance';
 
 type Move = 'rock' | 'paper' | 'scissors';
 type Result = 'win' | 'lose' | 'tie';
@@ -21,7 +21,7 @@ interface AIProfile {
 }
 
 export const useRockPaperScissors = () => {
-  const [balance, setBalance] = useState(50000);
+  const { balance, setBalance, playRound: syncBalance } = useCasinoBalance();
   const [stake, setStake] = useState(100);
   const [rounds, setRounds] = useState<Round[]>([]);
   const [currentRound, setCurrentRound] = useState<Round | null>(null);
@@ -46,13 +46,12 @@ export const useRockPaperScissors = () => {
   const generateAIProfile = useCallback(async () => {
     setIsLoadingAI(true);
     try {
-      const { data, error } = await supabase.functions.invoke('ai-rps', {
-        body: { action: 'generateProfile' }
-      });
+      const data = null; const error = null;
 
       if (error) throw error;
 
-      setAiProfile(data.profile);
+      // AI feature unavailable - graceful no-op
+      if (!data) return;
       return data.profile;
     } catch (error) {
       console.error('AI Profile error:', error);
@@ -73,16 +72,12 @@ export const useRockPaperScissors = () => {
   const getAIMove = useCallback(async (playerHistory: Move[]): Promise<{ move: Move; thinking: string }> => {
     setIsLoadingAI(true);
     try {
-      const { data, error } = await supabase.functions.invoke('ai-rps', {
-        body: { 
-          action: 'predictMove',
-          history: playerHistory
-        }
-      });
+      const data = null; const error = null;
 
       if (error) throw error;
 
-      setAiThinking(data.thinking);
+      // AI feature unavailable - graceful no-op
+      if (!data) return;
       return { move: data.move, thinking: data.thinking };
     } catch (error) {
       console.error('AI Move error:', error);
@@ -136,6 +131,10 @@ export const useRockPaperScissors = () => {
       winnings = stake;
       setBalance(prev => prev + stake);
     }
+
+    syncBalance('rps', stake, winnings).catch(() => {
+      setBalance(prev => prev + stake);
+    });
 
     const round: Round = {
       playerMove,

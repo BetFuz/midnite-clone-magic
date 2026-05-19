@@ -10,7 +10,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { supabase } from "@/integrations/supabase/client";
 
 interface Tenant {
   id: string;

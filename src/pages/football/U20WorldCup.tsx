@@ -1,23 +1,16 @@
-import Header from "@/components/Header";
-import Sidebar from "@/components/Sidebar";
-import BetSlip from "@/components/BetSlip";
-import { LeagueMatchSchedule } from "@/components/LeagueMatchSchedule";
+import LeaguePageLayout from "@/components/layouts/LeaguePageLayout";
 
-const U20WorldCup = () => {
-  return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <div className="flex">
-        <Sidebar />
-        <main className="flex-1 p-6 overflow-y-auto h-[calc(100vh-4rem)]">
-          <h1 className="text-3xl font-bold text-foreground mb-2">FIFA U20 World Cup</h1>
-          <p className="text-muted-foreground mb-6">Under 20 international tournament</p>
-          <LeagueMatchSchedule leagueName="U20 World Cup" daysAhead={14} />
-        </main>
-        <BetSlip className="hidden md:flex" />
-      </div>
-    </div>
-  );
-};
+const U20WorldCup = () => (
+  <LeaguePageLayout
+    title="FIFA U20 World Cup"
+    leagueName="U20 World Cup"
+    emoji="🌍"
+    logoUrl="https://media.api-sports.io/football/leagues/18.png"
+    gradientFrom="from-sky-700"
+    gradientTo="to-blue-900"
+    daysAhead={14}
+    hasTable={false}
+  />
+);
 
 export default U20WorldCup;

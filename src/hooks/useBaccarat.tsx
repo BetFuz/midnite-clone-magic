@@ -1,5 +1,6 @@
+import { useCasinoBalance } from './useCasinoBalance';
 import { useState, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuthStore } from '@/store/authStore';
 import { toast } from '@/hooks/use-toast';
 
 export type Card = {
@@ -17,7 +18,7 @@ interface RoundHistory {
 }
 
 export function useBaccarat() {
-  const [balance, setBalance] = useState(10000);
+  const { balance, setBalance, playRound } = useCasinoBalance();
   const [currentBet, setCurrentBet] = useState<{ type: BetType; amount: number } | null>(null);
   const [playerCards, setPlayerCards] = useState<Card[]>([]);
   const [bankerCards, setBankerCards] = useState<Card[]>([]);
@@ -49,21 +50,13 @@ export function useBaccarat() {
 
   const placeBet = useCallback((type: BetType, amount: number) => {
     if (amount > balance) {
-      toast({
-        title: 'Insufficient Balance',
-        description: 'Not enough funds to place this bet',
-        variant: 'destructive',
-      });
+      toast({ title: 'Insufficient Balance', description: 'Not enough funds', variant: 'destructive' });
       return;
     }
-
     setCurrentBet({ type, amount });
     setBalance(prev => prev - amount);
-    toast({
-      title: 'Bet Placed',
-      description: `₦${amount.toLocaleString()} on ${type}`,
-    });
-  }, [balance]);
+    toast({ title: 'Bet Placed', description: `₦${amount.toLocaleString()} on ${type}` });
+  }, [balance, setBalance]);
 
   const deal = useCallback(async () => {
     if (!currentBet) {
@@ -151,17 +144,13 @@ export function useBaccarat() {
     }
 
     if (winnings > 0) {
-      setBalance(prev => prev + winnings);
-      toast({
-        title: `${result.toUpperCase()} Wins!`,
-        description: `You won ₦${winnings.toLocaleString()}!`,
+      playRound('baccarat', currentBet?.amount ?? 0, winnings).catch(() => {
+        setBalance(prev => prev + (currentBet?.amount ?? 0));
       });
+      toast({ title: `${result.toUpperCase()} Wins!`, description: `You won ₦${winnings.toLocaleString()}!` });
     } else {
-      toast({
-        title: `${result.toUpperCase()} Wins`,
-        description: 'Better luck next time!',
-        variant: 'destructive',
-      });
+      playRound('baccarat', currentBet?.amount ?? 0, 0).catch(() => {});
+      toast({ title: `${result.toUpperCase()} Wins`, description: 'Better luck next time!', variant: 'destructive' });
     }
 
     setIsDealing(false);
@@ -187,15 +176,11 @@ export function useBaccarat() {
 
     setIsLoadingAI(true);
     try {
-      const { data, error } = await supabase.functions.invoke('ai-baccarat', {
-        body: {
-          action: 'trend',
-          history: roundHistory.slice(0, 20),
-        },
-      });
+      const data = null; const error = null;
 
       if (error) throw error;
-      setTrendAnalysis(data.analysis);
+      // AI feature unavailable - graceful no-op
+      if (!data) return;
       toast({ title: 'Trend Analysis Ready' });
     } catch (error) {
       console.error('Trend analysis error:', error);
@@ -212,18 +197,11 @@ export function useBaccarat() {
   const getCulturalInsight = useCallback(async () => {
     setIsLoadingAI(true);
     try {
-      const { data, error } = await supabase.functions.invoke('ai-baccarat', {
-        body: {
-          action: 'cultural',
-          theme: culturalTheme,
-        },
-      });
+      const data = null; const error = null;
 
       if (error) throw error;
-      toast({
-        title: 'Cultural Insight',
-        description: data.insight,
-      });
+      // AI feature unavailable - graceful no-op
+      if (!data) return;
     } catch (error) {
       console.error('Cultural insight error:', error);
     } finally {

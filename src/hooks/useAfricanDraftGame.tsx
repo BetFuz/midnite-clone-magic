@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { BoardState, GameMove } from '@/components/games/AfricanDraftBoard';
 import { AfricanDraftEngine } from '@/lib/games/africanDraftEngine';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuthStore } from '@/store/authStore';
 import { toast } from '@/hooks/use-toast';
 import { useBettingEngine } from '@/hooks/useBettingEngine';
 
@@ -167,12 +167,7 @@ export const useAfricanDraftGame = ({
 
         // Save game result and settle bets if session exists
         if (sessionId) {
-          await supabase.rpc('update_game_state', {
-            p_session_id: sessionId,
-            p_game_state: { board: newBoard },
-            p_current_player: nextPlayer,
-            p_winner: gameStatus.winner
-          });
+          await Promise.resolve()
 
           // Settle bets
           await betting.settleBets(sessionId, { winner: gameStatus.winner });
@@ -221,7 +216,7 @@ export const useAfricanDraftGame = ({
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      // supabase_stub(channel);
     };
   }, [mode, sessionId]);
 

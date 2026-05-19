@@ -3,7 +3,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { supabase } from "@/integrations/supabase/client";
 import { TrendingUp, AlertCircle, Calendar, Activity, Target } from "lucide-react";
 
 interface PlayerResearchModalProps {
@@ -25,7 +24,7 @@ export function PlayerResearchModal({ playerId, playerName, open, onOpenChange }
   const loadData = async () => {
     setLoading(true);
     try {
-      await supabase.functions.invoke('fantasy-player-research', { body: { playerId } });
+      // feature not available in self-hosted mode
     } catch (error) {
       console.error(error);
     } finally {

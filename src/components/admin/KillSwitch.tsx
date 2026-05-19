@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { AlertTriangle, Power, CheckCircle2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -46,9 +45,7 @@ export const KillSwitch = () => {
   // Suspend live events mutation
   const suspendMutation = useMutation({
     mutationFn: async (suspend: boolean) => {
-      const response = await supabase.functions.invoke('suspend-live-events', {
-        body: { suspend },
-      });
+      const response = { data: null, error: new Error('Feature not available in self-hosted mode') };
 
       if (response.error) throw response.error;
       return response.data;

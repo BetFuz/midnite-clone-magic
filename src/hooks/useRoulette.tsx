@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { useCasinoBalance } from './useCasinoBalance';
 
 export type BetType = 
   | 'straight' | 'split' | 'street' | 'corner' | 'line'
@@ -23,11 +23,11 @@ const RED_NUMBERS = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 
 const BLACK_NUMBERS = [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35];
 
 export function useRoulette() {
+  const { balance, setBalance, playRound } = useCasinoBalance();
   const [bets, setBets] = useState<Bet[]>([]);
   const [spinHistory, setSpinHistory] = useState<SpinResult[]>([]);
   const [isSpinning, setIsSpinning] = useState(false);
   const [currentResult, setCurrentResult] = useState<SpinResult | null>(null);
-  const [balance, setBalance] = useState(10000);
   const [aiAnalysis, setAiAnalysis] = useState<string>('');
   const [isLoadingAI, setIsLoadingAI] = useState(false);
 
@@ -126,31 +126,28 @@ export function useRoulette() {
 
   const spin = useCallback(async () => {
     if (bets.length === 0) {
-      toast({
-        title: 'No Bets Placed',
-        description: 'Place at least one bet to spin',
-        variant: 'destructive',
-      });
+      toast({ title: 'No Bets Placed', description: 'Place at least one bet to spin', variant: 'destructive' });
       return;
     }
 
-    const totalBet = bets.reduce((sum, bet) => sum + bet.amount, 0);
+    const totalBet = bets.reduce((sum, b) => sum + b.amount, 0);
+    if (totalBet > balance) {
+      toast({ title: 'Insufficient Balance', variant: 'destructive' });
+      return;
+    }
+
     setBalance(prev => prev - totalBet);
     setIsSpinning(true);
+    setBets([]);
 
-    // Simulate spin animation delay
     await new Promise(resolve => setTimeout(resolve, 3000));
 
-    const winningNumber = Math.floor(Math.random() * 37); // 0-36
-    const result: SpinResult = {
-      number: winningNumber,
-      color: getNumberColor(winningNumber),
-    };
+    const winningNumber = Math.floor(Math.random() * 37);
+    const result: SpinResult = { number: winningNumber, color: getNumberColor(winningNumber) };
 
     setCurrentResult(result);
     setSpinHistory(prev => [result, ...prev.slice(0, 19)]);
 
-    // Calculate winnings
     let totalWin = 0;
     bets.forEach(bet => {
       if (bet.numbers.includes(winningNumber)) {
@@ -158,10 +155,14 @@ export function useRoulette() {
       }
     });
 
+    // Sync with backend
+    playRound('roulette', totalBet, totalWin).catch(() => {
+      setBalance(prev => prev + totalBet);
+    });
+
     if (totalWin > 0) {
-      setBalance(prev => prev + totalWin);
       toast({
-        title: `Winner! ${winningNumber} ${result.color.toUpperCase()}`,
+        title: `🎰 ${winningNumber} ${result.color.toUpperCase()}`,
         description: `You won ₦${totalWin.toLocaleString()}!`,
       });
     } else {
@@ -173,8 +174,7 @@ export function useRoulette() {
     }
 
     setIsSpinning(false);
-    setBets([]);
-  }, [bets, balance]);
+  }, [bets, balance, playRound, setBalance]);
 
   const getAIAnalysis = useCallback(async () => {
     if (spinHistory.length < 5) {
@@ -187,15 +187,11 @@ export function useRoulette() {
 
     setIsLoadingAI(true);
     try {
-      const { data, error } = await supabase.functions.invoke('ai-roulette', {
-        body: { 
-          action: 'analyze',
-          spinHistory: spinHistory.slice(0, 10) 
-        },
-      });
+      const data = null; const error = null;
 
       if (error) throw error;
-      setAiAnalysis(data.analysis);
+      // AI feature unavailable - graceful no-op
+      if (!data) return;
       toast({ title: 'AI Analysis Ready' });
     } catch (error) {
       console.error('AI analysis error:', error);
@@ -212,19 +208,11 @@ export function useRoulette() {
   const getAIStrategy = useCallback(async () => {
     setIsLoadingAI(true);
     try {
-      const { data, error } = await supabase.functions.invoke('ai-roulette', {
-        body: { 
-          action: 'strategy',
-          balance,
-          spinHistory: spinHistory.slice(0, 10)
-        },
-      });
+      const data = null; const error = null;
 
       if (error) throw error;
-      toast({
-        title: 'AI Strategy Suggestion',
-        description: data.strategy,
-      });
+      // AI feature unavailable - graceful no-op
+      if (!data) return;
     } catch (error) {
       console.error('AI strategy error:', error);
       toast({

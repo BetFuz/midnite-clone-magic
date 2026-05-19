@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuthStore } from '@/store/authStore';
 import { toast } from 'sonner';
 
 interface RacingParticipant {
@@ -42,29 +42,7 @@ export const usePremiumRacing = ({ raceType, raceId }: UsePremiumRacingProps) =>
   const generatePremiumAssets = async () => {
     setIsGenerating(true);
     try {
-      // Generate hero image
-      const { data: imageData, error: imageError } = await supabase.functions.invoke('kie-ai-generate', {
-        body: {
-          action: 'generateImage',
-          prompt: racePrompts[raceType],
-          type: 'hero',
-          style: 'photorealistic'
-        }
-      });
-
-      if (imageError) throw imageError;
-      if (imageData?.imageUrl) {
-        setHeroImage(imageData.imageUrl);
-      }
-
-      // Generate cinematic race video
-      const { data: videoData, error: videoError } = await supabase.functions.invoke('kie-ai-generate', {
-        body: {
-          action: 'generateVideo',
-          prompt: racePrompts[raceType],
-          type: 'cinematic'
-        }
-      });
+      // AI image/video generation unavailable
 
       if (videoError) throw videoError;
       if (videoData?.videoUrl) {
@@ -82,16 +60,9 @@ export const usePremiumRacing = ({ raceType, raceId }: UsePremiumRacingProps) =>
 
   const generateCommentary = async () => {
     try {
-      const { data, error } = await supabase.functions.invoke('racing-simulation', {
-        body: {
-          raceType,
-          raceId,
-          participants
-        }
-      });
-
-      if (error) throw error;
-      if (data?.commentary) {
+      const data = null;
+      // Feature unavailable
+      if (data != null && false) {
         setCommentary(data.commentary);
       }
     } catch (error) {

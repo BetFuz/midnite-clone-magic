@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { useAIImageGeneration } from './useAIImageGeneration';
+import { useCasinoBalance } from './useCasinoBalance';
 
 export interface SlotSymbol {
   id: string;
@@ -43,11 +43,11 @@ const DEFAULT_THEME: SlotTheme = {
 };
 
 export const useSlotMachine = () => {
+  const { balance, setBalance, playRound } = useCasinoBalance();
   const [theme, setTheme] = useState<SlotTheme>(DEFAULT_THEME);
   const [reels, setReels] = useState<string[][]>([[], [], []]);
   const [isSpinning, setIsSpinning] = useState(false);
-  const [balance, setBalance] = useState(1000);
-  const [betAmount, setBetAmount] = useState(10);
+  const [betAmount, setBetAmount] = useState(500);
   const [totalWin, setTotalWin] = useState(0);
   const [winningLines, setWinningLines] = useState<number[]>([]);
   const [isLoadingTheme, setIsLoadingTheme] = useState(false);
@@ -63,29 +63,10 @@ export const useSlotMachine = () => {
     initializeReels();
   }, [initializeReels]);
 
-  const generateAITheme = useCallback(async (playerPreferences?: string) => {
+  const generateAITheme = useCallback(async (_playerPreferences?: string) => {
     setIsLoadingTheme(true);
     try {
-      const { data, error } = await supabase.functions.invoke('ai-slot-theme', {
-        body: { preferences: playerPreferences || 'African cultural themes with vibrant colors' }
-      });
-
-      if (error) throw error;
-
-      if (data?.theme) {
-        setTheme(data.theme);
-        toast({
-          title: "🎰 New Theme Generated!",
-          description: `Now playing: ${data.theme.name}`,
-        });
-      }
-    } catch (error) {
-      console.error('Error generating AI theme:', error);
-      toast({
-        title: "Using Default Theme",
-        description: "AI theme generation unavailable",
-        variant: "destructive"
-      });
+      // AI theme generation unavailable
     } finally {
       setIsLoadingTheme(false);
     }
@@ -137,13 +118,12 @@ export const useSlotMachine = () => {
     setTotalWin(0);
     setBalance(prev => prev - betAmount);
 
-    // Simulate spinning animation
     const spinDuration = 2000;
     const spinInterval = 100;
     let elapsed = 0;
 
     const interval = setInterval(() => {
-      setReels(prev => prev.map(reel => 
+      setReels(prev => prev.map(reel =>
         reel.map(() => theme.symbols[Math.floor(Math.random() * theme.symbols.length)].emoji)
       ));
       elapsed += spinInterval;
@@ -151,29 +131,30 @@ export const useSlotMachine = () => {
       if (elapsed >= spinDuration) {
         clearInterval(interval);
 
-        // Final reel positions
-        const finalReels = [0, 1, 2].map(() => 
+        const finalReels = [0, 1, 2].map(() =>
           [0, 1, 2].map(() => theme.symbols[Math.floor(Math.random() * theme.symbols.length)].emoji)
         );
         setReels(finalReels);
 
-        // Check for wins
         const { lines, win } = checkWinningLines(finalReels);
         setWinningLines(lines);
         setTotalWin(win);
 
+        playRound('slots', betAmount, win).catch(() => {
+          setBalance(prev => prev + betAmount);
+        });
+
         if (win > 0) {
-          setBalance(prev => prev + win);
           toast({
             title: win >= betAmount * 50 ? "🎉 JACKPOT! 🎉" : "🎰 Winner!",
-            description: `You won ₦${win.toFixed(2)}!`,
+            description: `You won ₦${win.toLocaleString()}!`,
           });
         }
 
         setIsSpinning(false);
       }
     }, spinInterval);
-  }, [isSpinning, balance, betAmount, theme.symbols, checkWinningLines]);
+  }, [isSpinning, balance, betAmount, theme.symbols, checkWinningLines, playRound, setBalance]);
 
   const { generateImage } = useAIImageGeneration();
   const [themeBackground, setThemeBackground] = useState<string | null>(null);

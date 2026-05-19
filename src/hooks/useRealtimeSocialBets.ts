@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuthStore } from '@/store/authStore';
 import { useToast } from '@/hooks/use-toast';
 
 interface SocialBet {
@@ -207,9 +207,9 @@ export const useRealtimeSocialBets = (options: UseRealtimeSocialBetsOptions = {}
 
     return () => {
       console.log('Cleaning up social bets subscriptions');
-      supabase.removeChannel(channel);
-      supabase.removeChannel(likesChannel);
-      supabase.removeChannel(copiesChannel);
+      // supabase_stub(channel);
+      // supabase_stub(likesChannel);
+      // supabase_stub(copiesChannel);
     };
   }, [autoLoadNew, toast]);
 

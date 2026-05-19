@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuthStore } from '@/store/authStore';
 
 export interface MarketOutcome {
   outcome: string;

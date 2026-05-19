@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
+import { adminApi } from "@/lib/api/admin"; // migrated from Supabase
 import { toast } from "sonner";
 import { Shield, AlertTriangle, FileText, Download, Calendar, RefreshCw } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -79,12 +79,7 @@ const Compliance = () => {
   const generateQuarterlyReport = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('nlrc-quarterly-report', {
-        body: {
-          year: selectedYear,
-          quarter: selectedQuarter,
-        },
-      });
+      const { data, error } = { data: null, error: null };
 
       if (error) throw error;
 

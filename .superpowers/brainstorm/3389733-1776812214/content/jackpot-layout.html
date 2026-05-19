@@ -1,0 +1,133 @@
+<h2>FuzJackpot — Page Layout</h2>
+<p class="subtitle">How should the three tiers (Mini / Midi / Mega) be presented?</p>
+
+<div class="cards">
+
+  <!-- Option A -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0d1520;padding:12px;border-radius:8px;font-family:monospace;font-size:11px;color:#ccc;">
+      <div style="display:flex;gap:6px;margin-bottom:8px;">
+        <div style="flex:1;background:#00b15c22;border:1px solid #00b15c44;border-radius:6px;padding:6px;text-align:center;">
+          <div style="color:#00b15c;font-weight:bold;font-size:10px;">MINI</div>
+          <div style="color:#fff;font-size:13px;font-weight:bold;">₦1M</div>
+          <div style="color:#888;font-size:9px;">8 matches · ₦100</div>
+          <div style="color:#00b15c;font-size:9px;">🟢 127 entries</div>
+        </div>
+        <div style="flex:1;background:#3b82f622;border:2px solid #3b82f6;border-radius:6px;padding:6px;text-align:center;">
+          <div style="color:#3b82f6;font-weight:bold;font-size:10px;">MIDI ✓</div>
+          <div style="color:#fff;font-size:13px;font-weight:bold;">₦5M</div>
+          <div style="color:#888;font-size:9px;">12 matches · ₦200</div>
+          <div style="color:#3b82f6;font-size:9px;">🔵 341 entries</div>
+        </div>
+        <div style="flex:1;background:#f59e0b22;border:1px solid #f59e0b44;border-radius:6px;padding:6px;text-align:center;">
+          <div style="color:#f59e0b;font-weight:bold;font-size:10px;">MEGA</div>
+          <div style="color:#fff;font-size:13px;font-weight:bold;">₦50M</div>
+          <div style="color:#888;font-size:9px;">17 matches · ₦500</div>
+          <div style="color:#f59e0b;font-size:9px;">🟡 89 entries</div>
+        </div>
+      </div>
+      <div style="background:#111827;border-radius:6px;padding:8px;">
+        <div style="color:#3b82f6;font-size:10px;font-weight:bold;margin-bottom:4px;">MIDI JACKPOT — Match 1 of 12</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="color:#ccc;font-size:10px;">Man City vs Arsenal</span>
+          <div style="display:flex;gap:4px;">
+            <div style="background:#1f2d3d;padding:3px 8px;border-radius:4px;font-size:9px;color:#ccc;">1</div>
+            <div style="background:#00b15c;padding:3px 8px;border-radius:4px;font-size:9px;color:#fff;">X</div>
+            <div style="background:#1f2d3d;padding:3px 8px;border-radius:4px;font-size:9px;color:#ccc;">2</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Tier Cards + Content Below</h3>
+      <p>Three tier cards at the top (all visible at once). Click a tier to make it active — its matches load below. Real-time entry counts on each card show social proof.</p>
+    </div>
+  </div>
+
+  <!-- Option B -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0d1520;padding:12px;border-radius:8px;font-family:monospace;font-size:11px;color:#ccc;">
+      <div style="display:flex;gap:6px;margin-bottom:8px;background:#111827;border-radius:8px;padding:4px;">
+        <div style="flex:1;background:#00b15c;border-radius:6px;padding:5px;text-align:center;color:#fff;font-size:10px;font-weight:bold;">MINI ₦1M</div>
+        <div style="flex:1;padding:5px;text-align:center;color:#666;font-size:10px;">MIDI ₦5M</div>
+        <div style="flex:1;padding:5px;text-align:center;color:#666;font-size:10px;">MEGA ₦50M</div>
+      </div>
+      <div style="background:#111827;border-radius:6px;padding:8px;margin-bottom:6px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+          <span style="color:#00b15c;font-size:9px;font-weight:bold;">🏆 MINI JACKPOT — ₦1,200,000 pool</span>
+          <span style="color:#888;font-size:9px;">Closes in 2d 14h</span>
+        </div>
+        <div style="background:#1f2d3d;height:4px;border-radius:2px;overflow:hidden;margin-bottom:6px;">
+          <div style="background:#00b15c;height:100%;width:65%;border-radius:2px;"></div>
+        </div>
+      </div>
+      <div style="background:#111827;border-radius:6px;padding:6px;margin-bottom:4px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="color:#ccc;font-size:9px;">Chelsea vs Liverpool</span>
+          <div style="display:flex;gap:3px;">
+            <div style="background:#00b15c;padding:2px 8px;border-radius:4px;font-size:9px;color:#fff;">1</div>
+            <div style="background:#1f2d3d;padding:2px 8px;border-radius:4px;font-size:9px;color:#ccc;">X</div>
+            <div style="background:#1f2d3d;padding:2px 8px;border-radius:4px;font-size:9px;color:#ccc;">2</div>
+          </div>
+        </div>
+      </div>
+      <div style="background:#111827;border-radius:6px;padding:6px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="color:#ccc;font-size:9px;">Barcelona vs Real Madrid</span>
+          <div style="display:flex;gap:3px;">
+            <div style="background:#1f2d3d;padding:2px 8px;border-radius:4px;font-size:9px;color:#ccc;">1</div>
+            <div style="background:#1f2d3d;padding:2px 8px;border-radius:4px;font-size:9px;color:#ccc;">X</div>
+            <div style="background:#1f2d3d;padding:2px 8px;border-radius:4px;font-size:9px;color:#ccc;">2</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Tab Navigation</h3>
+      <p>Classic tabs across the top — Mini, Midi, Mega. One tab active at a time. Growing pot shown prominently inside each tab. Clean and familiar — matches how betting tabs work across the rest of the site.</p>
+    </div>
+  </div>
+
+  <!-- Option C -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0d1520;padding:12px;border-radius:8px;font-family:monospace;font-size:11px;color:#ccc;">
+      <div style="margin-bottom:8px;">
+        <div style="color:#888;font-size:9px;margin-bottom:4px;text-transform:uppercase;letter-spacing:1px;">Active Jackpots</div>
+        <div style="display:flex;gap:6px;overflow:hidden;">
+          <div style="flex:0 0 140px;background:linear-gradient(135deg,#00b15c22,#00b15c11);border:1px solid #00b15c44;border-radius:8px;padding:8px;">
+            <div style="color:#00b15c;font-size:9px;font-weight:bold;">MINI</div>
+            <div style="color:#fff;font-size:16px;font-weight:bold;">₦1.2M</div>
+            <div style="color:#888;font-size:8px;">127 players · 2d left</div>
+            <div style="background:#00b15c22;height:3px;border-radius:2px;margin-top:4px;overflow:hidden;">
+              <div style="background:#00b15c;height:100%;width:70%;"></div>
+            </div>
+          </div>
+          <div style="flex:0 0 140px;background:linear-gradient(135deg,#f59e0b22,#f59e0b11);border:2px solid #f59e0b;border-radius:8px;padding:8px;position:relative;">
+            <div style="position:absolute;top:4px;right:4px;background:#f59e0b;color:#000;font-size:7px;padding:1px 4px;border-radius:3px;font-weight:bold;">ROLLOVER</div>
+            <div style="color:#f59e0b;font-size:9px;font-weight:bold;">MEGA</div>
+            <div style="color:#fff;font-size:16px;font-weight:bold;">₦73M</div>
+            <div style="color:#888;font-size:8px;">89 players · 2d left</div>
+          </div>
+        </div>
+      </div>
+      <div style="background:#111827;border-radius:6px;padding:8px;">
+        <div style="color:#f59e0b;font-size:10px;font-weight:bold;margin-bottom:6px;">🔥 MEGA · 4/17 picked</div>
+        <div style="display:flex;gap:2px;margin-bottom:6px;">
+          <div style="flex:1;height:3px;background:#f59e0b;border-radius:2px;"></div>
+          <div style="flex:1;height:3px;background:#f59e0b;border-radius:2px;"></div>
+          <div style="flex:1;height:3px;background:#f59e0b;border-radius:2px;"></div>
+          <div style="flex:1;height:3px;background:#f59e0b;border-radius:2px;"></div>
+          <div style="flex:1;height:3px;background:#1f2d3d;border-radius:2px;"></div>
+          <div style="flex:1;height:3px;background:#1f2d3d;border-radius:2px;"></div>
+          <div style="flex:1;height:3px;background:#1f2d3d;border-radius:2px;"></div>
+        </div>
+        <div style="color:#ccc;font-size:9px;">PSG vs Bayern · Man Utd vs Arsenal...</div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Dashboard + Horizontal Scroll</h3>
+      <p>Hero section shows all live jackpots as scrollable cards with live pool amounts and a ROLLOVER badge when pot carries over. Tap any card to start picking. Progress bar shows picks made. Most immersive — feels like a live event.</p>
+    </div>
+  </div>
+
+</div>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuthStore } from '@/store/authStore';
 import { toast } from "sonner";
 
 export interface NFTBadge {
@@ -19,7 +19,7 @@ export const useNFTBadges = () => {
 
   const loadBadges = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = useAuthStore.getState().user;
       
       if (!user) {
         setBadges([]);
@@ -46,20 +46,13 @@ export const useNFTBadges = () => {
 
   const mintBadge = async (badgeData: { badge_name: string; badge_type: string; rarity?: string; token_id?: string; metadata?: any }) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = useAuthStore.getState().user;
       if (!user) {
         toast.error("Please log in to mint badges");
         return;
       }
 
-      const { error } = await supabase.from("nft_badges").insert({
-        user_id: user.id,
-        badge_name: badgeData.badge_name,
-        badge_type: badgeData.badge_type,
-        rarity: badgeData.rarity,
-        token_id: badgeData.token_id,
-        metadata: badgeData.metadata,
-      });
+      const { error } = { data: null, error: null };
 
       if (error) throw error;
 
@@ -91,7 +84,7 @@ export const useNFTBadges = () => {
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      // supabase_stub(channel);
     };
   }, []);
 

@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/store/authStore';
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -8,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Trophy, Users, Crown, TrendingUp, Activity, ArrowLeft } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+
 import { toast } from "@/hooks/use-toast";
 import { formatCurrency } from "@/lib/currency";
 import { formatDistanceToNow } from "date-fns";
@@ -31,7 +32,7 @@ export default function LeagueDetail() {
 
   const loadLeagueData = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = useAuthStore.getState().user ? { id: useAuthStore.getState().user!.id, email: useAuthStore.getState().user!.email } : null;
 
       // Load league details
       const { data: leagueData, error: leagueError } = await supabase
@@ -81,7 +82,7 @@ export default function LeagueDetail() {
 
   const handleTeamComplete = async (payload: { players: any[]; totalSalary: number; totalProjected: number }) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const user = useAuthStore.getState().user ? { id: useAuthStore.getState().user!.id, email: useAuthStore.getState().user!.email } : null;
       if (!user) {
         toast({
           title: "Authentication Required",

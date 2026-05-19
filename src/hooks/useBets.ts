@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { betApi } from '@/lib/api/bets';
 import { useToast } from '@/hooks/use-toast';
 
 interface BetSelection {
@@ -12,11 +12,16 @@ interface BetSelection {
   selection_value: string;
   odds: number;
   match_time?: string;
+  // BetFuz API fields
+  eventId?: string;
+  marketId?: string;
+  oddsId?: string;
 }
 
 interface CreateBetParams {
   stake: number;
   selections: BetSelection[];
+  betType?: 'single' | 'accumulator';
 }
 
 export const useBets = () => {
@@ -24,28 +29,27 @@ export const useBets = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const createBet = async ({ stake, selections }: CreateBetParams) => {
+  const createBet = async ({ stake, selections, betType }: CreateBetParams) => {
     setIsCreating(true);
     try {
-      const { data, error } = await supabase.functions.invoke('create-bet', {
-        body: { stake, selections }
-      });
+      const apiSelections = selections.map(s => ({
+        eventId: s.eventId || s.match_id,
+        marketId: s.marketId || s.selection_type,
+        oddsId: s.oddsId || `${s.match_id}_${s.selection_type}_${s.selection_value}`,
+        odds: s.odds,
+      }));
 
-      if (error) throw error;
+      const type = betType || (selections.length > 1 ? 'accumulator' : 'single');
+      const data = await betApi.placeBet({ selections: apiSelections, stake, betType: type });
 
       toast({
         title: "Bet Placed Successfully",
         description: `Your bet of ₦${stake.toLocaleString()} has been placed.`,
       });
-
       return { data, error: null };
     } catch (error: any) {
-      console.error('Error creating bet:', error);
-      toast({
-        title: "Bet Failed",
-        description: error.message || "Failed to place bet",
-        variant: "destructive",
-      });
+      const msg = error?.response?.data?.message || error?.message || "Failed to place bet";
+      toast({ title: "Bet Failed", description: msg, variant: "destructive" });
       return { data: null, error };
     } finally {
       setIsCreating(false);
@@ -55,30 +59,16 @@ export const useBets = () => {
   const listBets = async (page: number = 1, limit: number = 20) => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('list-bets', {
-        body: { page, limit }
-      });
-
-      if (error) throw error;
-
+      const data = await betApi.getMyBets({ limit, offset: (page - 1) * limit });
       return { data, error: null };
     } catch (error: any) {
-      console.error('Error fetching bets:', error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to fetch bets",
-        variant: "destructive",
-      });
+      const msg = error?.response?.data?.message || error?.message || "Failed to fetch bets";
+      toast({ title: "Error", description: msg, variant: "destructive" });
       return { data: null, error };
     } finally {
       setIsLoading(false);
     }
   };
 
-  return {
-    createBet,
-    listBets,
-    isCreating,
-    isLoading
-  };
+  return { createBet, listBets, isCreating, isLoading };
 };

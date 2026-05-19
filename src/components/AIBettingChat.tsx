@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Bot, Send, Loader2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
 interface Message {
@@ -33,9 +32,7 @@ const AIBettingChat = () => {
     setMessages(newMessages);
 
     try {
-      const { data, error } = await supabase.functions.invoke("ai-betting-chat", {
-        body: { messages: newMessages }
-      });
+      const { data, error } = { data: null, error: new Error('Feature not available in self-hosted mode') };
 
       if (error) throw error;
 

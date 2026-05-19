@@ -1,419 +1,299 @@
+import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import BetSlip from "@/components/BetSlip";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Play, Star, TrendingUp, Zap, Dice1, Hash, Grid3x3, CircleDot, Sparkles, Disc, CreditCard, Shuffle, Search, Shield, Crown, Users, Bot, Trophy } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import {
+  Play, Search, Shield, TrendingUp,
+  Crown, Users, Flame, Shuffle,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
-const Games = () => {
+/* ── Game data ───────────────────────────────────────────── */
+interface Game {
+  id: number;
+  name: string;
+  provider: string;
+  category: string;
+  minBet: number;
+  multiplier: string;
+  featured?: boolean;
+  african?: boolean;
+  provablyFair?: boolean;
+  hot?: boolean;
+  players?: number;
+  slug?: string;          // internal React Router path: /games/<slug>
+  externalUrl?: string;   // full page navigation (different frontend)
+  externalProvider?: boolean; // third-party provider, not yet integrated
+  new?: boolean;
+  emoji?: string;         // override thumbnail emoji
+}
+
+const GAMES: Game[] = [
+  // ── FuzGames Crash Games — LIVE (7 games, port 3001) ──
+  { id: 101, name: "Fuz Hero",   provider: "FuzGames", category: "Crash", minBet: 100, multiplier: "1x–1000x+", featured: true, african: true, provablyFair: true, hot: true,  players: 4821, new: true, externalUrl: "/games/fuz-hero/",   emoji: "🚀" },
+  { id: 102, name: "Fuz Jet",    provider: "FuzGames", category: "Crash", minBet: 100, multiplier: "1x–1000x+", featured: true, african: true, provablyFair: true, hot: true,  players: 2103, new: true, externalUrl: "/games/fuz-jet/",    emoji: "✈️" },
+  { id: 103, name: "Fuz Rocket", provider: "FuzGames", category: "Crash", minBet: 100, multiplier: "1x–1000x+", featured: true, african: true, provablyFair: true, players: 1887, new: true, externalUrl: "/games/fuz-rocket/",  emoji: "🛸" },
+  { id: 104, name: "Fuz Rush",   provider: "FuzGames", category: "Crash", minBet: 100, multiplier: "1x–1000x+", featured: true, african: true, provablyFair: true, players: 1542, new: true, externalUrl: "/games/fuz-rush/",    emoji: "⚡" },
+  { id: 105, name: "Fuz Rider",  provider: "FuzGames", category: "Crash", minBet: 100, multiplier: "1x–1000x+", featured: true, african: true, provablyFair: true, players: 1230, new: true, externalUrl: "/games/fuz-rider/",   emoji: "🏍️" },
+  { id: 106, name: "Fuz Naira",  provider: "FuzGames", category: "Crash", minBet: 100, multiplier: "1x–1000x+", featured: true, african: true, provablyFair: true, hot: true,  players: 3104, new: true, externalUrl: "/games/fuz-naira/",  emoji: "💰" },
+  { id: 107, name: "Fuz Bird",   provider: "FuzGames", category: "Crash", minBet: 100, multiplier: "1x–1000x+", featured: true, african: true, provablyFair: true, players: 987,  new: true, externalUrl: "/games/fuz-bird/",   emoji: "🦅" },
+
+  // ── FuzGames Instant Games — LIVE ──
+  { id: 201, name: "Fuz Wheel", provider: "FuzGames", category: "Spin",  minBet: 100, multiplier: "1.5x–50x", featured: true, african: true, provablyFair: true, hot: true, players: 2341, new: true, externalUrl: "/games/fuz-wheel/", emoji: "🎡" },
+  { id: 202, name: "Fuz Dice",  provider: "FuzGames", category: "Dice",  minBet: 50,  multiplier: "1.02x–49x", featured: true, african: true, provablyFair: true,           players: 1654, new: true, externalUrl: "/games/fuz-dice/",  emoji: "🎲" },
+  { id: 203, name: "Fuz Mines", provider: "FuzGames", category: "Mines", minBet: 50,  multiplier: "1x–???",    featured: true, african: true, provablyFair: true, hot: true, players: 1932, new: true, externalUrl: "/games/fuz-mines/", emoji: "💣" },
+
+  // ── Traditional African Games — LIVE (real engine + Supabase) ──
+  { id: 41, name: "African Draft", provider: "FuzGames", category: "Traditional", minBet: 500, multiplier: "2x–20x",  featured: true, african: true, provablyFair: true, hot: true, players: 3241, slug: "african-draft" },
+  { id: 42, name: "Morabaraba",    provider: "FuzGames", category: "Traditional", minBet: 300, multiplier: "2x–15x",  featured: true, african: true, provablyFair: true,           players: 1820, slug: "morabaraba" },
+  { id: 43, name: "Mancala",       provider: "FuzGames", category: "Traditional", minBet: 200, multiplier: "2x–12x",  featured: true, african: true, provablyFair: true,           players: 2105, slug: "mancala" },
+];
+
+/* ── Category config ─────────────────────────────────────── */
+const CATEGORIES = [
+  { id: "All",         label: "All",     icon: Shuffle,    color: "from-zinc-700 to-zinc-900" },
+  { id: "Crash",       label: "Crash",   icon: TrendingUp, color: "from-red-600 to-rose-900",     emoji: "🚀" },
+  { id: "Spin",        label: "Spin",    icon: TrendingUp, color: "from-yellow-500 to-amber-800", emoji: "🎡" },
+  { id: "Dice",        label: "Dice",    icon: Shuffle,    color: "from-blue-600 to-blue-900",    emoji: "🎲" },
+  { id: "Mines",       label: "Mines",   icon: Shuffle,    color: "from-orange-600 to-orange-900",emoji: "💣" },
+  { id: "Traditional", label: "African", icon: Crown,      color: "from-yellow-600 to-amber-900", emoji: "🏺" },
+];
+
+const CAT_MAP = Object.fromEntries(CATEGORIES.map(c => [c.id, c]));
+
+function formatPlayers(n?: number) {
+  if (!n) return null;
+  return n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
+}
+
+/* ── Game thumbnail ──────────────────────────────────────── */
+function GameThumb({ game }: { game: Game }) {
+  const cat = CAT_MAP[game.category] ?? CATEGORIES[0];
+  return (
+    <div className={cn(
+      "w-full aspect-[4/3] bg-gradient-to-br relative overflow-hidden",
+      cat.color
+    )}>
+      <div className="absolute inset-0 opacity-10"
+        style={{ backgroundImage: "repeating-linear-gradient(45deg,#fff 0,#fff 1px,transparent 0,transparent 50%)", backgroundSize: "12px 12px" }}
+      />
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-4xl select-none drop-shadow-lg">{game.emoji ?? cat.emoji ?? "🎮"}</span>
+      </div>
+      {/* Status badges */}
+      <div className="absolute top-1.5 left-1.5 flex flex-col gap-0.5">
+        {game.african && (
+          <span className="text-[9px] bg-green-600 text-white font-bold px-1.5 py-0.5 rounded-full">🇳🇬 NG</span>
+        )}
+        {game.new && (
+          <span className="text-[9px] bg-blue-500 text-white font-bold px-1.5 py-0.5 rounded-full">NEW</span>
+        )}
+      </div>
+      {game.provablyFair && (
+        <div className="absolute top-1.5 right-1.5 bg-black/40 rounded-full p-1" title="Provably Fair">
+          <Shield className="w-2.5 h-2.5 text-white" />
+        </div>
+      )}
+      {game.players && (
+        <div className="absolute bottom-1.5 left-1.5 flex items-center gap-0.5 bg-black/50 rounded-full px-1.5 py-0.5">
+          <Users className="w-2 h-2 text-green-400" />
+          <span className="text-[8px] text-green-400 font-bold">{formatPlayers(game.players)}</span>
+        </div>
+      )}
+      {game.hot && (
+        <div className="absolute bottom-1.5 right-1.5 flex items-center gap-0.5 bg-orange-500/80 rounded-full px-1.5 py-0.5">
+          <Flame className="w-2 h-2 text-white" />
+          <span className="text-[8px] text-white font-bold">HOT</span>
+        </div>
+      )}
+      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-all flex flex-col items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg">
+          <Play className="w-4 h-4 text-black fill-black" />
+        </div>
+        <span className="text-[10px] text-white font-bold bg-white/20 px-2 py-0.5 rounded-full">Play Now</span>
+      </div>
+    </div>
+  );
+}
+
+/* ── Game card ───────────────────────────────────────────── */
+function GameCard({ game, large }: { game: Game; large?: boolean }) {
   const navigate = useNavigate();
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [searchQuery, setSearchQuery] = useState("");
-  
-  const gameCategories = [
-    { id: "All", label: "All Games", icon: Shuffle },
-    { id: "Traditional", label: "Traditional", icon: Crown },
-    { id: "Crash", label: "Crash", icon: TrendingUp },
-    { id: "Spin", label: "Spin", icon: Disc },
-    { id: "Dice", label: "Dice", icon: Dice1 },
-    { id: "Numbers", label: "Numbers", icon: Hash },
-    { id: "Mines", label: "Mines", icon: Grid3x3 },
-    { id: "Plinko", label: "Plinko", icon: CircleDot },
-    { id: "Instant", label: "Instant Win", icon: Zap },
-    { id: "Virtual", label: "Virtual Sports", icon: Sparkles },
-    { id: "Cards", label: "Cards", icon: CreditCard },
-  ];
 
-  const allGames = [
-    // Traditional African Games (4) - Each game supports P2P, Human vs AI, AI vs AI, and Cultural Mode
-    { id: 41, name: "African Draft", category: "Traditional", minBet: 500, maxBet: 100000, multiplier: "2x - 20x", featured: true, african: true, provablyFair: true, modes: ["P2P Betting", "Beat AI", "AI Tournament", "Traditional"], slug: "african-draft" },
-    { id: 42, name: "Morabaraba", category: "Traditional", minBet: 300, maxBet: 75000, multiplier: "2x - 15x", featured: true, african: true, provablyFair: true, modes: ["Cow Trading", "Beat AI", "AI Tournament", "Sacred Cows"], slug: "morabaraba" },
-    { id: 43, name: "Mancala", category: "Traditional", minBet: 200, maxBet: 50000, multiplier: "2x - 12x", featured: true, african: true, provablyFair: true, modes: ["Seed Betting", "Beat AI", "AI Tournament", "Seed Master"], slug: "mancala" },
-    { id: 44, name: "Pan-African Tournament", category: "Traditional", minBet: 1000, maxBet: 200000, multiplier: "5x - 100x", featured: true, african: true, provablyFair: true, modes: ["Multi-Player", "Skill Levels", "AI Championship", "Pan-African"], slug: "tournament" },
-
-    // Crash Games (5)
-    { id: 1, name: "Aviator Classic", category: "Crash", minBet: 10, maxBet: 100000, multiplier: "1.00x - 1000x+", featured: true, african: false, provablyFair: true },
-    { id: 2, name: "Space Rocket", category: "Crash", minBet: 10, maxBet: 100000, multiplier: "1.00x - 500x", featured: true, african: true, provablyFair: true },
-    { id: 3, name: "Lucky Jet", category: "Crash", minBet: 20, maxBet: 50000, multiplier: "1.00x - 800x", featured: false, african: false, provablyFair: true },
-    { id: 4, name: "Crash X Nigeria", category: "Crash", minBet: 10, maxBet: 100000, multiplier: "1.00x - 600x", featured: true, african: true, provablyFair: true },
-    { id: 5, name: "Rocket Race", category: "Crash", minBet: 50, maxBet: 200000, multiplier: "1.00x - 1500x", featured: false, african: false, provablyFair: true },
-
-    // Spin Games (4)
-    { id: 6, name: "Lucky Wheel Nigeria", category: "Spin", minBet: 100, maxBet: 50000, multiplier: "2x - 500x", featured: true, african: true, provablyFair: false },
-    { id: 7, name: "Color Wheel", category: "Spin", minBet: 50, maxBet: 20000, multiplier: "2x - 100x", featured: false, african: false, provablyFair: true },
-    { id: 8, name: "Mega Wheel Live", category: "Spin", minBet: 200, maxBet: 100000, multiplier: "5x - 1000x", featured: true, african: false, provablyFair: false },
-    { id: 9, name: "Cash Spin Lagos", category: "Spin", minBet: 50, maxBet: 30000, multiplier: "2x - 200x", featured: false, african: true, provablyFair: true },
-
-    // Dice Games (3)
-    { id: 10, name: "Classic Dice", category: "Dice", minBet: 10, maxBet: 50000, multiplier: "1.01x - 99x", featured: true, african: false, provablyFair: true },
-    { id: 11, name: "African Dice", category: "Dice", minBet: 10, maxBet: 50000, multiplier: "1.01x - 99x", featured: true, african: true, provablyFair: true },
-    { id: 12, name: "Multi-Dice", category: "Dice", minBet: 20, maxBet: 75000, multiplier: "2x - 150x", featured: false, african: false, provablyFair: true },
-
-    // Number Games (4)
-    { id: 13, name: "Lucky Numbers", category: "Numbers", minBet: 100, maxBet: 10000, multiplier: "10x - 10000x", featured: true, african: true, provablyFair: false },
-    { id: 14, name: "Quick Pick 3", category: "Numbers", minBet: 50, maxBet: 5000, multiplier: "5x - 500x", featured: true, african: false, provablyFair: false },
-    { id: 15, name: "Mega Draw", category: "Numbers", minBet: 200, maxBet: 20000, multiplier: "50x - 50000x", featured: false, african: false, provablyFair: false },
-    { id: 16, name: "Keno Nigeria", category: "Numbers", minBet: 100, maxBet: 15000, multiplier: "10x - 5000x", featured: false, african: true, provablyFair: false },
-
-    // Mines Games (3)
-    { id: 17, name: "Classic Mines", category: "Mines", minBet: 10, maxBet: 100000, multiplier: "1.01x - 1000x", featured: true, african: false, provablyFair: true },
-    { id: 18, name: "Diamond Mines", category: "Mines", minBet: 20, maxBet: 100000, multiplier: "1.01x - 800x", featured: true, african: true, provablyFair: true },
-    { id: 19, name: "Treasure Hunt", category: "Mines", minBet: 10, maxBet: 75000, multiplier: "1.01x - 600x", featured: false, african: true, provablyFair: true },
-
-    // Plinko Games (3)
-    { id: 20, name: "Plinko Classic", category: "Plinko", minBet: 10, maxBet: 100000, multiplier: "0.5x - 1000x", featured: true, african: false, provablyFair: true },
-    { id: 21, name: "Lagos Plinko", category: "Plinko", minBet: 10, maxBet: 75000, multiplier: "0.5x - 800x", featured: true, african: true, provablyFair: true },
-    { id: 22, name: "Mega Plinko", category: "Plinko", minBet: 50, maxBet: 150000, multiplier: "0.5x - 1500x", featured: false, african: false, provablyFair: true },
-
-    // Instant Win Games (5)
-    { id: 23, name: "Scratch Cards Nigeria", category: "Instant", minBet: 100, maxBet: 5000, multiplier: "1x - 5000x", featured: true, african: true, provablyFair: false },
-    { id: 24, name: "Instant Cash", category: "Instant", minBet: 50, maxBet: 10000, multiplier: "1x - 1000x", featured: false, african: false, provablyFair: false },
-    { id: 25, name: "Lucky 7s", category: "Instant", minBet: 100, maxBet: 20000, multiplier: "1x - 777x", featured: true, african: false, provablyFair: false },
-    { id: 26, name: "Gold Rush", category: "Instant", minBet: 200, maxBet: 25000, multiplier: "1x - 2500x", featured: false, african: true, provablyFair: false },
-    { id: 27, name: "Cash Blast", category: "Instant", minBet: 50, maxBet: 15000, multiplier: "1x - 500x", featured: false, african: false, provablyFair: false },
-
-    // Virtual Sports (6)
-    { id: 28, name: "Virtual Football", category: "Virtual", minBet: 100, maxBet: 50000, multiplier: "1.5x - 50x", featured: true, african: true, provablyFair: false },
-    { id: 29, name: "Virtual Horse Racing", category: "Virtual", minBet: 100, maxBet: 50000, multiplier: "2x - 100x", featured: true, african: false, provablyFair: false },
-    { id: 30, name: "Virtual Greyhounds", category: "Virtual", minBet: 50, maxBet: 30000, multiplier: "2x - 80x", featured: false, african: false, provablyFair: false },
-    { id: 31, name: "Virtual Speedway", category: "Virtual", minBet: 100, maxBet: 40000, multiplier: "2x - 120x", featured: false, african: false, provablyFair: false },
-    { id: 32, name: "Virtual Tennis", category: "Virtual", minBet: 100, maxBet: 35000, multiplier: "1.5x - 40x", featured: false, african: false, provablyFair: false },
-    { id: 33, name: "Virtual Basketball", category: "Virtual", minBet: 100, maxBet: 45000, multiplier: "1.5x - 60x", featured: true, african: false, provablyFair: false },
-
-    // Card Games (4)
-    { id: 34, name: "Hi-Lo Cards", category: "Cards", minBet: 10, maxBet: 50000, multiplier: "1.5x - 100x", featured: true, african: false, provablyFair: true },
-    { id: 35, name: "Card Crash", category: "Cards", minBet: 20, maxBet: 75000, multiplier: "1.5x - 150x", featured: false, african: false, provablyFair: true },
-    { id: 36, name: "Lucky Cards Nigeria", category: "Cards", minBet: 50, maxBet: 50000, multiplier: "2x - 200x", featured: true, african: true, provablyFair: true },
-    { id: 37, name: "Speed Baccarat", category: "Cards", minBet: 100, maxBet: 100000, multiplier: "0.95x - 8x", featured: false, african: false, provablyFair: false },
-
-    // Hybrid Games (3)
-    { id: 38, name: "FuzBlast", category: "Hybrid", minBet: 50, maxBet: 100000, multiplier: "1x - 1000x", featured: true, african: true, provablyFair: true },
-    { id: 39, name: "Naija Fortune", category: "Hybrid", minBet: 100, maxBet: 75000, multiplier: "2x - 888x", featured: true, african: true, provablyFair: true },
-    { id: 40, name: "Cash Climb", category: "Hybrid", minBet: 50, maxBet: 50000, multiplier: "1x - 500x", featured: false, african: true, provablyFair: true },
-  ];
-  
-  const handlePlayGame = (gameName: string, isDemo: boolean = false) => {
-    toast({
-      title: isDemo ? "Demo Mode" : "Launching Game",
-      description: isDemo ? `Playing ${gameName} with virtual currency` : `${gameName} is loading...`,
-    });
-  };
-  
-  const handleCategoryClick = (categoryId: string) => {
-    setSelectedCategory(categoryId);
-    const category = gameCategories.find(c => c.id === categoryId);
-    toast({
-      title: "Category Selected",
-      description: `Showing ${category?.label || 'all games'}`,
-    });
+  const handlePlay = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (game.externalUrl) { window.location.href = game.externalUrl; return; }
+    if (game.slug) { navigate(`/games/${game.slug}`); return; }
   };
 
-  const filteredGames = allGames.filter(game => {
-    const matchesCategory = selectedCategory === "All" || game.category === selectedCategory;
-    const matchesSearch = game.name.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  return (
+    <div
+      className="group rounded-xl overflow-hidden border border-border bg-card hover:border-primary/50 transition-all cursor-pointer"
+      onClick={handlePlay}
+    >
+      <GameThumb game={game} />
+      <div className={cn("px-2 py-1.5", large && "px-3 py-2")}>
+        <p className={cn("font-bold truncate leading-tight", large ? "text-sm" : "text-xs")}>{game.name}</p>
+        <div className="flex items-center justify-between mt-0.5">
+          <span className="text-[9px] text-muted-foreground truncate">{game.provider}</span>
+          <span className="text-[9px] text-primary font-bold shrink-0 ml-1">₦{game.minBet.toLocaleString()}+</span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-  const featuredGames = allGames.filter(g => g.featured);
-  const africanGames = allGames.filter(g => g.african);
-  const provablyFairGames = allGames.filter(g => g.provablyFair);
+/* ── Section header ──────────────────────────────────────── */
+function SectionHeader({ icon: Icon, label, count, emoji }: {
+  icon: React.ElementType; label: string; count?: number; emoji?: string;
+}) {
+  return (
+    <div className="flex items-center gap-2 mb-3">
+      <span className="text-base leading-none">{emoji}</span>
+      <h2 className="text-sm font-bold text-foreground">{label}</h2>
+      {count != null && (
+        <Badge variant="outline" className="text-[9px] px-1.5 py-0 ml-1">{count}</Badge>
+      )}
+    </div>
+  );
+}
+
+/* ── Page ────────────────────────────────────────────────── */
+const Games = () => {
+  const [activeCat, setActiveCat] = useState("All");
+  const [search, setSearch] = useState("");
+
+  const filtered = useMemo(() => GAMES.filter(g => {
+    const matchCat    = activeCat === "All" || g.category === activeCat;
+    const matchSearch = g.name.toLowerCase().includes(search.toLowerCase());
+    return matchCat && matchSearch;
+  }), [activeCat, search]);
+
+  const hot      = GAMES.filter(g => g.hot);
+  const fuzCrash = GAMES.filter(g => g.category === "Crash");
+  const african  = GAMES.filter(g => g.category === "Traditional");
+
+  const showSections = activeCat === "All" && !search;
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <div className="flex">
-        <Sidebar />
-        
-        <main className="flex-1 p-6 overflow-y-auto h-[calc(100vh-4rem)] pb-24">
-          <div className="mb-6">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+        <Sidebar className="hidden md:flex" />
+
+        <main className="flex-1 overflow-y-auto h-[calc(100vh-4rem)] pb-24 md:pb-6">
+
+          {/* Hero banner */}
+          <div className="bg-gradient-to-r from-violet-800 via-purple-900 to-indigo-900 px-4 md:px-6 py-4">
+            <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-3xl font-bold text-foreground mb-2">FuzGames</h1>
-                <p className="text-muted-foreground">Instant games, virtual sports & provably fair gaming</p>
+                <h1 className="text-lg font-black text-white tracking-tight">FuzGames</h1>
+                <p className="text-xs text-white/60 mt-0.5">Crash · African Originals · Strategy</p>
               </div>
-              <div className="flex gap-2">
-                <Badge variant="outline" className="text-xs">
-                  <Shield className="h-3 w-3 mr-1" />
-                  {provablyFairGames.length} Provably Fair
+              <div className="flex flex-col items-end gap-1">
+                <Badge className="bg-white/15 text-white border-white/20 text-[9px] gap-1">
+                  <Shield className="w-2.5 h-2.5" /> {GAMES.filter(g => g.provablyFair).length} Provably Fair
                 </Badge>
-                <Badge variant="outline" className="text-xs bg-green-600/10 text-green-600 border-green-600/20">
-                  🇳🇬 {africanGames.length} Nigerian Themed
+                <Badge className="bg-green-500/20 text-green-300 border-green-500/30 text-[9px]">
+                  🇳🇬 {GAMES.filter(g => g.african).length} Nigerian Games
                 </Badge>
               </div>
             </div>
-            
-            <div className="relative max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          </div>
+
+          {/* Search */}
+          <div className="px-3 md:px-4 pt-3 pb-0">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
               <Input
-                placeholder="Search games..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                placeholder="Search games…"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="pl-9 h-9 text-sm bg-muted border-0"
               />
             </div>
           </div>
 
-          <div className="flex gap-2 mb-6 overflow-x-auto pb-2 pr-24">
-            {gameCategories.map((category) => (
-              <Button
-                key={category.id}
-                variant={selectedCategory === category.id ? "default" : "secondary"}
-                size="sm"
-                className="whitespace-nowrap flex items-center gap-1.5"
-                onClick={() => handleCategoryClick(category.id)}
-              >
-                <category.icon className="h-4 w-4" />
-                {category.label}
-              </Button>
-            ))}
+          {/* Category tabs */}
+          <div className="sticky top-0 z-10 bg-background border-b border-border mt-3">
+            <div className="flex overflow-x-auto scrollbar-hide px-3 md:px-4 gap-0">
+              {CATEGORIES.map(cat => (
+                <button
+                  key={cat.id}
+                  onClick={() => { setActiveCat(cat.id); setSearch(""); }}
+                  className={cn(
+                    "flex items-center gap-1.5 shrink-0 px-3 py-2.5 text-xs font-semibold border-b-2 transition-all whitespace-nowrap",
+                    activeCat === cat.id
+                      ? "border-primary text-primary"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  <cat.icon className="w-3 h-3" />
+                  {cat.label}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <section className="mb-8">
-            <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
-              <Star className="h-5 w-5 text-primary" fill="currentColor" />
-              Featured Games
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {featuredGames.length === 0 ? (
-                <p className="text-muted-foreground text-sm col-span-2 md:col-span-4">No featured games available.</p>
-              ) : (
-                featuredGames.map((game) => (
-                  <Card key={game.id} className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all cursor-pointer">
-                    <div className="aspect-square bg-gradient-to-br from-primary/20 via-primary/5 to-background relative flex items-center justify-center">
-                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button size="lg" className="rounded-full w-14 h-14 p-0" onClick={(e) => { e.stopPropagation(); handlePlayGame(game.name, false); }}>
-                          <Play className="h-5 w-5" fill="currentColor" />
-                        </Button>
-                        <Button size="sm" variant="secondary" onClick={(e) => { e.stopPropagation(); handlePlayGame(game.name, true); }}>
-                          Demo Mode
-                        </Button>
-                      </div>
-                      {game.african && (
-                        <Badge className="absolute top-2 left-2 bg-green-600 hover:bg-green-700 text-white text-xs">
-                          🇳🇬 Nigerian
-                        </Badge>
-                      )}
-                      {game.provablyFair && (
-                        <div className="absolute top-2 right-2">
-                          <div className="bg-primary/20 backdrop-blur-sm rounded-full p-1.5" title="Provably Fair">
-                            <Shield className="h-3.5 w-3.5 text-primary" />
-                          </div>
-                        </div>
-                      )}
-                      <div className="text-center px-3">
-                        <TrendingUp className="h-12 w-12 text-primary/40 mx-auto mb-2" />
-                      </div>
-                    </div>
-                    <div className="p-3">
-                      <h3 className="font-semibold text-sm text-foreground mb-1 truncate">{game.name}</h3>
-                      <p className="text-xs text-muted-foreground mb-2">{game.category} • {game.multiplier}</p>
-                      <p className="text-xs text-muted-foreground">Min: ₦{game.minBet.toLocaleString()}</p>
-                    </div>
-                  </Card>
-                ))
-              )}
-            </div>
-          </section>
+          <div className="px-3 md:px-4 py-4 space-y-6">
 
-          {/* Popular Nigerian Games */}
-          {africanGames.length > 0 && (
-            <section className="mb-8">
-              <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
-                🇳🇬 Popular Nigerian Games
-                <Badge variant="secondary" className="text-xs">{africanGames.length}</Badge>
-              </h2>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                {africanGames.slice(0, 5).map((game) => (
-                  <Card key={game.id} className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all cursor-pointer">
-                    <div className="aspect-square bg-gradient-to-br from-green-600/20 via-green-600/5 to-background relative flex items-center justify-center">
-                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button size="sm" className="rounded-full w-10 h-10 p-0" onClick={(e) => { e.stopPropagation(); handlePlayGame(game.name, false); }}>
-                          <Play className="h-4 w-4" fill="currentColor" />
-                        </Button>
-                      </div>
-                      <Badge className="absolute top-2 left-2 bg-green-600 text-white text-xs">
-                        Nigerian
-                      </Badge>
-                      <Zap className="h-10 w-10 text-green-600/40" />
-                    </div>
-                    <div className="p-2">
-                      <h3 className="font-semibold text-xs text-foreground truncate">{game.name}</h3>
-                      <p className="text-xs text-muted-foreground">{game.multiplier}</p>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Traditional African Games Section */}
-          {allGames.filter(g => g.category === "Traditional").length > 0 && searchQuery === "" && selectedCategory === "All" && (
-            <section className="mb-8">
-              <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
-                <Crown className="h-5 w-5 text-yellow-500" />
-                Traditional African Games
-                <Badge variant="secondary" className="text-xs bg-yellow-600/10 text-yellow-600">4 Games • All Modes</Badge>
-              </h2>
-              <div className="bg-card border border-yellow-600/20 rounded-lg p-4 mb-4">
-                <p className="text-sm text-muted-foreground mb-2">
-                  Experience authentic African games with modern betting. Each game supports multiple modes:
+            {/* Filtered / search results */}
+            {!showSections && (
+              <div>
+                <p className="text-xs text-muted-foreground mb-3">
+                  {filtered.length} game{filtered.length !== 1 ? "s" : ""}
+                  {search ? ` matching "${search}"` : ` in ${CAT_MAP[activeCat]?.label ?? activeCat}`}
                 </p>
-                <div className="flex flex-wrap gap-2 mt-3">
-                  <Badge variant="outline" className="text-xs"><Users className="h-3 w-3 mr-1" />P2P Betting</Badge>
-                  <Badge variant="outline" className="text-xs"><Bot className="h-3 w-3 mr-1" />Human vs AI</Badge>
-                  <Badge variant="outline" className="text-xs"><Trophy className="h-3 w-3 mr-1" />AI Tournament</Badge>
-                  <Badge variant="outline" className="text-xs"><Crown className="h-3 w-3 mr-1" />Cultural Mode</Badge>
-                </div>
+                {filtered.length === 0 ? (
+                  <div className="flex flex-col items-center py-16 gap-2">
+                    <span className="text-3xl">🎮</span>
+                    <p className="text-sm text-muted-foreground">No games found</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-3 md:grid-cols-5 gap-2">
+                    {filtered.map(g => <GameCard key={g.id} game={g} />)}
+                  </div>
+                )}
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {allGames.filter(g => g.category === "Traditional").map((game) => (
-                  <Card 
-                    key={game.id} 
-                    className="group overflow-hidden bg-card border-yellow-600/20 hover:border-yellow-600/50 transition-all cursor-pointer"
-                    onClick={() => game.slug && navigate(`/games/${game.slug}`)}
-                  >
-                    <div className="aspect-square bg-gradient-to-br from-yellow-600/20 via-yellow-600/5 to-background relative flex items-center justify-center">
-                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button size="sm" className="rounded-full w-10 h-10 p-0" onClick={(e) => { e.stopPropagation(); handlePlayGame(game.name, false); }}>
-                          <Play className="h-4 w-4" fill="currentColor" />
-                        </Button>
-                        <Button size="sm" variant="secondary" onClick={(e) => { e.stopPropagation(); handlePlayGame(game.name, true); }}>
-                          Demo
-                        </Button>
-                      </div>
-                      <Badge className="absolute top-2 left-2 bg-yellow-600 text-white text-xs">
-                        🏆 Traditional
-                      </Badge>
-                      <div className="absolute top-2 right-2">
-                        <div className="bg-yellow-600/20 backdrop-blur-sm rounded-full p-1.5" title="Provably Fair">
-                          <Shield className="h-3.5 w-3.5 text-yellow-600" />
-                        </div>
-                      </div>
-                      <Crown className="h-12 w-12 text-yellow-600/40" />
-                    </div>
-                    <div className="p-3">
-                      <h3 className="font-semibold text-sm text-foreground mb-1 truncate">{game.name}</h3>
-                      <p className="text-xs text-muted-foreground mb-2">{game.multiplier}</p>
-                      <div className="flex flex-wrap gap-1">
-                        {game.modes?.slice(0, 2).map((mode: string, idx: number) => (
-                          <Badge key={idx} variant="outline" className="text-[10px] px-1 py-0">
-                            {mode === "P2P Betting" || mode === "Cow Trading" || mode === "Seed Betting" || mode === "Multi-Player" ? (
-                              <Users className="h-2.5 w-2.5 mr-0.5" />
-                            ) : mode === "Beat AI" || mode === "Skill Levels" ? (
-                              <Bot className="h-2.5 w-2.5 mr-0.5" />
-                            ) : mode === "AI Tournament" || mode === "AI Championship" ? (
-                              <Trophy className="h-2.5 w-2.5 mr-0.5" />
-                            ) : (
-                              <Crown className="h-2.5 w-2.5 mr-0.5" />
-                            )}
-                            {mode}
-                          </Badge>
-                        ))}
-                        {game.modes && game.modes.length > 2 && (
-                          <Badge variant="outline" className="text-[10px] px-1 py-0">
-                            +{game.modes.length - 2}
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </section>
-          )}
+            )}
 
-          {/* Provably Fair Games */}
-          {provablyFairGames.length > 0 && searchQuery === "" && selectedCategory === "All" && (
-            <section className="mb-8">
-              <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
-                <Shield className="h-5 w-5 text-primary" />
-                Provably Fair Games
-                <Badge variant="secondary" className="text-xs">{provablyFairGames.length}</Badge>
-              </h2>
-              <div className="bg-card border border-border rounded-lg p-4 mb-4">
-                <p className="text-sm text-muted-foreground">
-                  These games use cryptographic hashing to ensure fairness. Every result can be independently verified by players.
-                </p>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                {provablyFairGames.slice(0, 5).map((game) => (
-                  <Card key={game.id} className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all cursor-pointer">
-                    <div className="aspect-square bg-gradient-to-br from-primary/20 via-primary/5 to-background relative flex items-center justify-center">
-                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button size="sm" className="rounded-full w-10 h-10 p-0" onClick={(e) => { e.stopPropagation(); handlePlayGame(game.name, false); }}>
-                          <Play className="h-4 w-4" fill="currentColor" />
-                        </Button>
-                      </div>
-                      <Shield className="h-10 w-10 text-primary/40" />
-                    </div>
-                    <div className="p-2">
-                      <h3 className="font-semibold text-xs text-foreground truncate">{game.name}</h3>
-                      <p className="text-xs text-muted-foreground">{game.category}</p>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </section>
-          )}
+            {/* Default sections view */}
+            {showSections && (
+              <>
+                {/* Hot right now */}
+                <section>
+                  <SectionHeader icon={Flame} label="Hot Right Now" emoji="🔥" />
+                  <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
+                    {hot.slice(0, 4).map(g => <GameCard key={g.id} game={g} large />)}
+                  </div>
+                </section>
 
-          <section className="mb-8">
-            <h2 className="text-xl font-bold text-foreground mb-4">
-              {selectedCategory === "All" ? "All Games" : `${gameCategories.find(c => c.id === selectedCategory)?.label} Games`}
-              <span className="text-sm font-normal text-muted-foreground ml-2">({filteredGames.length} games)</span>
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {filteredGames.length === 0 ? (
-                <p className="text-muted-foreground text-sm col-span-2 md:col-span-4">No games found. Try adjusting your filters.</p>
-              ) : (
-                filteredGames.map((game) => (
-                  <Card key={game.id} className="group overflow-hidden bg-card border-border hover:border-primary/50 transition-all cursor-pointer">
-                    <div className="aspect-square bg-gradient-to-br from-primary/20 via-primary/5 to-background relative flex items-center justify-center">
-                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button size="lg" className="rounded-full w-14 h-14 p-0" onClick={(e) => { e.stopPropagation(); handlePlayGame(game.name, false); }}>
-                          <Play className="h-5 w-5" fill="currentColor" />
-                        </Button>
-                        <Button size="sm" variant="secondary" onClick={(e) => { e.stopPropagation(); handlePlayGame(game.name, true); }}>
-                          Demo Mode
-                        </Button>
-                      </div>
-                      {game.african && (
-                        <Badge className="absolute top-2 left-2 bg-green-600 hover:bg-green-700 text-white text-xs">
-                          🇳🇬 Nigerian
-                        </Badge>
-                      )}
-                      {game.provablyFair && (
-                        <div className="absolute top-2 right-2">
-                          <div className="bg-primary/20 backdrop-blur-sm rounded-full p-1.5" title="Provably Fair">
-                            <Shield className="h-3.5 w-3.5 text-primary" />
-                          </div>
-                        </div>
-                      )}
-                      {game.featured && (
-                        <div className="absolute bottom-2 right-2">
-                          <div className="bg-primary/20 backdrop-blur-sm rounded-full p-1.5">
-                            <Star className="h-3.5 w-3.5 text-primary" fill="currentColor" />
-                          </div>
-                        </div>
-                      )}
-                      <div className="text-center px-3">
-                        <TrendingUp className="h-12 w-12 text-primary/40 mx-auto mb-2" />
-                      </div>
-                    </div>
-                    <div className="p-3">
-                      <h3 className="font-semibold text-sm text-foreground mb-1 truncate">{game.name}</h3>
-                      <p className="text-xs text-muted-foreground mb-2">{game.category} • {game.multiplier}</p>
-                      <p className="text-xs text-muted-foreground">Min: ₦{game.minBet.toLocaleString()}</p>
-                    </div>
-                  </Card>
-                ))
-              )}
-            </div>
-          </section>
+                {/* FuzGames Crash — 7 live games */}
+                <section>
+                  <SectionHeader icon={TrendingUp} label="FuzGames Crash — Live Now" count={fuzCrash.length} emoji="🚀" />
+                  <div className="grid grid-cols-3 md:grid-cols-7 gap-2">
+                    {fuzCrash.map(g => <GameCard key={g.id} game={g} />)}
+                  </div>
+                </section>
+
+                {/* Traditional African */}
+                <section>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-base">🏺</span>
+                    <h2 className="text-sm font-bold">Traditional African Games</h2>
+                    <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-[9px]">P2P · vs AI</Badge>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                    {african.map(g => <GameCard key={g.id} game={g} large />)}
+                  </div>
+                </section>
+              </>
+            )}
+          </div>
         </main>
 
         <BetSlip className="hidden md:flex" />
